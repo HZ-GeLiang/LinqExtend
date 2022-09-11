@@ -36,7 +36,7 @@ namespace LinqExtend
 
         #endregion
 
-        public static string AggregateBy(this DataRowCollection source, string columnName, string separator)
+        public static string AggregateToString(this DataRowCollection source, string columnName, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
             if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException($"{nameof(columnName)}参数不能为空", nameof(columnName));
@@ -51,7 +51,7 @@ namespace LinqExtend
             return txt;
         }
 
-        public static string AggregateBy(this DataRowCollection source, Func<DataRow, dynamic> content, string separator)
+        public static string AggregateToString(this DataRowCollection source, Func<DataRow, dynamic> content, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
@@ -67,7 +67,7 @@ namespace LinqExtend
             return txt;
         }
 
-        public static string AggregateBy<TSource>(this IEnumerable<TSource> source, string separator)
+        public static string AggregateToString<TSource>(this IEnumerable<TSource> source, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
             if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
@@ -84,7 +84,7 @@ namespace LinqExtend
             return txt;
         }
 
-        public static string AggregateBy<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> content, string separator)
+        public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> content, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
@@ -102,7 +102,8 @@ namespace LinqExtend
             return txt;
         }
 
-        public static string AggregateBy<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> content, string separator)
+        
+        public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> content, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
