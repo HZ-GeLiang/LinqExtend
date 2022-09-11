@@ -5,4 +5,5 @@
 /.vs/LinqExtend/v17
 /.vs/LinqExtend
 /LinqExtend.Standard/obj
-/LinqExtend.Standard/bin/Debug
+/LinqExtend.Standard/bin/Debug 
+/.vs/ProjectEvaluation
