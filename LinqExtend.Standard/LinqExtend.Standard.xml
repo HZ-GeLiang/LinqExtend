@@ -4,15 +4,6 @@
         <name>LinqExtend.Standard</name>
     </assembly>
     <members>
-        <member name="M:LinqExtend.ForEachExtensions.ForEachKey``2(System.Collections.Generic.IDictionary{``0,``1},System.Action{``0})">
-            <summary>
-            遍历key时,可以修改key对应的value值
-            </summary>
-            <typeparam name="TKey"></typeparam>
-            <typeparam name="TValue"></typeparam>
-            <param name="dict"></param>
-            <param name="action"></param>
-        </member>
         <member name="T:LinqExtend.OrderByExtensions.DynamicSortComparer`1">
             <summary>
             排序比较器
