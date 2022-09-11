@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>
+			netstandard1.0;
+		</TargetFrameworks>
+		<RootNamespace>LinqExtend</RootNamespace>
+		<NoWarn>CS1591</NoWarn>
+		<WarningLevel>4</WarningLevel>
+		<DocumentationFile>$(SolutionDir)$(AssemblyName)\$(AssemblyName).xml</DocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<Authors>GeLiang</Authors>
+		<Company>GeLiang</Company>
+		<Copyright>Copyright (c) GeLiang</Copyright>
+		<PackageId>LinqExtend</PackageId>
+		<Description>Linq 2 Object extension</Description>
+		<PackageProjectUrl>https://github.com/HZ-GeLiang/LinqExtend</PackageProjectUrl>
+		<PackageTags>LinqExtend, Linq2Object, Linq</PackageTags>
+		<PackageReleaseNotes></PackageReleaseNotes>
+		<RepositoryType>github</RepositoryType>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Version>0.0.1</Version>
+		<LangVersion>10</LangVersion>
+	</PropertyGroup>
+</Project>
