@@ -16,8 +16,6 @@ namespace LinqExtend.Test
         [TestMethod]
         public void AggregateToString()
         {
-
-
             {
                 var peopleList = new List<People>()
                     {
