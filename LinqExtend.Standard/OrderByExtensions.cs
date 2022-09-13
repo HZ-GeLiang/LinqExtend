@@ -220,7 +220,8 @@ namespace LinqExtend
                 throw new Exception($"不支持的操作,请修改代码:{nameof(OrderByExpression)}");
             }
 
-            return orderedResult.ToList(); //注: 如果  据源的数据在执行 methodCallExpression.Method时发生错误, 这里体现
+            //return orderedResult.ToList(); //注: 如果  据源的数据在执行 methodCallExpression.Method时发生错误, 这里体现
+            return orderedResult; 
         }
 
         private static IOrderedEnumerable<TSource> OrderByCustom_Order<TSource, TOrderType>(
