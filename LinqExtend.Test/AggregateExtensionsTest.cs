@@ -1,5 +1,4 @@
 using System.Data;
-using static LinqExtend.Test.OrderByExtensionsTest;
 using System.Text;
 
 namespace LinqExtend.Test
