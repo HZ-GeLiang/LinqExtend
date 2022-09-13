@@ -5,6 +5,51 @@ namespace LinqExtend.Test
     [TestClass]
     public class OrderByExtensionsTest
     {
+        internal class pepple2
+        {
+            public int Height { get; set; }
+            public string Name { get; set; }
+            public int Weight { get; set; }
+        }
+
+        [TestMethod]
+        public void Test_OrderBy()
+        {
+            {
+                var list = new List<string> { "3", "2", "4" };
+                var str = list.OrderBy((a, b) =>
+                {
+                    return string.Compare(a, b);
+                }).AggregateToString(",");
+                Assert.AreEqual("2,3,4", str);
+
+            }
+
+            {
+                List<pepple2> pepples = new List<pepple2>()
+                {
+                    new pepple2{ Height=100, Name="ac", Weight =1  },
+                    new pepple2{ Height=99, Name="ac", Weight =3  },
+                    new pepple2{ Height=100, Name="aa", Weight =2  },
+                };
+                var str = pepples.OrderBy((a, b) =>
+                {
+                    if (a.Height == b.Height && a.Name == b.Name)
+                    {
+                        return 0;
+                    }
+                    if (a.Height == b.Height)
+                    {
+                        return String.Compare(a.Name, b.Name);//从小到大
+                    }
+                    //else
+                    return a.Height > b.Height ? 1 : -1; //从小到大
+                }).ToList().AggregateToString(a => a.Weight, ",");
+                Assert.AreEqual("3,2,1", str);
+            }
+        }
+
+
         public class test_001
         {
             public int Id { get; set; }
