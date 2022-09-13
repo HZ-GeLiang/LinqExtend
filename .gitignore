@@ -7,3 +7,5 @@
 /LinqExtend.Standard/obj
 /LinqExtend.Standard/bin/Debug 
 /.vs/ProjectEvaluation
+/LinqExtend.Test/obj
+/LinqExtend.Test/bin/Debug/net6.0
