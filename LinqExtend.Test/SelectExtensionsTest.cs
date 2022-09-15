@@ -37,7 +37,7 @@ namespace LinqExtend.Test
         }
 
         [TestMethod]
-        public void SelectMap()
+        public void SelectMap_Enumerable()
         {
             List<People> peoples = new List<People>()
             {
@@ -94,5 +94,12 @@ namespace LinqExtend.Test
             //        new ParameterExpression[1] { parameterExpression }
             //    );
         }
+
+        [TestMethod]
+        public void SelectMap_Queryable()
+        {
+            //todo:
+        }
+
     }
 }

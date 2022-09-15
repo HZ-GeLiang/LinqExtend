@@ -119,16 +119,15 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
-            //获得 TSource 和 TResult 共有的属性
-            var props = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
-            props.IntersectWith(typeof(TResult).GetProperties().ToHashSet(a => a.Name));
+            var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
+            var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
+            var propsCommon = propsSource.Intersect(propsResult); //TSource 和 TResult 的相同属性
 
             var parameterExp = Expression.Parameter(typeof(TSource), "a");
-
-            MemberBinding[] bindings = new MemberBinding[props.Count];
+            MemberBinding[] bindings = new MemberBinding[propsCommon.Count()];
 
             var i = 0;
-            foreach (var propertyName in props)
+            foreach (var propertyName in propsCommon)
             {
                 //if (selector != null)
                 //{
