@@ -205,5 +205,34 @@ namespace LinqExtend
 
             return list;
         }
+
+
+        /// <summary>
+        /// 2个类相同的属性
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        private static List<string> GetCommonProps<TSource, TResult>() where TSource : class where TResult : class, new()
+        {
+            var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
+            var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
+            var propsCommon = propsSource.Intersect(propsResult);
+            return propsCommon.ToList();
+        }
+
+        /// <summary>
+        /// TResult 类 没有映射的属性
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
+        private static List<string> GetExceptProps<TSource, TResult>() where TSource : class where TResult : class, new()
+        {
+            var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
+            var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
+            var resultPropsExcept = propsResult.Except(propsSource); //propsResult 的 差集
+            return propsResult.ToList();
+        }
     }
 }
