@@ -227,12 +227,12 @@ namespace LinqExtend
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <returns></returns>
-        private static List<string> GetExceptProps<TSource, TResult>() where TSource : class where TResult : class, new()
+        private static List<string> GetPropsExcept<TSource, TResult>() where TSource : class where TResult : class, new()
         {
             var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
             var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
             var resultPropsExcept = propsResult.Except(propsSource); //propsResult 的 差集
-            return propsResult.ToList();
+            return resultPropsExcept.ToList();
         }
     }
 }
