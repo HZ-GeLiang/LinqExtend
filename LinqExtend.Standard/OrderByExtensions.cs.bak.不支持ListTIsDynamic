@@ -48,9 +48,9 @@ namespace LinqExtend
         #region OrderByExpression
 
         private static Type dynamicType = null;
-        public static IEnumerable<dynamic> OrderByExpression<TSource>(
+        public static IEnumerable<TSource> OrderByExpression<TSource>(
           this IEnumerable<TSource> source,
-          Expression<Func<TSource, dynamic>> orderExpression
+          Expression<Func<TSource, object>> orderExpression
         ) where TSource : class
         {
             dynamicType = orderExpression.Body.Type;
@@ -89,8 +89,7 @@ namespace LinqExtend
                 return source;
             }
 
-            //IOrderedEnumerable<TSource> orderedResult = null;
-            IOrderedEnumerable<object> orderedResult = null; // 因为要支持  List.Select(a => new {...}).OrderByExpression(...)
+            IOrderedEnumerable<TSource> orderedResult = null; 
 
             var type_TEntity = typeof(TSource);
             foreach (dynamic argument in arguments)
@@ -288,22 +287,22 @@ namespace LinqExtend
             var enumerableType = typeof(System.Linq.Enumerable);
 
             var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-            //var methodGenericTypes = new Type[] { typeof(TSource), TOrderType };  //注: typeof(TSource)  == typeof(Object), 此时 typeof(TSource) 必须为public的
+            var methodGenericTypes = new Type[] { typeof(TSource), TOrderType };  //注: typeof(TSource)  == typeof(Object), 此时 typeof(TSource) 必须为public的
 
-            Type[] types = source.GetType().GetGenericArguments();
-            Type[] methodGenericTypes;
-            if (types.Length == 1)
-            {
-                methodGenericTypes = new Type[] { types[0], TOrderType };
-            }
-            else if (types.Length == 2)
-            {
-                methodGenericTypes = new Type[] { types[1], TOrderType };
-            }
-            else
-            {
-                throw new NotSupportedException("请完善代码,当前情况不在单元测试中 ");
-            }
+            //Type[] types = source.GetType().GetGenericArguments();
+            //Type[] methodGenericTypes;
+            //if (types.Length == 1)
+            //{ 
+            //    methodGenericTypes = new Type[] { types[0], TOrderType };
+            //}
+            //else if (types.Length == 2)
+            //{
+            //    methodGenericTypes = new Type[] { types[1], TOrderType };
+            //}
+            //else
+            //{
+            //    throw new NotSupportedException("请完善代码,当前情况不在单元测试中 ");
+            //}
 
             if (orderedResult == null)
             {
