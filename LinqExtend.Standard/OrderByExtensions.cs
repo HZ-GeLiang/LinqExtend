@@ -48,7 +48,7 @@ namespace LinqExtend
         #region OrderByExpression
 
         private static Type dynamicType = null;
-        public static IEnumerable<dynamic> OrderByExpression<TSource>(
+        public static IEnumerable<TSource> OrderByExpression<TSource>(
           this IEnumerable<TSource> source,
           Expression<Func<TSource, dynamic>> orderExpression
         ) where TSource : class
@@ -89,8 +89,7 @@ namespace LinqExtend
                 return source;
             }
 
-            //IOrderedEnumerable<TSource> orderedResult = null;
-            IOrderedEnumerable<object> orderedResult = null; // 因为要支持  List.Select(a => new {...}).OrderByExpression(...)
+            IOrderedEnumerable<TSource> orderedResult = null;
 
             var type_TEntity = typeof(TSource);
             foreach (dynamic argument in arguments)
@@ -138,12 +137,7 @@ namespace LinqExtend
                             new ParameterExpression[1] { parameterExp }
                         );
 
-                    //
-                    //source is IEnumerable<TSource>               true
-                    //source.First().GetType() == typeof(TSource)   true
-
-                    //var aa = OrderByCustom_Order(source, orderedResult, lambda, genericType_arg2);
-                    orderedResult = OrderByCustom_Order(source, orderedResult, lambda, genericType_arg2);
+                    orderedResult = OrderByCustom_Order<TSource>(source, orderedResult, lambda, genericType_arg2) as IOrderedEnumerable<TSource>;
                     continue;
                 }
 
@@ -196,7 +190,7 @@ namespace LinqExtend
                                     );
 
                                 //注: 如果 在执行 methodCallExpression.Method 时发生错误, 这里不会体现
-                                orderedResult = OrderByCustom_Order(source, orderedResult, lambda, genericType_arg2);
+                                orderedResult = OrderByCustom_Order<TSource>(source, orderedResult, lambda, genericType_arg2);
                                 continue;
 
                             }
@@ -243,7 +237,7 @@ namespace LinqExtend
                                 body,
                                 new ParameterExpression[1] { parameterExp }
                             );
-                        orderedResult = OrderByCustom_Order(source, orderedResult, lambda, genericType_arg2);
+                        orderedResult = OrderByCustom_Order<TSource>(source, orderedResult, lambda, genericType_arg2);
                         continue;
                     }
                 }
