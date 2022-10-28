@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,7 +11,7 @@ namespace LinqExtend
 {
     public static class OrderByExtensions
     {
-        #region OrderBy
+        #region OrderByFunc
 
         /// <summary>
         /// 排序比较器
@@ -30,18 +29,27 @@ namespace LinqExtend
             public int Compare(T x, T y) => _func(x, y);
         }
 
-        public static IOrderedEnumerable<TSource> OrderBy<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, int> comparer)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <param name="source">数据源</param>
+        /// <param name="comparer">比较器:传入一个委托,内部会自动创建比较器</param>
+        /// <returns></returns>
+        public static IOrderedEnumerable<TSource> OrderByFunc<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource, int> comparer)
             where TSource : class
         {
             if (source is null)
             {
-                throw new ArgumentException($@"{nameof(source)} can not be null");
+                //throw new ArgumentException($@"{nameof(source)} can not be null");
+                return Enumerable.Empty<TSource>().OrderBy(a => a);
             }
+
             var sortComparer = new DynamicSortComparer<TSource>(comparer);
             var result = source.OrderBy(a => a, sortComparer); //需要 using System.Linq;
-
             return result;
         }
+
 
         #endregion
 
@@ -304,7 +312,7 @@ namespace LinqExtend
                 var methodPara = new object[] { source, lambda.Compile() };
                 var orderByMehtod = enumerableType
                     .GetMethods(bindingFlags)
-                    .First(mi => mi.Name == "OrderBy" && mi.GetParameters().Length == 2);
+                    .First(mi => mi.Name == nameof(System.Linq.Enumerable.OrderBy) && mi.GetParameters().Length == 2);
                 return (IOrderedEnumerable<TSource>)orderByMehtod.MakeGenericMethod(methodGenericTypes).Invoke(null, methodPara);
             }
             else
@@ -313,7 +321,7 @@ namespace LinqExtend
                 var thenByMehtod =
                      enumerableType
                     .GetMethods(bindingFlags)
-                    .First(mi => mi.Name == "ThenBy" && mi.GetParameters().Length == 2);
+                    .First(mi => mi.Name == nameof(System.Linq.Enumerable.ThenBy) && mi.GetParameters().Length == 2);
                 return (IOrderedEnumerable<TSource>)thenByMehtod.MakeGenericMethod(methodGenericTypes).Invoke(null, methodPara);
             }
         }
