@@ -253,9 +253,9 @@ namespace LinqExtend
                 //"System.Linq.Expressions.MemberAssignment"
                 if (argument is System.Linq.Expressions.MemberAssignment)
                 {
-                    throw new Exception($"完善细节");
+                    //AnonymousType
+                    throw new ArgumentException($@"{nameof(OrderByExpression)}的参数{nameof(orderExpression)}只支持匿名类型");
                 }
-
 
                 throw new Exception($"不支持的操作,请修改代码:{nameof(OrderByExpression)}");
             }

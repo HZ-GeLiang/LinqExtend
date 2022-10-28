@@ -319,21 +319,21 @@ namespace LinqExtend.Test
                     .AggregateToString(a => a, ",")
                 ;
 
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                // 一个确切的对象(提示异常,不支持这种写法, 因为 linq 2 object 也不支持
+                var orderResult2 = tests
+                    .OrderByExpression(a => new test_001_select
+                    {
+                        Id = a.Id,
+                        Name = Convert.ToInt32(a.Name),
+                    })
+                    .ToList()
+                    .Select(a => a.Id)
+                    .AggregateToString(a => a, ",")
+                    ; // 准确结果应该是   1 5 6 2 3 4 
+            });
 
-            // 一个确切的对象
-            var orderResult2 = tests
-                .OrderByExpression(a => new test_001_select
-                {
-                    Id = a.Id,
-                    Name = Convert.ToInt32(a.Name),
-                })
-                .ToList()
-                .Select(a => a.Id)
-                .AggregateToString(a => a, ",")
-                ; // 准确结果应该是   1 5 6 2 3 4 
-
-            Assert.AreEqual(orderResult2, orderResult);
         }
-
     }
 }
