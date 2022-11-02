@@ -11,7 +11,7 @@ namespace LinqExtend.Test
         }
 
         [TestMethod]
-        public void Test_OrderBy()
+        public void Test_OrderByFunc()
         {
             {
                 var list = new List<string> { "3", "2", "4" };
@@ -51,7 +51,7 @@ namespace LinqExtend.Test
         }
 
         [TestMethod]
-        public void Test_OrderBy_ListIsNull()
+        public void Test_OrderByFunc_ListIsNull()
         {
 
             {
@@ -113,24 +113,14 @@ namespace LinqExtend.Test
             var orderResult =
                     (from a in tests
                      orderby a.Name
-                     select new test_001
-                     {
-                         Id = a.Id,
-                         Name = a.Name
-                     }
+                     select a
                     )
-                    .ToList()
-                    .Select(a => a.Id)
-                    .AggregateToString(a => a, ",")
-                    ;
+                    .AggregateToString(a => a.Id, ",");
 
             // 单个字段
             var orderResult2 = tests
                 .OrderByExpression(a => new { a.Name })
-                .ToList()
-                .Select(a => a.Id)
-                .AggregateToString(a => a, ",")
-                ; // 准确结果应该是   1 5 2 4 3 6 
+                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6 
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -151,24 +141,14 @@ namespace LinqExtend.Test
             var orderResult =
                     (from a in tests
                      orderby Convert.ToInt32(a.Name), a.Id
-                     select new test_001
-                     {
-                         Id = a.Id,
-                         Name = a.Name
-                     }
+                     select a
                     )
-                    .ToList()
-                    .Select(a => a.Id)
-                    .AggregateToString(a => a, ",")
-                    ;
+                    .AggregateToString(a => a.Id, ",");
 
             // 多字段
             var orderResult2 = tests
                 .OrderByExpression(a => new { Name = Convert.ToInt32(a.Name), Id = a.Id })
-                .ToList()
-                .Select(a => a.Id)
-                .AggregateToString(a => a, ",")
-                ; // 准确结果应该是   1 5 6 2 3 4 
+                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4 
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -189,36 +169,27 @@ namespace LinqExtend.Test
             var orderResult =
                       (from a in tests
                        orderby string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name)
-                       select new test_001
-                       {
-                           Id = a.Id,
-                           Name = a.Name
-                       }
+                       select a
                     )
-                    .ToList()
-                    .Select(a => a.Id)
-                    .AggregateToString(a => a, ",")
-                    ;
+                    .AggregateToString(a => a.Id, ",");
 
             //支持三元表达式
             var orderResult2 = tests
                 .OrderByExpression(a => new { Name = string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name) })
-                .Select(a => a.Id)
-                .AggregateToString(a => a, ","); // 准确结果应该是   5 1 6 2 4 3
+                .AggregateToString(a => a.Id, ","); // 准确结果应该是   5 1 6 2 4 3
             Assert.AreEqual(orderResult2, orderResult);
 
             var orderResult3 = tests
               .OrderByExpression(a => new { Name = string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name), a.Id })
-              .Select(a => a.Id)
-              .AggregateToString(a => a, ","); // 准确结果应该是   5 1 6 2 3 4 
+              .AggregateToString(a => a.Id, ","); // 准确结果应该是   5 1 6 2 3 4 
 
             Assert.AreEqual(orderResult3, "5,1,6,2,3,4");
         }
 
+
         [TestMethod]
         public void Test_OrderByExpression_ListTIsDynamic()
         {
-
             List<test_001> tests = new List<test_001>()
             {
                 new test_001{Id=1, Name="0" },
@@ -231,18 +202,16 @@ namespace LinqExtend.Test
 
             {
                 var orderResult =
-                  (from a in tests
+                  (from a in
+                       tests.Select(a => new
+                       {
+                           a.Id,
+                           a.Name
+                       })
                    orderby a.Name
-                   select new
-                   {
-                       Id = a.Id,
-                       Name = a.Name
-                   }
+                   select a
                   )
-                  .ToList()
-                  .Select(a => a.Id)
-                  .AggregateToString(a => a, ",")
-                  ;
+                  .AggregateToString(a => a.Id, ",");
 
                 // List<匿名类> 进行排序
                 var orderResult2 = tests
@@ -252,10 +221,7 @@ namespace LinqExtend.Test
                    a.Name
                })
                .OrderByExpression(a => new { a.Name })
-               .ToList()
-               .Select(a => a.Id)
-               .AggregateToString(a => a, ",")
-               ; // 准确结果应该是   1 5 2 4 3 6 
+               .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6 
 
                 Assert.AreEqual(orderResult2, orderResult);
             }
@@ -264,15 +230,9 @@ namespace LinqExtend.Test
                 var orderResult =
                  (from a in tests
                   orderby a.Name
-                  select new
-                  {
-                      Id = a.Id,
-                  }
+                  select a
                  )
-                 .ToList()
-                 .Select(a => a.Id)
-                 .AggregateToString(a => a, ",")
-                 ;
+                 .AggregateToString(a => a.Id, ",");
 
                 // List<匿名类> 进行排序
                 var orderResult2 = tests
@@ -282,10 +242,7 @@ namespace LinqExtend.Test
                    a.Name
                })
                .OrderByExpression(a => new { a.Id })
-               .ToList()
-               .Select(a => a.Id)
-               .AggregateToString(a => a, ",")
-               ; // 准确结果应该是   1,2,3,4,5,6
+               .AggregateToString(a => a.Id, ","); // 准确结果应该是   1,2,3,4,5,6
 
                 Assert.AreEqual(orderResult2, "1,2,3,4,5,6");
             }
@@ -304,20 +261,20 @@ namespace LinqExtend.Test
                 new test_001{Id=6, Name="6"},
             };
 
-            var orderResult =
-                    (from a in tests
-                     orderby Convert.ToInt32(a.Name), a.Id
-                     //orderby new test_001_select { Name = Convert.ToInt32(a.Name), Id = a.Id }  // 不能这样写
-                     select new test_001
-                     {
-                         Id = a.Id,
-                         Name = a.Name
-                     }
-                    )
-                    .ToList()
-                    .Select(a => a.Id)
-                    .AggregateToString(a => a, ",")
-                ;
+            Assert.ThrowsException<InvalidOperationException>(() =>
+            {
+                //System.InvalidOperationException:“Failed to compare two elements in the array.”
+                //ArgumentException: At least one object must implement IComparable.
+
+                var orderResult =
+                        (from a in tests
+                         orderby Convert.ToInt32(a.Name), a.Id
+                         // 不能这样写, 异常信息如上注释
+                         orderby new test_001_select { Name = Convert.ToInt32(a.Name), Id = a.Id }
+                         select a
+                        )
+                        .AggregateToString(a => a.Id, ",");
+            });
 
             Assert.ThrowsException<ArgumentException>(() =>
             {
@@ -328,12 +285,45 @@ namespace LinqExtend.Test
                         Id = a.Id,
                         Name = Convert.ToInt32(a.Name),
                     })
-                    .ToList()
-                    .Select(a => a.Id)
-                    .AggregateToString(a => a, ",")
-                    ; // 准确结果应该是   1 5 6 2 3 4 
+                    .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4 
             });
 
+        }
+
+
+        [TestMethod]
+        public void Test_OrderByExpression_Desc()
+        {
+            List<test_001> tests = new List<test_001>()
+            {
+                new test_001{Id=1, Name="0" },
+                new test_001{Id=2, Name="11"},
+                new test_001{Id=4, Name="11"},
+                new test_001{Id=3, Name="11"},
+                new test_001{Id=5, Name="0"},
+                new test_001{Id=6, Name="6"},
+            };
+
+            var orderResult2 = tests
+                    .OrderByExpression(a => new { a.Name }, a => a.Id) // 不在排序字段中
+                    .AggregateToString(a => a.Id, ","); //1,5,2,4,3,6
+            Assert.AreEqual(orderResult2, "1,5,2,4,3,6");
+
+            var orderResult4 = tests
+                  .OrderByExpression(a => new { a.Name }, a => new { }) // 没有倒序排序字段
+                  .AggregateToString(a => a.Id, ","); //1,5,2,4,3,6
+            Assert.AreEqual(orderResult4, "1,5,2,4,3,6");
+
+
+            var orderResult1 = tests
+                   .OrderByExpression(a => new { a.Name }, a => a.Name) // 在排序字段中
+                   .AggregateToString(a => a.Id, ","); //6,2,4,3,1,5
+            Assert.AreEqual(orderResult1, "6,2,4,3,1,5");
+
+            var orderResult3 = tests
+                   .OrderByExpression(a => new { a.Name }, a => new { a.Id, a.Name }) // 部分字段在排序中
+                   .AggregateToString(a => a.Id, ","); //6,2,4,3,1,5
+            Assert.AreEqual(orderResult3, "6,2,4,3,1,5");
         }
     }
 }
