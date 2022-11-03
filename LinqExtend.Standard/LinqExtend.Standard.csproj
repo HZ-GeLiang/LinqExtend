@@ -1,12 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>
+			<!--net6.0;
+			net5.0;
+			netcoreapp3.1;
+			net45;-->
 			netstandard2.0;
 		</TargetFrameworks>
 		<RootNamespace>LinqExtend</RootNamespace>
 		<NoWarn>CS1591</NoWarn>
 		<WarningLevel>4</WarningLevel>
-		<DocumentationFile>$(SolutionDir)$(AssemblyName)\$(AssemblyName).xml</DocumentationFile>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<!--<DocumentationFile>$(SolutionDir)$(AssemblyName)\$(AssemblyName).xml</DocumentationFile>-->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<Authors>GeLiang</Authors>
@@ -21,14 +26,6 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Version>0.0.5</Version>
 		<LangVersion>10</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(Configuration)' == 'DEBUG' ">
-		<DefineConstants>DEBUG;</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-		<DefineConstants>RELEASE;</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
