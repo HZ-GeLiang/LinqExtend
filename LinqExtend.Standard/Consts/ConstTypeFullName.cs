@@ -1,4 +1,4 @@
-namespace LinqExtend.Consts
+﻿namespace LinqExtend.Consts
 {
     internal static partial class ConstTypeFullName
     {

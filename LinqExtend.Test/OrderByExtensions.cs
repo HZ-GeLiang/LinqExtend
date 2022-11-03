@@ -1,4 +1,4 @@
-namespace LinqExtend.Test
+ï»¿namespace LinqExtend.Test
 {
     [TestClass]
     public class OrderByExtensionsTest
@@ -16,7 +16,7 @@ namespace LinqExtend.Test
             {
                 var list = new List<string> { "3", "2", "4" };
 
-                //µ¥¸ö×Ö¶Î
+                //å•ä¸ªå­—æ®µ
                 var str = list.OrderByFunc((a, b) =>
                 {
                     return string.Compare(a, b);
@@ -32,7 +32,7 @@ namespace LinqExtend.Test
                     new pepple2{ Height=99, Name="ac", Weight =3  },
                     new pepple2{ Height=100, Name="aa", Weight =2  },
                 };
-                //¶à¸ö×Ö¶Î,×Ô¼º¿ØÖÆ·µ»ØÖµ
+                //å¤šä¸ªå­—æ®µ,è‡ªå·±æ§åˆ¶è¿”å›å€¼
                 var str = pepples.OrderByFunc((a, b) =>
                 {
                     if (a.Height == b.Height && a.Name == b.Name)
@@ -41,10 +41,10 @@ namespace LinqExtend.Test
                     }
                     if (a.Height == b.Height)
                     {
-                        return String.Compare(a.Name, b.Name);//´ÓĞ¡µ½´ó
+                        return String.Compare(a.Name, b.Name);//ä»å°åˆ°å¤§
                     }
                     //else
-                    return a.Height > b.Height ? 1 : -1; //´ÓĞ¡µ½´ó
+                    return a.Height > b.Height ? 1 : -1; //ä»å°åˆ°å¤§
                 }).AggregateToString(a => a.Weight, ",");
                 Assert.AreEqual(str, "3,2,1");
             }
@@ -56,7 +56,7 @@ namespace LinqExtend.Test
 
             {
                 List<string> list = null;
-                //µ¥¸ö×Ö¶Î
+                //å•ä¸ªå­—æ®µ
                 var str = list.OrderByFunc((a, b) =>
                 {
                     return string.Compare(a, b);
@@ -67,7 +67,7 @@ namespace LinqExtend.Test
 
             {
                 List<pepple2> pepples = null;
-                //¶à¸ö×Ö¶Î,×Ô¼º¿ØÖÆ·µ»ØÖµ
+                //å¤šä¸ªå­—æ®µ,è‡ªå·±æ§åˆ¶è¿”å›å€¼
                 var str = pepples.OrderByFunc((a, b) =>
                 {
                     if (a.Height == b.Height && a.Name == b.Name)
@@ -76,10 +76,10 @@ namespace LinqExtend.Test
                     }
                     if (a.Height == b.Height)
                     {
-                        return String.Compare(a.Name, b.Name);//´ÓĞ¡µ½´ó
+                        return String.Compare(a.Name, b.Name);//ä»å°åˆ°å¤§
                     }
                     //else
-                    return a.Height > b.Height ? 1 : -1; //´ÓĞ¡µ½´ó
+                    return a.Height > b.Height ? 1 : -1; //ä»å°åˆ°å¤§
                 }).AggregateToString(a => a.Weight, ",");
                 Assert.AreEqual(str, "");
             }
@@ -117,10 +117,10 @@ namespace LinqExtend.Test
                     )
                     .AggregateToString(a => a.Id, ",");
 
-            // µ¥¸ö×Ö¶Î
+            // å•ä¸ªå­—æ®µ
             var orderResult2 = tests
                 .OrderByExpression(a => new { a.Name })
-                .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   1 5 2 4 3 6 
+                .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   1 5 2 4 3 6 
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -145,10 +145,10 @@ namespace LinqExtend.Test
                     )
                     .AggregateToString(a => a.Id, ",");
 
-            // ¶à×Ö¶Î
+            // å¤šå­—æ®µ
             var orderResult2 = tests
                 .OrderByExpression(a => new { Name = Convert.ToInt32(a.Name), Id = a.Id })
-                .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   1 5 6 2 3 4 
+                .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   1 5 6 2 3 4 
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -173,15 +173,15 @@ namespace LinqExtend.Test
                     )
                     .AggregateToString(a => a.Id, ",");
 
-            //Ö§³ÖÈıÔª±í´ïÊ½
+            //æ”¯æŒä¸‰å…ƒè¡¨è¾¾å¼
             var orderResult2 = tests
                 .OrderByExpression(a => new { Name = string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name) })
-                .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   5 1 6 2 4 3
+                .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   5 1 6 2 4 3
             Assert.AreEqual(orderResult2, orderResult);
 
             var orderResult3 = tests
               .OrderByExpression(a => new { Name = string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name), a.Id })
-              .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   5 1 6 2 3 4 
+              .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   5 1 6 2 3 4 
 
             Assert.AreEqual(orderResult3, "5,1,6,2,3,4");
         }
@@ -213,7 +213,7 @@ namespace LinqExtend.Test
                   )
                   .AggregateToString(a => a.Id, ",");
 
-                // List<ÄäÃûÀà> ½øĞĞÅÅĞò
+                // List<åŒ¿åç±»> è¿›è¡Œæ’åº
                 var orderResult2 = tests
                .Select(a => new
                {
@@ -221,7 +221,7 @@ namespace LinqExtend.Test
                    a.Name
                })
                .OrderByExpression(a => new { a.Name })
-               .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   1 5 2 4 3 6 
+               .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   1 5 2 4 3 6 
 
                 Assert.AreEqual(orderResult2, orderResult);
             }
@@ -234,7 +234,7 @@ namespace LinqExtend.Test
                  )
                  .AggregateToString(a => a.Id, ",");
 
-                // List<ÄäÃûÀà> ½øĞĞÅÅĞò
+                // List<åŒ¿åç±»> è¿›è¡Œæ’åº
                 var orderResult2 = tests
                .Select(a => new
                {
@@ -242,7 +242,7 @@ namespace LinqExtend.Test
                    a.Name
                })
                .OrderByExpression(a => new { a.Id })
-               .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   1,2,3,4,5,6
+               .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   1,2,3,4,5,6
 
                 Assert.AreEqual(orderResult2, "1,2,3,4,5,6");
             }
@@ -263,13 +263,13 @@ namespace LinqExtend.Test
 
             Assert.ThrowsException<InvalidOperationException>(() =>
             {
-                //System.InvalidOperationException:¡°Failed to compare two elements in the array.¡±
+                //System.InvalidOperationException:â€œFailed to compare two elements in the array.â€
                 //ArgumentException: At least one object must implement IComparable.
 
                 var orderResult =
                         (from a in tests
                          orderby Convert.ToInt32(a.Name), a.Id
-                         // ²»ÄÜÕâÑùĞ´, Òì³£ĞÅÏ¢ÈçÉÏ×¢ÊÍ
+                         // ä¸èƒ½è¿™æ ·å†™, å¼‚å¸¸ä¿¡æ¯å¦‚ä¸Šæ³¨é‡Š
                          orderby new test_001_select { Name = Convert.ToInt32(a.Name), Id = a.Id }
                          select a
                         )
@@ -278,14 +278,14 @@ namespace LinqExtend.Test
 
             Assert.ThrowsException<ArgumentException>(() =>
             {
-                // Ò»¸öÈ·ÇĞµÄ¶ÔÏó(ÌáÊ¾Òì³£,²»Ö§³ÖÕâÖÖĞ´·¨, ÒòÎª linq 2 object Ò²²»Ö§³Ö
+                // ä¸€ä¸ªç¡®åˆ‡çš„å¯¹è±¡(æç¤ºå¼‚å¸¸,ä¸æ”¯æŒè¿™ç§å†™æ³•, å› ä¸º linq 2 object ä¹Ÿä¸æ”¯æŒ
                 var orderResult2 = tests
                     .OrderByExpression(a => new test_001_select
                     {
                         Id = a.Id,
                         Name = Convert.ToInt32(a.Name),
                     })
-                    .AggregateToString(a => a.Id, ","); // ×¼È·½á¹ûÓ¦¸ÃÊÇ   1 5 6 2 3 4 
+                    .AggregateToString(a => a.Id, ","); // å‡†ç¡®ç»“æœåº”è¯¥æ˜¯   1 5 6 2 3 4 
             });
 
         }
@@ -305,23 +305,23 @@ namespace LinqExtend.Test
             };
 
             var orderResult2 = tests
-                    .OrderByExpression(a => new { a.Name }, a => a.Id) // ²»ÔÚÅÅĞò×Ö¶ÎÖĞ
+                    .OrderByExpression(a => new { a.Name }, a => a.Id) // ä¸åœ¨æ’åºå­—æ®µä¸­
                     .AggregateToString(a => a.Id, ","); //1,5,2,4,3,6
             Assert.AreEqual(orderResult2, "1,5,2,4,3,6");
 
             var orderResult4 = tests
-                  .OrderByExpression(a => new { a.Name }, a => new { }) // Ã»ÓĞµ¹ĞòÅÅĞò×Ö¶Î
+                  .OrderByExpression(a => new { a.Name }, a => new { }) // æ²¡æœ‰å€’åºæ’åºå­—æ®µ
                   .AggregateToString(a => a.Id, ","); //1,5,2,4,3,6
             Assert.AreEqual(orderResult4, "1,5,2,4,3,6");
 
 
             var orderResult1 = tests
-                   .OrderByExpression(a => new { a.Name }, a => a.Name) // ÔÚÅÅĞò×Ö¶ÎÖĞ
+                   .OrderByExpression(a => new { a.Name }, a => a.Name) // åœ¨æ’åºå­—æ®µä¸­
                    .AggregateToString(a => a.Id, ","); //6,2,4,3,1,5
             Assert.AreEqual(orderResult1, "6,2,4,3,1,5");
 
             var orderResult3 = tests
-                   .OrderByExpression(a => new { a.Name }, a => new { a.Id, a.Name }) // ²¿·Ö×Ö¶ÎÔÚÅÅĞòÖĞ
+                   .OrderByExpression(a => new { a.Name }, a => new { a.Id, a.Name }) // éƒ¨åˆ†å­—æ®µåœ¨æ’åºä¸­
                    .AggregateToString(a => a.Id, ","); //6,2,4,3,1,5
             Assert.AreEqual(orderResult3, "6,2,4,3,1,5");
         }
