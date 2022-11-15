@@ -44,13 +44,29 @@ namespace LinqExtend
                 return string.Empty;
             }
             if (string.IsNullOrEmpty(columnName)) throw new ArgumentNullException($"{nameof(columnName)}参数不能为空", nameof(columnName));
-            if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+
             var sb = new StringBuilder();
-            foreach (DataRow item in source)
+            var separatorhasValue = !string.IsNullOrEmpty(separator);
+
+            if (separatorhasValue)
             {
-                sb.Append(item[columnName]).Append(separator);
+                foreach (DataRow item in source)
+                {
+                    sb.Append(item[columnName]).Append(separator);
+                }
             }
-            sb.RemoveLastChar(separator);
+            else
+            {
+                foreach (DataRow item in source)
+                {
+                    sb.Append(item[columnName]);
+                }
+            }
+
+            if (separatorhasValue)
+            {
+                sb.Replace(separator, string.Empty, sb.Length - separator.Length, separator.Length);
+            }
             var txt = sb.ToString();
             return txt;
         }
@@ -63,14 +79,29 @@ namespace LinqExtend
                 return string.Empty;
             }
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
-            if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
 
             var sb = new StringBuilder();
-            foreach (DataRow row in source)
+            var separatorhasValue = !string.IsNullOrEmpty(separator);
+
+            if (separatorhasValue)
             {
-                sb.Append(content.Invoke(row)).Append(separator);
+                foreach (DataRow row in source)
+                {
+                    sb.Append(content.Invoke(row)).Append(separator);
+                }
             }
-            sb.RemoveLastChar(separator);
+            else
+            {
+                foreach (DataRow row in source)
+                {
+                    sb.Append(content.Invoke(row));
+                }
+            }
+
+            if (separatorhasValue)
+            {
+                sb.Replace(separator, string.Empty, sb.Length - separator.Length, separator.Length);
+            }
             var txt = sb.ToString();
             return txt;
         }
@@ -82,16 +113,33 @@ namespace LinqExtend
             {
                 return string.Empty;
             }
-            if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
-            
+
             var sb = new StringBuilder();
-            foreach (var item in source)
+            var separatorhasValue = !string.IsNullOrEmpty(separator);
+
+            if (separatorhasValue)
             {
-                sb.Append(item).Append(separator);
+                foreach (var item in source)
+                {
+                    sb.Append(item).Append(separator);
+                }
+            }
+            else
+            {
+                foreach (var item in source)
+                {
+                    sb.Append(item);
+                }
+            }
+            if (sb.Length <= 0)
+            {
+                return string.Empty;
             }
 
-            sb.RemoveLastChar(separator);
-
+            if (separatorhasValue)
+            {
+                sb.Replace(separator, string.Empty, sb.Length - separator.Length, separator.Length);
+            }
             var txt = sb.ToString();
             return txt;
         }
@@ -104,20 +152,38 @@ namespace LinqExtend
                 return string.Empty;
             }
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
-            if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
 
             var sb = new StringBuilder();
-            foreach (var item in source)
+            var separatorhasValue = !string.IsNullOrEmpty(separator);
+
+            if (separatorhasValue)
             {
-                sb.Append(content.Invoke(item)).Append(separator);
+                foreach (var item in source)
+                {
+                    sb.Append(content.Invoke(item)).Append(separator);
+                }
+            }
+            else
+            {
+                foreach (var item in source)
+                {
+                    sb.Append(content.Invoke(item));
+                }
             }
 
-            sb.RemoveLastChar(separator);
+            if (sb.Length <= 0)
+            {
+                return string.Empty;
+            }
+
+            if (separatorhasValue)
+            {
+                sb.Replace(separator, string.Empty, sb.Length - separator.Length, separator.Length);
+            }
 
             var txt = sb.ToString();
             return txt;
         }
-
 
         public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> content, string separator)
         {
@@ -127,14 +193,35 @@ namespace LinqExtend
                 return string.Empty;
             }
             if (content is null) throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
-            if (string.IsNullOrEmpty(separator)) throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+
 
             var sb = new StringBuilder();
-            foreach (var item in source)
+            var separatorhasValue = !string.IsNullOrEmpty(separator);
+
+            if (separatorhasValue)
             {
-                sb.Append(content.Invoke(item)).Append(separator);
+                foreach (var item in source)
+                {
+                    sb.Append(content.Invoke(item)).Append(separator);
+                }
             }
-            sb.RemoveLastChar(separator);
+            else
+            {
+                foreach (var item in source)
+                {
+                    sb.Append(content.Invoke(item));
+                }
+            }
+
+            if (sb.Length <= 0)
+            {
+                return string.Empty;
+            }
+
+            if (separatorhasValue)
+            {
+                sb.Replace(separator, string.Empty, sb.Length - separator.Length, separator.Length);
+            }
             var txt = sb.ToString();
             return txt;
         }
