@@ -77,7 +77,7 @@ namespace LinqExtend.EF
         }
 
         /// <summary>
-        /// 没有值 (这个没有值是语义上的)
+        /// 为空,没有值 (这个没有值是语义上的)
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="propAccessor"></param>
@@ -96,7 +96,7 @@ namespace LinqExtend.EF
                 //var p1 = Expression.Parameter(type_TEntity,"b");                
                 var p1 = propAccessor.Parameters.Single();//等价上面的写法 
 
-                string propName = null;
+                string propName;
 
                 if (expression.NodeType == ExpressionType.MemberAccess)
                 {
@@ -109,15 +109,60 @@ namespace LinqExtend.EF
                 }
 
                 var lambda =
-                Expression.Lambda<Func<TEntity, bool>>(
-                    Expression.Call(
-                        typeof(string).GetMethod("IsEmpty"),
-                        Expression.MakeMemberAccess(p1,
-                           type_TEntity.GetProperty(propName)//"AuthorName"
-                        )
-                    ),
-                    p1
-                );
+                    Expression.Lambda<Func<TEntity, bool>>(
+                        Expression.Call(
+                            typeof(string).GetMethod("IsNullOrEmpty"),
+                            Expression.MakeMemberAccess(p1,
+                               type_TEntity.GetProperty(propName)//"AuthorName"
+                            )
+                        ),
+                        p1
+                    );
+
+                return lambda;
+            }
+            else
+            {
+                throw new ArgumentException("propAccessor 的写法暂不被支持.");
+            }
+        }
+
+        public static Expression<Func<TEntity, bool>> IsNotEmpty<TEntity>(Expression<Func<TEntity, string>> propAccessor)
+              where TEntity : class
+        {
+            //把 !string.IsNullOrEmpty 翻译成对应的表达式树
+
+            var expression = propAccessor.Body;
+            if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
+            {
+                var type_TEntity = typeof(TEntity);
+                //var p1 = Expression.Parameter(type_TEntity,"b");                
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+
+                string propName;
+
+                if (expression.NodeType == ExpressionType.MemberAccess)
+                {
+                    propName = ((dynamic)expression).Member.Name;
+                }
+                else
+                {
+                    DebuggerHelper.Break();
+                    throw new NotSupportedException($"Unknow expression {expression.GetType()}");
+                }
+
+                var lambda =
+                    Expression.Lambda<Func<TEntity, bool>>(
+                        Expression.Not(
+                            Expression.Call(
+                                typeof(string).GetMethod("IsNullOrEmpty"),
+                                Expression.MakeMemberAccess(p1,
+                                   type_TEntity.GetProperty(propName)//"AuthorName"
+                                )
+                            )
+                        ),
+                        p1
+                    );
 
                 return lambda;
             }
@@ -168,6 +213,12 @@ namespace LinqExtend.EF
         public static Expression<Func<TEntity, bool>> IsEmpty(Expression<Func<TEntity, string>> propAccessor)
         {
             return ExpressionHelper.IsEmpty<TEntity>(propAccessor);
+        }
+
+        /// <inheritdoc cref="ExpressionHelper.IsNotEmpty{TEntity}(Expression{Func{TEntity, string}})"/>     
+        public static Expression<Func<TEntity, bool>> IsNotEmpty(Expression<Func<TEntity, string>> propAccessor)
+        {
+            return ExpressionHelper.IsNotEmpty<TEntity>(propAccessor);
         }
 
     }
