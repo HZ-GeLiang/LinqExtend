@@ -77,7 +77,7 @@ namespace LinqExtend.EF
         }
 
         /// <summary>
-        /// 为空,没有值 (这个没有值是语义上的)
+        /// 是空的,没有值 (这个没有值是语义上的)
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="propAccessor"></param>
@@ -127,6 +127,14 @@ namespace LinqExtend.EF
             }
         }
 
+        /// <summary>
+        /// 不为空,有值 (这个有值是语义上的)
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="propAccessor"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public static Expression<Func<TEntity, bool>> IsNotEmpty<TEntity>(Expression<Func<TEntity, string>> propAccessor)
               where TEntity : class
         {
@@ -173,28 +181,41 @@ namespace LinqExtend.EF
         }
 
 
-        // 删除状态的
-        public static Expression<Func<TEntity, bool>> IsDeleted<TEntity>(Expression<Action<TEntity>> propAccessor)
+        /// <summary>
+        /// 删除状态的,即软删除的
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TPropType"></typeparam>
+        /// <param name="propAccessor"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static Expression<Func<TEntity, bool>> IsDeleted<TEntity, TPropType>(Func<Action<TEntity,TPropType>> propAccessor)
         {
             throw new NotImplementedException();
         }
 
-        // 软删除状态的
-        public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity>(Expression<Action<TEntity>> propAccessor)
+        /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Func{Action{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Func<Action<TEntity, TPropType>> propAccessor)
         {
-            throw new NotImplementedException();
+            return IsDeleted(propAccessor);
         }
 
-        // 没有被删除的
+        /// <summary>
+        /// 没有被删除的,,即未标记为软删除的
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="propAccessor"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public static Expression<Func<TEntity, bool>> IsNotDeleted<TEntity>(Expression<Action<TEntity>> propAccessor)
         {
             throw new NotImplementedException();
         }
 
-        // 没有被软删除的
+        /// <inheritdoc cref="IsNotDeleted{TEntity}(Expression{Action{TEntity}})" />
         public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TEntity>(Expression<Action<TEntity>> propAccessor)
         {
-            throw new NotImplementedException();
+            return IsNotDeleted(propAccessor);
         }
     }
 
@@ -220,6 +241,9 @@ namespace LinqExtend.EF
         {
             return ExpressionHelper.IsNotEmpty<TEntity>(propAccessor);
         }
+
+
+     
 
     }
 }

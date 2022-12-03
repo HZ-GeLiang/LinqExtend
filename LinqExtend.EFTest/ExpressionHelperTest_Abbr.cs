@@ -46,6 +46,20 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2);
         }
 
+
+        [TestMethod]
+        public void IsEmpty_Test2()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsEmpty_Test2(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsEmpty(b => b.Publisher2))// 利用语法,进行简写
+                .ToQueryString();
+
+            Assert.AreEqual(sql1, sql2);
+        }
+
         [TestMethod]
         public void IsNotEmpty_Test()
         {
@@ -54,6 +68,19 @@ namespace LinqExtend.EF.Test
 
             var sql2 = ctx.Books
                 .Where(IsNotEmpty(b => b.Publisher))// 利用语法,进行简写
+                .ToQueryString();
+
+            Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
+        public void IsNotEmpty_Test2()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsNotEmpty_Test2(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsNotEmpty(b => b.Publisher2))// 利用语法,进行简写
                 .ToQueryString();
 
             Assert.AreEqual(sql1, sql2);
