@@ -38,7 +38,7 @@ namespace LinqExtend.EF.Test
         {
             using TestDbContext ctx = new TestDbContext();
             var sql1 = ExpressionHelperTest_Common.GetSql_IsEmpty_Test(ctx);
-            
+
             var sql2 = ctx.Books
                 .Where(IsEmpty(b => b.Publisher))// 利用语法,进行简写
                 .ToQueryString();
@@ -85,6 +85,32 @@ namespace LinqExtend.EF.Test
 
             Assert.AreEqual(sql1, sql2);
         }
+
+        [TestMethod]
+        public void IsDeleted_Test1()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test1(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsDeleted(b => b.IsDel))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
+        public void IsDeleted_Test2()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test2(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsDeleted(b=> b.IsDel2))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+
 
     }
 }

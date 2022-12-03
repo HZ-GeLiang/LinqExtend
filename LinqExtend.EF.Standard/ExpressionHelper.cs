@@ -36,10 +36,10 @@ namespace LinqExtend.EF
             {
                 BinaryExpression equalExpr;
                 //other的prop属性的值
-                object otherValue = null;
+                object toCompareValue = null;
                 if (compareObject != null)
                 {
-                    otherValue = prop.GetValue(compareObject);
+                    toCompareValue = prop.GetValue(compareObject);
                 }
                 Type propType = prop.PropertyType;
                 //访问待比较的属性
@@ -47,7 +47,7 @@ namespace LinqExtend.EF
                     propAccessor.Body,//要取出来Body部分，不能带参数
                     prop
                 );
-                Expression rightExpr = Expression.Convert(Expression.Constant(otherValue), propType);
+                Expression rightExpr = Expression.Convert(Expression.Constant(toCompareValue), propType);
                 if (propType.IsPrimitive)//基本数据类型和复杂类型比较方法不一样
                 {
                     equalExpr = Expression.Equal(leftExpr, rightExpr);
@@ -180,7 +180,6 @@ namespace LinqExtend.EF
             }
         }
 
-
         /// <summary>
         /// 删除状态的,即软删除的
         /// </summary>
@@ -188,14 +187,63 @@ namespace LinqExtend.EF
         /// <typeparam name="TPropType"></typeparam>
         /// <param name="propAccessor"></param>
         /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         /// <exception cref="NotImplementedException"></exception>
-        public static Expression<Func<TEntity, bool>> IsDeleted<TEntity, TPropType>(Func<Action<TEntity,TPropType>> propAccessor)
+        public static Expression<Func<TEntity, bool>> IsDeleted<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
+            /*
+               .Where(b => b.IsDel.HasValue && b.IsDel == true)
+               .Where(b => b.IsDel == true)    //同时兼顾了 bool? 和 bool
+            */
+
+            var expression = propAccessor.Body;
+            if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
+            {
+                var type_TEntity = typeof(TEntity);
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+
+                string propName;
+
+                if (expression.NodeType == ExpressionType.MemberAccess)
+                {
+                    propName = ((dynamic)expression).Member.Name;
+                }
+                else
+                {
+                    DebuggerHelper.Break();
+                    throw new NotSupportedException($"Unknow expression {expression.GetType()}");
+                }
+
+                var prop = type_TEntity.GetProperty(propName);
+
+                ConstantExpression propValue =
+                    prop.PropertyType == typeof(Nullable<bool>)
+                    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
+                    ? Expression.Constant(true, typeof(Nullable<bool>))
+                    : Expression.Constant(true);
+
+                var lambda =
+                    Expression.Lambda<Func<TEntity, bool>>(
+                        Expression.Equal(
+                            Expression.MakeMemberAccess(p1, prop),
+                            propValue
+                        ),
+                        p1
+                    );
+
+                return lambda;
+            }
+            else
+            {
+                throw new ArgumentException("propAccessor 的写法暂不被支持.");
+            }
+
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Func{Action{TEntity, TPropType}})"/>
-        public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Func<Action<TEntity, TPropType>> propAccessor)
+        /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             return IsDeleted(propAccessor);
         }
@@ -209,6 +257,31 @@ namespace LinqExtend.EF
         /// <exception cref="NotImplementedException"></exception>
         public static Expression<Func<TEntity, bool>> IsNotDeleted<TEntity>(Expression<Action<TEntity>> propAccessor)
         {
+            /*
+                .Where(b => b.IsDel == null || b.IsDel == false)
+                .Where(b => b.IsDel != true)  //同时兼顾了 bool? 和 bool
+             */
+            /*
+             
+var b = Parameter(
+    typeof(Book),
+    "b"
+);
+
+Lambda(
+    NotEqual(
+        MakeMemberAccess(b,
+            typeof(Book).GetProperty("IsDel")
+        ),
+        Convert(
+            Constant(true),
+            typeof(bool?)
+        )
+    ),
+    b
+)
+            */
+            //
             throw new NotImplementedException();
         }
 
@@ -242,8 +315,18 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsNotEmpty<TEntity>(propAccessor);
         }
 
+        /// <inheritdoc cref="ExpressionHelper.IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsDeleted<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        {
+            return ExpressionHelper.IsDeleted<TEntity, TPropType>(propAccessor);
+        }
 
-     
+        /// <inheritdoc cref="ExpressionHelper.IsSoftDelete{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsSoftDelete<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        {
+            return ExpressionHelper.IsSoftDelete<TEntity, TPropType>(propAccessor);
+
+        }
 
     }
 }

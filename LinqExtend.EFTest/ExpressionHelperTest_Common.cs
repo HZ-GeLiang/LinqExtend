@@ -52,59 +52,45 @@ namespace LinqExtend.Test
 
         public static string GetSql_IsDeleted_Test1(TestDbContext ctx)
         {
+            //bool? 的2种写法
             var sql1 = ctx.Books
-              .Where(b => b.IsDel.HasValue && b.IsDel == true)
+              //.Where(b => b.IsDel.HasValue && b.IsDel == true)
+              .Where(b => b.IsDel == true) //兼顾 bool? 和 bool
               .ToQueryString();
             return sql1;
         }
 
         public static string GetSql_IsDeleted_Test2(TestDbContext ctx)
         {
+            //bool 共2种写法
             var sql1 = ctx.Books
-              .Where(b => b.IsDel2 == true)
-              .ToQueryString();
-            return sql1;
-        }
-
-        public static string GetSql_IsDeleted_Test2_2(TestDbContext ctx)
-        {
-            var sql1 = ctx.Books
-              .Where(b => b.IsDel2)
+              //.Where(b => b.IsDel2)
+              .Where(b => b.IsDel2 == true)  //兼顾 bool? 和 bool
               .ToQueryString();
             return sql1;
         }
 
         public static string GetSql_IsNotDeleted_Test1(TestDbContext ctx)
         {
+            //bool? 的2种写法
             var sql1 = ctx.Books
-              .Where(b => b.IsDel == null && b.IsDel == false)
-              .ToQueryString();
-            return sql1;
-        }
-
-        public static string GetSql_IsNotDeleted_Test1_2(TestDbContext ctx)
-        {
-            var sql1 = ctx.Books
-              .Where(b => b.IsDel != true)
+              //.Where(b => b.IsDel == null && b.IsDel == false)
+              .Where(b => b.IsDel != true) //兼顾 bool? 和 bool
               .ToQueryString();
             return sql1;
         }
 
         public static string GetSql_IsNotDeleted_Test2(TestDbContext ctx)
         {
+            //bool 共2种写法
             var sql1 = ctx.Books
-              .Where(b => b.IsDel2 != false)
+              //.Where(b => !b.IsDel2)
+              .Where(b => b.IsDel2 != true)//兼顾 bool? 和 bool
               .ToQueryString();
             return sql1;
         }
 
-        public static string GetSql_IsNotDeleted_Test2_2(TestDbContext ctx)
-        {
-            var sql1 = ctx.Books
-              .Where(b => !b.IsDel2)
-              .ToQueryString();
-            return sql1;
-        }
+
 
     }
 }
