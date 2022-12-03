@@ -239,7 +239,6 @@ namespace LinqExtend.EF
                 throw new ArgumentException("propAccessor 的写法暂不被支持.");
             }
 
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
@@ -252,41 +251,62 @@ namespace LinqExtend.EF
         /// 没有被删除的,,即未标记为软删除的
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
+        /// <typeparam name="TPropType"></typeparam>
         /// <param name="propAccessor"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public static Expression<Func<TEntity, bool>> IsNotDeleted<TEntity>(Expression<Action<TEntity>> propAccessor)
+        /// <exception cref="NotSupportedException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public static Expression<Func<TEntity, bool>> IsNotDeleted<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             /*
                 .Where(b => b.IsDel == null || b.IsDel == false)
                 .Where(b => b.IsDel != true)  //同时兼顾了 bool? 和 bool
              */
-            /*
-             
-var b = Parameter(
-    typeof(Book),
-    "b"
-);
+            var expression = propAccessor.Body;
+            if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
+            {
+                var type_TEntity = typeof(TEntity);
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
 
-Lambda(
-    NotEqual(
-        MakeMemberAccess(b,
-            typeof(Book).GetProperty("IsDel")
-        ),
-        Convert(
-            Constant(true),
-            typeof(bool?)
-        )
-    ),
-    b
-)
-            */
-            //
-            throw new NotImplementedException();
+                string propName;
+
+                if (expression.NodeType == ExpressionType.MemberAccess)
+                {
+                    propName = ((dynamic)expression).Member.Name;
+                }
+                else
+                {
+                    DebuggerHelper.Break();
+                    throw new NotSupportedException($"Unknow expression {expression.GetType()}");
+                }
+
+                var prop = type_TEntity.GetProperty(propName);
+
+                ConstantExpression propValue =
+                    prop.PropertyType == typeof(Nullable<bool>)
+                    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
+                    ? Expression.Constant(true, typeof(Nullable<bool>))
+                    : Expression.Constant(true);
+
+                var lambda =
+                    Expression.Lambda<Func<TEntity, bool>>(
+                        Expression.NotEqual(
+                            Expression.MakeMemberAccess(p1, prop),
+                            propValue
+                        ),
+                        p1
+                    );
+
+                return lambda;
+            }
+            else
+            {
+                throw new ArgumentException("propAccessor 的写法暂不被支持.");
+            }
         }
 
-        /// <inheritdoc cref="IsNotDeleted{TEntity}(Expression{Action{TEntity}})" />
-        public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TEntity>(Expression<Action<TEntity>> propAccessor)
+        /// <inheritdoc cref="IsNotDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})" />
+        public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             return IsNotDeleted(propAccessor);
         }
@@ -325,7 +345,18 @@ Lambda(
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             return ExpressionHelper.IsSoftDelete<TEntity, TPropType>(propAccessor);
+        }
 
+        /// <inheritdoc cref="ExpressionHelper.IsNotDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsNotDeleted<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        {
+            return ExpressionHelper.IsNotDeleted<TEntity, TPropType>(propAccessor);
+        }
+
+        /// <inheritdoc cref="ExpressionHelper.IsNotSoftDelete{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        {
+            return ExpressionHelper.IsNotSoftDelete<TEntity, TPropType>(propAccessor);
         }
 
     }
