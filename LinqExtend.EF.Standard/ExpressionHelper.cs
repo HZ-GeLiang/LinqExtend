@@ -222,18 +222,7 @@ namespace LinqExtend.EF
                 //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
                 //    ? Expression.Constant(true, typeof(Nullable<bool>))
                 //    : Expression.Constant(true);
-
-                if (trueValue == null)
-                {
-                    lock (lockHelper)
-                    {
-                        if (trueValue == null)//double check 针对多线程
-                        {
-                            SetTrueValue();
-                        }
-                    }
-                }
-
+             
                 if (!trueValue.ContainsKey(prop.PropertyType))
                 {
                     throw new ArgumentException($"Type暂不被支持.{prop.PropertyType}");
@@ -257,41 +246,33 @@ namespace LinqExtend.EF
             }
         }
 
-
-        private static readonly object lockHelper = new object();
-
-        private volatile static Dictionary<Type, ConstantExpression> trueValue = null;//volatile  防止在特定平台下对指令集的微调 
-        private static void SetTrueValue()
+        private static Dictionary<Type, ConstantExpression> trueValue = new Dictionary<Type, ConstantExpression>()
         {
-            trueValue = new Dictionary<Type, ConstantExpression>();
-
-            //不能用语法糖把代码直接写道 trueValue , 会有 System.TypeInitializationException
             //共计11种类型 bool + ushort    short    int    uint    char    float    double    long    ulong    decimal
-            trueValue.Add(typeof(bool?), Expression.Constant((bool?)true, typeof(bool?)));
-            trueValue.Add(typeof(bool), Expression.Constant((bool)true, typeof(bool)));
-            trueValue.Add(typeof(int?), Expression.Constant((int?)1, typeof(int?)));
-            trueValue.Add(typeof(int), Expression.Constant((int)1, typeof(int)));
-            // 这行有 System.TypeInitializationException , 在往后的没测试了...
-            trueValue.Add(typeof(short?), Expression.Constant((short?)1, typeof(short?)));
-            trueValue.Add(typeof(short), Expression.Constant((short)1, typeof(short)));
-            trueValue.Add(typeof(char?), Expression.Constant((char?)'1', typeof(char?)));
-            trueValue.Add(typeof(char), Expression.Constant((char)'1', typeof(char)));
-            trueValue.Add(typeof(float?), Expression.Constant((float?)1, typeof(float?)));
-            trueValue.Add(typeof(float), Expression.Constant((float)1, typeof(float)));
-            trueValue.Add(typeof(double?), Expression.Constant((double?)1, typeof(double?)));
-            trueValue.Add(typeof(double), Expression.Constant((double)1, typeof(double)));
-            trueValue.Add(typeof(long?), Expression.Constant((long?)1, typeof(long?)));
-            trueValue.Add(typeof(long), Expression.Constant((long)1, typeof(long)));
-            trueValue.Add(typeof(decimal?), Expression.Constant((decimal?)1, typeof(decimal?)));
-            trueValue.Add(typeof(decimal), Expression.Constant((decimal)1, typeof(decimal)));
-            trueValue.Add(typeof(uint?), Expression.Constant((uint?)1, typeof(uint?)));
-            trueValue.Add(typeof(uint), Expression.Constant((uint)1, typeof(uint)));
-            trueValue.Add(typeof(ushort?), Expression.Constant((ushort?)1, typeof(ushort?)));
-            trueValue.Add(typeof(ushort), Expression.Constant((ushort)1, typeof(ushort)));
-            trueValue.Add(typeof(ulong?), Expression.Constant((ulong?)1, typeof(ulong?)));
-            trueValue.Add(typeof(ulong), Expression.Constant((ulong)1, typeof(ulong)));
-
-        }
+            {typeof(bool?),    Expression.Constant((bool?)true, typeof(bool?))},
+            {typeof(bool),     Expression.Constant((bool)true,  typeof(bool))},
+            {typeof(int?),     Expression.Constant((int?)1,     typeof(int?))},
+            {typeof(int),      Expression.Constant((int)1,      typeof(int))},
+            {typeof(short?),   Expression.Constant((short?)1,   typeof(short?))},
+            {typeof(short),    Expression.Constant((short)1,    typeof(short))},
+            {typeof(char?),    Expression.Constant((char?)'1',  typeof(char?))},
+            {typeof(char),     Expression.Constant((char)'1',   typeof(char))},
+            {typeof(float?),   Expression.Constant((float?)1,   typeof(float?))},
+            {typeof(float),    Expression.Constant((float)1,    typeof(float))},
+            {typeof(double?),  Expression.Constant((double?)1,  typeof(double?))},
+            {typeof(double),   Expression.Constant((double)1,   typeof(double))},
+            {typeof(long?),    Expression.Constant((long?)1,    typeof(long?))},
+            {typeof(long),     Expression.Constant((long)1,     typeof(long))},
+            {typeof(decimal?), Expression.Constant((decimal?)1, typeof(decimal?))},
+            {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
+            {typeof(uint?),    Expression.Constant((uint?)1,    typeof(uint?))},
+            {typeof(uint),     Expression.Constant((uint)1,     typeof(uint))},
+            {typeof(ushort?),  Expression.Constant((ushort?)1,  typeof(ushort?))},
+            {typeof(ushort),   Expression.Constant((ushort)1,   typeof(ushort))},
+            {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
+            {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
+        };
+         
 
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
