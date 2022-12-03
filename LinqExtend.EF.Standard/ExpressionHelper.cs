@@ -313,13 +313,18 @@ namespace LinqExtend.EF
                     throw new NotSupportedException($"Unknow expression {expression.GetType()}");
                 }
 
-                var prop = type_TEntity.GetProperty(propName);
+                var prop = type_TEntity.GetProperty(propName); 
+                //ConstantExpression propValue =
+                //    prop.PropertyType == typeof(Nullable<bool>)
+                //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
+                //    ? Expression.Constant(true, typeof(Nullable<bool>))
+                //    : Expression.Constant(true);
 
-                ConstantExpression propValue =
-                    prop.PropertyType == typeof(Nullable<bool>)
-                    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
-                    ? Expression.Constant(true, typeof(Nullable<bool>))
-                    : Expression.Constant(true);
+                if (!trueValue.ContainsKey(prop.PropertyType))
+                {
+                    throw new ArgumentException($"Type暂不被支持.{prop.PropertyType}");
+                }
+                ConstantExpression propValue = trueValue[prop.PropertyType];
 
                 var lambda =
                     Expression.Lambda<Func<TEntity, bool>>(
@@ -344,7 +349,6 @@ namespace LinqExtend.EF
             return IsNotDeleted(propAccessor);
         }
     }
-
 
     /// <inheritdoc cref="ExpressionHelper"/>
     public sealed class ExpressionHelper<TEntity> where TEntity : class
