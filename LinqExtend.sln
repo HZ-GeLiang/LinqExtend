@@ -5,7 +5,15 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinqExtend.Standard", "LinqExtend.Standard\LinqExtend.Standard.csproj", "{0E1BBD15-C139-40B8-9187-D005513ED497}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinqExtend.Test", "LinqExtend.Test\LinqExtend.Test.csproj", "{466E108B-9A95-4D9E-81DA-8532B582E351}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinqExtend.Test", "LinqExtend.Test\LinqExtend.Test.csproj", "{466E108B-9A95-4D9E-81DA-8532B582E351}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinqExtend.EF.Test", "LinqExtend.EFTest\LinqExtend.EF.Test.csproj", "{C5213B49-8C58-422A-A317-E0836D2229E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LinqExtend.EF.Standard", "LinqExtend.EF.Standard\LinqExtend.EF.Standard.csproj", "{FC5EC455-3B20-40C7-9872-292DA602550D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{920B66CC-E290-466C-8095-780764E7DBA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{43B171AC-C874-41A9-AEFA-AE7C20782615}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,9 +29,23 @@ Global
 		{466E108B-9A95-4D9E-81DA-8532B582E351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{466E108B-9A95-4D9E-81DA-8532B582E351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{466E108B-9A95-4D9E-81DA-8532B582E351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5213B49-8C58-422A-A317-E0836D2229E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5213B49-8C58-422A-A317-E0836D2229E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5213B49-8C58-422A-A317-E0836D2229E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5213B49-8C58-422A-A317-E0836D2229E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC5EC455-3B20-40C7-9872-292DA602550D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC5EC455-3B20-40C7-9872-292DA602550D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC5EC455-3B20-40C7-9872-292DA602550D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC5EC455-3B20-40C7-9872-292DA602550D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E1BBD15-C139-40B8-9187-D005513ED497} = {43B171AC-C874-41A9-AEFA-AE7C20782615}
+		{466E108B-9A95-4D9E-81DA-8532B582E351} = {920B66CC-E290-466C-8095-780764E7DBA1}
+		{C5213B49-8C58-422A-A317-E0836D2229E4} = {920B66CC-E290-466C-8095-780764E7DBA1}
+		{FC5EC455-3B20-40C7-9872-292DA602550D} = {43B171AC-C874-41A9-AEFA-AE7C20782615}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D1884036-2D3A-419A-81FC-B9E20943ABB8}

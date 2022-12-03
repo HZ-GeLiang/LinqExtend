@@ -7,7 +7,7 @@
 			net45;-->
 			netstandard2.0;
 		</TargetFrameworks>
-		<RootNamespace>LinqExtend</RootNamespace>
+		<RootNamespace>LinqExtend.EF</RootNamespace>
 		<!--<NoWarn>CS1591</NoWarn>
 		<WarningLevel>4</WarningLevel>-->
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -17,14 +17,14 @@
 		<Authors>GeLiang</Authors>
 		<Company>GeLiang</Company>
 		<Copyright>Copyright (c) GeLiang</Copyright>
-		<PackageId>LinqExtend</PackageId>
-		<Description>Linq 2 Object extension</Description>
+		<PackageId>LinqExtend.EF</PackageId>
+		<Description>EFHelper</Description>
 		<PackageProjectUrl>https://github.com/HZ-GeLiang/LinqExtend</PackageProjectUrl>
-		<PackageTags>LinqExtend, Linq2Object, Linq</PackageTags>
+		<PackageTags>LinqExtend, EFHelper, Linq</PackageTags>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<RepositoryType>github</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>0.0.5</Version>
+		<Version>0.0.1</Version>
 		<LangVersion>10</LangVersion>
 	</PropertyGroup>
 
