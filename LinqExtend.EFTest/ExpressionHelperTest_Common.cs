@@ -15,7 +15,7 @@ namespace LinqExtend.Test
             return sql1;
         }
 
-        public static string GetSql_IsNullOrEmpty_Test(TestDbContext ctx)
+        public static string GetSql_IsEmpty_Test(TestDbContext ctx)
         {
             var sql1 = ctx.Books
               .Where(b => string.IsNullOrEmpty(b.Publisher))

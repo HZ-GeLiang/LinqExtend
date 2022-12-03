@@ -15,7 +15,7 @@ namespace LinqExtend.EF.Test
     /// 利用语法,进行简写的示例
     /// </summary>
     [TestClass]
-    public class ExpressionHelperTest
+    public class ExpressionHelperTest_Abbr
     {
         //[TestMethod]
         //public void MakeEqual_Test()
@@ -34,13 +34,13 @@ namespace LinqExtend.EF.Test
         //}
 
         [TestMethod]
-        public void IsNullOrEmpty_Test()
+        public void IsEmpty_Test()
         {
             using TestDbContext ctx = new TestDbContext();
-            var sql1 = ExpressionHelperTest_Common.GetSql_IsNullOrEmpty_Test(ctx);
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsEmpty_Test(ctx);
             
             var sql2 = ctx.Books
-                .Where(IsNullOrEmpty(b => b.Publisher))// 利用语法,进行简写
+                .Where(IsEmpty(b => b.Publisher))// 利用语法,进行简写
                 .ToQueryString();
 
             Assert.AreEqual(sql1, sql2);
