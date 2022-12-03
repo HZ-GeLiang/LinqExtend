@@ -1,0 +1,4 @@
+﻿初始化数据库
+add-migration InitialCreate
+update-database
+ 
