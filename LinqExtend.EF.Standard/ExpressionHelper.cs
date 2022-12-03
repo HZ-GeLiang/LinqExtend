@@ -25,11 +25,11 @@ namespace LinqExtend.EF
         /// <param name="compareObject">比较的值对象</param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public static Expression<Func<T1, bool>> MakeEqual<T1, T2>(Expression<Func<T1, T2>> propAccessor, T2 compareObject)
+        internal static Expression<Func<T1, bool>> MakeEqual<T1, T2>(Expression<Func<T1, T2>> propAccessor, T2 compareObject)
            where T1 : class
            where T2 : class
         {
-            //这个代码来自 杨中科
+            //这个代码来自 杨中科 ,  之所以是 internal, 是因为 单元测试没通过, 觉得应该可以调整, 当作一个todo
 
             BinaryExpression conditionalExpr = null;
             foreach (var prop in typeof(T2).GetProperties())
@@ -158,7 +158,7 @@ namespace LinqExtend.EF
     public sealed class ExpressionHelper<TEntity> where TEntity : class
     {
         /// <inheritdoc cref="ExpressionHelper.MakeEqual{T1, T2}(Expression{Func{T1, T2}}, T2)" />
-        public static Expression<Func<TEntity, bool>> MakeEqual<T2>(Expression<Func<TEntity, T2>> propAccessor, T2 compareObject)
+        internal static Expression<Func<TEntity, bool>> MakeEqual<T2>(Expression<Func<TEntity, T2>> propAccessor, T2 compareObject)
                 where T2 : class
         {
             return ExpressionHelper.MakeEqual<TEntity, T2>(propAccessor, compareObject);
