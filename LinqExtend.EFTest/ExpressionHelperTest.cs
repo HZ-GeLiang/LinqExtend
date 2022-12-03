@@ -101,6 +101,31 @@ namespace LinqExtend.Test
 
 
         [TestMethod]
+        public void IsDeleted_Test3()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test3(ctx);
+
+            var sql2 = ctx.Books
+                .Where(ExpressionHelper.IsDeleted((Book b) => b.IsDel3))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
+        public void IsDeleted_Test4()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test4(ctx);
+
+            //.Where(b => b.IsDel2 == true)
+            var sql2 = ctx.Books
+                .Where(ExpressionHelper.IsDeleted((Book b) => b.IsDel4))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
         public void IsNotDeleted_Test1()
         {
             using TestDbContext ctx = new TestDbContext();

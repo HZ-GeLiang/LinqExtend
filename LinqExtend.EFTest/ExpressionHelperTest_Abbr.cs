@@ -110,6 +110,31 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2);
         }
 
+        [TestMethod]
+        public void IsDeleted_Test3()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test3(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsDeleted(b => b.IsDel3))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+
+        [TestMethod]
+        public void IsDeleted_Test4()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test4(ctx);
+
+            var sql2 = ctx.Books
+                .Where(IsDeleted(b => b.IsDel4))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
 
         [TestMethod]
         public void IsNotDeleted_Test1()
