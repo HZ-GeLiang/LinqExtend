@@ -24,5 +24,15 @@ namespace LinqExtend.Test
             return sql1;
         }
 
+        public static string GetSql_IsNotEmpty_Test(TestDbContext ctx)
+        {
+            var sql1 = ctx.Books
+              .Where(b => !string.IsNullOrEmpty(b.Publisher))
+              .ToQueryString();
+            //注: sql 的 where 子句中 是否进行 null判断是取决于字段是否可空
+            return sql1;
+        }
+
+
     }
 }
