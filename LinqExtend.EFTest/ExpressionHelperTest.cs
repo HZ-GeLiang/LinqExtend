@@ -148,7 +148,30 @@ namespace LinqExtend.Test
                 .Where(ExpressionHelper.IsNotDeleted((Book b) => b.IsDel2))
                 .ToQueryString();
             Assert.AreEqual(sql1, sql2);
+        }
 
+        [TestMethod]
+        public void IsNotDeleted_Test3()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsNotDeleted_Test3(ctx);
+
+            var sql2 = ctx.Books
+                .Where(ExpressionHelper.IsNotDeleted((Book b) => b.IsDel3))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
+        public void IsNotDeleted_Test4()
+        {
+            using TestDbContext ctx = new TestDbContext();
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsNotDeleted_Test4(ctx);
+             
+            var sql2 = ctx.Books
+                .Where(ExpressionHelper.IsNotDeleted((Book b) => b.IsDel4))
+                .ToQueryString();
+            Assert.AreEqual(sql1, sql2);
         }
 
         [TestMethod]
@@ -180,8 +203,6 @@ namespace LinqExtend.Test
                 .Where(b => b.IsDel != true)
                 .Count();
              
-
-
 
             Console.WriteLine(sql1);
         }
