@@ -84,7 +84,7 @@ namespace LinqExtend.EF
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public static Expression<Func<TEntity, bool>> IsNullOrEmpty<TEntity>(Expression<Func<TEntity, string>> propAccessor)
+        public static Expression<Func<TEntity, bool>> IsEmpty<TEntity>(Expression<Func<TEntity, string>> propAccessor)
             where TEntity : class
         {
             //把 string.IsNullOrEmpty 翻译成对应的表达式树
@@ -111,7 +111,7 @@ namespace LinqExtend.EF
                 var lambda =
                 Expression.Lambda<Func<TEntity, bool>>(
                     Expression.Call(
-                        typeof(string).GetMethod("IsNullOrEmpty"),
+                        typeof(string).GetMethod("IsEmpty"),
                         Expression.MakeMemberAccess(p1,
                            type_TEntity.GetProperty(propName)//"AuthorName"
                         )
@@ -164,10 +164,10 @@ namespace LinqExtend.EF
             return ExpressionHelper.MakeEqual<TEntity, T2>(propAccessor, compareObject);
         }
 
-        /// <inheritdoc cref="ExpressionHelper.IsNullOrEmpty{TEntity}(Expression{Func{TEntity, string}})"/>     
-        public static Expression<Func<TEntity, bool>> IsNullOrEmpty(Expression<Func<TEntity, string>> propAccessor)
+        /// <inheritdoc cref="ExpressionHelper.IsEmpty{TEntity}(Expression{Func{TEntity, string}})"/>     
+        public static Expression<Func<TEntity, bool>> IsEmpty(Expression<Func<TEntity, string>> propAccessor)
         {
-            return ExpressionHelper.IsNullOrEmpty<TEntity>(propAccessor);
+            return ExpressionHelper.IsEmpty<TEntity>(propAccessor);
         }
 
     }

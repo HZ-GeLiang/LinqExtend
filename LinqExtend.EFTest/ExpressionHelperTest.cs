@@ -26,14 +26,14 @@ namespace LinqExtend.Test
         //}
 
         [TestMethod]
-        public void IsNullOrEmpty_Test()
+        public void IsEmpty_Test()
         {
             using TestDbContext ctx = new TestDbContext();
-            var sql1 = ExpressionHelperTest_Common.GetSql_IsNullOrEmpty_Test(ctx);
+            var sql1 = ExpressionHelperTest_Common.GetSql_IsEmpty_Test(ctx);
 
             var sql2 = ctx.Books
-                .Where(ExpressionHelper.IsNullOrEmpty((Book b) => b.Publisher))
-                //.Where(ExpressionHelper.IsNullOrEmpty<Book>( b => b.Publisher))//或这个写法
+                .Where(ExpressionHelper.IsEmpty((Book b) => b.Publisher))
+                //.Where(ExpressionHelper.IsEmpty<Book>( b => b.Publisher))//或这个写法
                 .ToQueryString();
             Assert.AreEqual(sql1, sql2);
         }
