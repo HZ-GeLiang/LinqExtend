@@ -1,6 +1,7 @@
 ﻿using LinqExtend.EF;
 using LinqExtend.EF.Test.EF;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace LinqExtend.Test
@@ -187,41 +188,67 @@ namespace LinqExtend.Test
                 Publisher = a.Publisher
             });
 
-            //SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher] FROM[T_Books] AS[t]
             var sql = query.ToQueryString();
-
+            Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
             var queryList = query.ToList();
 
             //var exp = ExpressionHelper.SelectMap<Book, BookDto>();
             //var selectMapList = ctx.Books.Select(exp).ToList();
 
-            var selectMapList = 
-                ctx.Books
+            var selectMapQuery = ctx.Books
                 .Select(ExpressionHelper.SelectMap<Book, BookDto>())
-                .ToList();
+                ;
+            var sql_selectMap = selectMapQuery.ToQueryString();
+            Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
+
+            var selectMapList = selectMapQuery.ToList();
 
             CollectionAssert.AreEqual(queryList, selectMapList);
-            Console.WriteLine(sql);
-
         }
 
 
 
         [TestMethod]
-        public void SelectMap_Test()
+        public void SelectMap_object2Linq_Test()
         {
+
+            return;//因为  LinqExtend.Standard 中的 还未完成. 
             using TestDbContext ctx = new TestDbContext();
 
-            var query = from b in ctx.Books
-                        select new { b };
-            var query2 = query.Select(a => new BookDto()
+            var query_tmp = from b in ctx.Books
+                            select new { b = b, key = "_key" };
+
+
+            var query = query_tmp.Select(a => new BookDto()
             {
-                Id = a.b.Id
+                Id = a.b.Id,
+                PubTime = a.b.PubTime,
+                Price = a.b.Price,
+                Publisher = a.b.Publisher
             });
 
-            var sql = query2.ToQueryString(); //SELECT [t].[Id] FROM [T_Books] AS [t]
+            var sql = query.ToQueryString();
+            Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
 
-            Console.WriteLine(sql);
+            var queryList = query.ToList();
+
+
+            var selectMapQuery = query_tmp.SelectMap(a => new BookDto
+            {
+                //规则            
+
+                Key = a.key
+
+            });
+            var sql_selectMap = selectMapQuery.ToQueryString();
+
+            var selectMapList = selectMapQuery.ToList();
+
+
+            CollectionAssert.AreEqual(queryList, selectMapList);
 
         }
 
