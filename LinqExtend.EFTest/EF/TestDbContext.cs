@@ -16,6 +16,8 @@ namespace LinqExtend.EF.Test.EF
         }
 
         public DbSet<Book> Books { get; set; } //表名默认为 DbSet 的属性名, 即 这里为 Books
+        public DbSet<Order> Orders { get; set; }  
+        public DbSet<Shop> Shops { get; set; }  
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
