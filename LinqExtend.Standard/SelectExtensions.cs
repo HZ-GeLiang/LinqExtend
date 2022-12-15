@@ -58,72 +58,12 @@ namespace LinqExtend
             where TSource : class 
             where TResult : class, new()
         {
-            #region 辅助方法
-            bool IsNullableType(Type type) => type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-
-            Type GetNullableTType(Type type) => type.GetProperty("Value").PropertyType;
-
-#if DEBUG
-            //Debug下,  如果转换异常,可以知道是哪个属性
-            object ChangeType(PropertyInfo propertyInfo, object val, Type type) => Convert.ChangeType(val, IsNullableType(type) ? GetNullableTType(type) : type);
-#else
-            object ChangeType(object val, Type type) => Convert.ChangeType(val, IsNullableType(type) ? GetNullableTType(type) : type);
-#endif
-
-            //是否为值类型
-            bool IsStructType(Type type)
-            {
-#if NET6_0_OR_GREATER
-
-                ArgumentNullException.ThrowIfNull(type);
-#else
-                if (type == null)
-                {
-                    throw new ArgumentNullException(nameof(type));
-                }
-#endif
-                var isStructType = !type.IsClass;
-                if (isStructType)
-                {
-                    return true;
-                }
-
-                if (IsNullableType(type) && !GetNullableTType(type).IsClass)
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            bool CanSetPropertyValue(PropertyInfo propertyInfo)
-            {
-                //if (!propertyInfo.CanWrite)// 判断此属性是否有Setter
-                //{
-                //    return false; ;//该属性不可写，直接跳出
-                //}
-
-                // If not writable then cannot null it;
-                // if not readable then cannot check it's value
-                // 后面2个表示:  Get and set methods have to be public
-                if (!propertyInfo.CanWrite ||
-                    !propertyInfo.CanRead ||
-                    propertyInfo.GetGetMethod(false) == null ||
-                    propertyInfo.GetSetMethod(false) == null
-                    )
-                {
-                    return false;
-                }
-                return true;
-            }
-            #endregion
-
             if (source == null)
             {
                 return Enumerable.Empty<TResult>();
             }
 
             var lambda = SelectMap_GetExpression<TSource, TResult>(selector);
-
 
             var methodPara = new object[] { source, lambda.Compile() };
 
