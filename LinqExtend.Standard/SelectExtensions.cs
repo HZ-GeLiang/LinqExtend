@@ -10,6 +10,9 @@ using System.Text;
 
 namespace LinqExtend
 {
+    /// <summary>
+    /// Select的扩展
+    /// </summary>
     public static class SelectExtensions
     {
         public static IEnumerable<TResult> Select<TResult>(this DataColumnCollection dataColumns, Func<DataColumn, TResult> selector)
@@ -46,10 +49,11 @@ namespace LinqExtend
             return list;
         }
 
+
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
             where TSource : class
             where TResult : class, new()
-        => SelectMap<TSource, TResult>(source, null);
+            => SelectMap<TSource, TResult>(source, null);
 
         private static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
             where TSource : class

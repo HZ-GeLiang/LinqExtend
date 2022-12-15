@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LinqExtend.Test.Model;
+using System;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -17,24 +18,13 @@ namespace LinqExtend.Test
             dt.Rows.Add("1");
             dt.Rows.Add("2");
 
-            var ids = dt.Rows.Select(a => Convert.ToInt32(a[0]));
+            var ids = dt.Rows.Select(a => Convert.ToInt32(a[0]));//扩展的
 
             Assert.AreEqual(1, ids.First());
             Assert.AreEqual(2, ids.Last());
         }
 
-        public class People
-        {
-            public int Id { get; set; }
-            public int Age { get; set; }
-            public string Name { get; set; }
-        }
 
-        public class PeopleDto
-        {
-            public int Id { get; set; }
-            public int Age { get; set; }
-        }
 
         [TestMethod]
         public void SelectMap_Enumerable()
@@ -45,54 +35,37 @@ namespace LinqExtend.Test
                 new People (){ Id =2 , Age =2 , Name="2"},
             };
 
-            var list2 = peoples.SelectMap<People, PeopleDto>();
-
-            Assert.AreEqual(2, list2.Count());
-
-            var list = peoples.Select(a => new PeopleDto
             {
-                Id = a.Id,
-                Age = a.Age,
-            });
+                //系统自带的2个方法的使用demo
+                var result = peoples.Select(a => new PeopleDto
+                {
+                    Id = a.Id,
+                    Age = a.Age,
+                }).ToList(); //自带的Select
 
-            Expression<Func<People, PeopleDto>> selector = a => new PeopleDto
+                var list = Enumerable.Select(peoples, delegate (People a)
+                {
+                    return new PeopleDto
+                    {
+                        Id = a.Id,
+                        Age = a.Age
+                    };
+                }).ToList(); //自带的Select
+
+                CollectionAssert.AreEqual(result, list);
+            }
+
             {
-                Id = a.Id,
-                Age = a.Age,
-            };
+                //扩展的方法, 没有automaper 那一步映射
+                var list = peoples.SelectMap<People, PeopleDto>().ToList();
 
+                CollectionAssert.AreEqual(list, new List<PeopleDto>()
+                {
+                    new PeopleDto(){ Id =1 , Age=1},
+                    new PeopleDto(){ Id =2 , Age=2},
+                });
+            }
 
-            //IEnumerable<PeopleDto> list = Enumerable.Select(peoples, delegate (People a)
-            //{
-            //    PeopleDto peopleDto = new PeopleDto();
-            //    peopleDto.Id = a.Id;
-            //    peopleDto.Age = a.Age;
-            //    return peopleDto;
-            //});
-
-            //ParameterExpression parameterExpression = Expression.Parameter(typeof(People), "a");
-            //Expression<Func<People, PeopleDto>> selector =
-            //    Expression.Lambda<Func<People, PeopleDto>>(
-            //        Expression.MemberInit(
-            //            Expression.New(typeof(PeopleDto)),
-            //            --dnspy
-            //        	  Expression.Bind(
-            //                methodof(
-            //                   SelectExtensionsTest.PeopleDto.set_Id(int)),
-            //                   Expression.Property(
-            //                      parameterExpression,
-            //                      methodof(SelectExtensionsTest.People.get_Id()
-            //                   )
-            //               )
-            //            ),
-            //            --ilspy
-            //            Expression.Bind(
-            //                (MethodInfo)MethodBase.GetMethodFromHandle((RuntimeMethodHandle)/*OpCode not supported: LdMemberToken*/),
-            //                Expression.Property(parameterExpression,
-            //                (MethodInfo)MethodBase.GetMethodFromHandle((RuntimeMethodHandle)/*OpCode not supported: LdMemberToken*/)))
-            //        ),
-            //        new ParameterExpression[1] { parameterExpression }
-            //    );
         }
 
         [TestMethod]
