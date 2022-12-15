@@ -184,5 +184,29 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2);
         }
 
+
+        [TestMethod]
+        public void SelectMap_DbSet_Test()
+        {
+            using TestDbContext ctx = new TestDbContext();
+
+            var query = ctx.Books.Select(a => new BookDto()
+            {
+                Id = a.Id,
+                PubTime = a.PubTime,
+                Price = a.Price,
+                Publisher = a.Publisher
+            });
+
+            var queryList = query.ToList();
+
+            var selectMapList =
+                ctx.Books
+                .Select(SelectMap<BookDto>())
+                .ToList();
+
+            CollectionAssert.AreEqual(queryList, selectMapList);
+        }
+
     }
 }

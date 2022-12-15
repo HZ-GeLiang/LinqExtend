@@ -1,9 +1,11 @@
 ﻿using LinqExtend.EF.Consts;
+using LinqExtend.EF.ExtendMethods;
 using LinqExtend.EF.Helper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -222,7 +224,7 @@ namespace LinqExtend.EF
                 //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
                 //    ? Expression.Constant(true, typeof(Nullable<bool>))
                 //    : Expression.Constant(true);
-             
+
                 if (!trueValue.ContainsKey(prop.PropertyType))
                 {
                     throw new ArgumentException($"Type暂不被支持.{prop.PropertyType}");
@@ -272,7 +274,7 @@ namespace LinqExtend.EF
             {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
             {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
         };
-         
+
 
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
@@ -313,7 +315,7 @@ namespace LinqExtend.EF
                     throw new NotSupportedException($"Unknow expression {expression.GetType()}");
                 }
 
-                var prop = type_TEntity.GetProperty(propName); 
+                var prop = type_TEntity.GetProperty(propName);
                 //ConstantExpression propValue =
                 //    prop.PropertyType == typeof(Nullable<bool>)
                 //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
@@ -348,6 +350,18 @@ namespace LinqExtend.EF
         {
             return IsNotDeleted(propAccessor);
         }
+
+
+        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
+            where TSource : class
+            where TResult : class, new()
+        {
+
+            Expression<Func<TSource, TResult>> lambda = SelectExtensions.SelectMap_GetExpression<TSource, TResult>(null);
+            return lambda;
+        }
+
+
     }
 
     /// <inheritdoc cref="ExpressionHelper"/>
@@ -396,5 +410,12 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsNotSoftDelete<TEntity, TPropType>(propAccessor);
         }
 
+
+        /// <inheritdoc cref="ExpressionHelper.SelectMap{TSource, TResult}"/>
+        public static Expression<Func<TEntity, TResult>> SelectMap<TResult>()
+            where TResult : class, new()
+        {
+            return ExpressionHelper.SelectMap<TEntity, TResult>();
+        }
     }
 }
