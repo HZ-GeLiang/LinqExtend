@@ -49,14 +49,13 @@ namespace LinqExtend
             return list;
         }
 
-
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
-            where TSource : class
+            where TSource : class 
             where TResult : class, new()
             => SelectMap<TSource, TResult>(source, null);
 
-        private static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
-            where TSource : class
+        private static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector = null)
+            where TSource : class 
             where TResult : class, new()
         {
             #region 辅助方法
@@ -123,6 +122,31 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
+            var lambda = SelectMap_GetExpression<TSource, TResult>(selector);
+
+
+            var methodPara = new object[] { source, lambda.Compile() };
+
+            var SelectMehtod =
+                    typeof(System.Linq.Enumerable)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(mi => mi.Name == "Select"
+                        && mi.GetParameters().Length == 2
+                        && mi.GetParameters().Last().ParameterType.GenericTypeArguments.Length == 2);
+
+            IEnumerable<TResult> list = (IEnumerable<TResult>)
+                SelectMehtod.MakeGenericMethod(
+                    new Type[] { typeof(TSource), typeof(TResult) }
+                ).Invoke(null, methodPara);
+
+            return list;
+        }
+
+        private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Func<TSource, TResult> selector)
+            where TSource : class 
+            where TResult : class, new()
+        {
+
             var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
             var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
             var propsCommon = propsSource.Intersect(propsResult); //TSource 和 TResult 的相同属性
@@ -135,7 +159,7 @@ namespace LinqExtend
             {
                 //if (selector != null)
                 //{
-                //   todo: 计划支持,部分属性按配置的来, 没有配置的按约定的走
+                //   todo: 部分属性按配置的来, 没有配置的按约定的走
                 //}
 
                 //todo: 计划支持类型不一致时的情况: ToList<T> 的实现参考...
@@ -167,7 +191,6 @@ namespace LinqExtend
                 //      propertyInfo.SetValue(model, new_colValue);
                 // }
 
-
                 bindings[i++] =
                     Expression.Bind(
                         typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
@@ -186,29 +209,16 @@ namespace LinqExtend
             Type[] templateTypeSet = new[] { typeof(TSource), genericType_arg2 };
             Type implementType = genericType.MakeGenericType(templateTypeSet);
 
-            var lambda =
+            var lambda = (Expression<Func<TSource, TResult>>)
                 Expression.Lambda(
                     implementType,
                     memberInitExpression,
                     new ParameterExpression[1] { parameterExp }
                 );
 
-            var methodPara = new object[] { source, lambda.Compile() };
+            return lambda;
 
-            var SelectMehtod =
-                    typeof(System.Linq.Enumerable)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .First(mi => mi.Name == "Select"
-                        && mi.GetParameters().Length == 2
-                        && mi.GetParameters().Last().ParameterType.GenericTypeArguments.Length == 2);
-
-            IEnumerable<TResult> list = (IEnumerable<TResult>)
-                SelectMehtod.MakeGenericMethod(
-                    new Type[] { typeof(TSource), typeof(TResult) }
-                ).Invoke(null, methodPara);
-
-            return list;
         }
-       
+
     }
 }

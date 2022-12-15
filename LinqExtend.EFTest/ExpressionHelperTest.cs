@@ -1,6 +1,7 @@
 ﻿using LinqExtend.EF;
 using LinqExtend.EF.Test.EF;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace LinqExtend.Test
 {
@@ -79,7 +80,7 @@ namespace LinqExtend.Test
         {
             using TestDbContext ctx = new TestDbContext();
             var sql1 = ExpressionHelperTest_Common.GetSql_IsDeleted_Test1(ctx);
-       
+
             var sql2 = ctx.Books
                 .Where(ExpressionHelper.IsDeleted((Book b) => b.IsDel))
                 .ToQueryString();
@@ -98,7 +99,6 @@ namespace LinqExtend.Test
                 .ToQueryString();
             Assert.AreEqual(sql1, sql2);
         }
-
 
         [TestMethod]
         public void IsDeleted_Test3()
@@ -167,11 +167,62 @@ namespace LinqExtend.Test
         {
             using TestDbContext ctx = new TestDbContext();
             var sql1 = ExpressionHelperTest_Common.GetSql_IsNotDeleted_Test4(ctx);
-             
+
             var sql2 = ctx.Books
                 .Where(ExpressionHelper.IsNotDeleted((Book b) => b.IsDel4))
                 .ToQueryString();
             Assert.AreEqual(sql1, sql2);
+        }
+
+        [TestMethod]
+        public void SelectMap_DbSet_Test()
+        {
+            using TestDbContext ctx = new TestDbContext();
+
+            var query = ctx.Books.Select(a => new BookDto()
+            {
+                Id = a.Id,
+                PubTime = a.PubTime,
+                Price = a.Price,
+                Publisher = a.Publisher
+            });
+
+            //SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher] FROM[T_Books] AS[t]
+            var sql = query.ToQueryString();
+
+            var queryList = query.ToList();
+
+            //var exp = ExpressionHelper.SelectMap<Book, BookDto>();
+            //var selectMapList = ctx.Books.Select(exp).ToList();
+
+            var selectMapList = 
+                ctx.Books
+                .Select(ExpressionHelper.SelectMap<Book, BookDto>())
+                .ToList();
+
+            CollectionAssert.AreEqual(queryList, selectMapList);
+            Console.WriteLine(sql);
+
+        }
+
+
+
+        [TestMethod]
+        public void SelectMap_Test()
+        {
+            using TestDbContext ctx = new TestDbContext();
+
+            var query = from b in ctx.Books
+                        select new { b };
+            var query2 = query.Select(a => new BookDto()
+            {
+                Id = a.b.Id
+            });
+
+            var sql = query2.ToQueryString(); //SELECT [t].[Id] FROM [T_Books] AS [t]
+
+            Console.WriteLine(sql);
+
         }
 
         [TestMethod]
@@ -202,7 +253,7 @@ namespace LinqExtend.Test
             var sql2 = ctx.Books
                 .Where(b => b.IsDel != true)
                 .Count();
-             
+
 
             Console.WriteLine(sql1);
         }
