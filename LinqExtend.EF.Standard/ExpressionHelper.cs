@@ -78,7 +78,7 @@ namespace LinqExtend.EF
         }
 
         /// <summary>
-        /// 是空的,没有值 (这个没有值是语义上的)
+        /// 是空的,没有值 (这个没有值是语义上的) 
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="propAccessor"></param>
@@ -272,8 +272,7 @@ namespace LinqExtend.EF
             {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
             {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
         };
-         
-
+    
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
@@ -348,8 +347,12 @@ namespace LinqExtend.EF
         {
             return IsNotDeleted(propAccessor);
         }
+
+       
+
     }
 
+    #region 泛型类
     /// <inheritdoc cref="ExpressionHelper"/>
     public sealed class ExpressionHelper<TEntity> where TEntity : class
     {
@@ -396,5 +399,7 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsNotSoftDelete<TEntity, TPropType>(propAccessor);
         }
 
-    }
+    } 
+    #endregion
+
 }
