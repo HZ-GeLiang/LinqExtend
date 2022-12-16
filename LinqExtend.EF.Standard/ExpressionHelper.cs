@@ -1,9 +1,11 @@
 ﻿using LinqExtend.EF.Consts;
+using LinqExtend.EF.ExtendMethods;
 using LinqExtend.EF.Helper;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -181,6 +183,33 @@ namespace LinqExtend.EF
             }
         }
 
+        private static Dictionary<Type, ConstantExpression> trueValue = new Dictionary<Type, ConstantExpression>()
+        {
+            //共计11种类型 bool + ushort    short    int    uint    char    float    double    long    ulong    decimal
+            {typeof(bool?),    Expression.Constant((bool?)true, typeof(bool?))},
+            {typeof(bool),     Expression.Constant((bool)true,  typeof(bool))},
+            {typeof(int?),     Expression.Constant((int?)1,     typeof(int?))},
+            {typeof(int),      Expression.Constant((int)1,      typeof(int))},
+            {typeof(short?),   Expression.Constant((short?)1,   typeof(short?))},
+            {typeof(short),    Expression.Constant((short)1,    typeof(short))},
+            {typeof(char?),    Expression.Constant((char?)'1',  typeof(char?))},
+            {typeof(char),     Expression.Constant((char)'1',   typeof(char))},
+            {typeof(float?),   Expression.Constant((float?)1,   typeof(float?))},
+            {typeof(float),    Expression.Constant((float)1,    typeof(float))},
+            {typeof(double?),  Expression.Constant((double?)1,  typeof(double?))},
+            {typeof(double),   Expression.Constant((double)1,   typeof(double))},
+            {typeof(long?),    Expression.Constant((long?)1,    typeof(long?))},
+            {typeof(long),     Expression.Constant((long)1,     typeof(long))},
+            {typeof(decimal?), Expression.Constant((decimal?)1, typeof(decimal?))},
+            {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
+            {typeof(uint?),    Expression.Constant((uint?)1,    typeof(uint?))},
+            {typeof(uint),     Expression.Constant((uint)1,     typeof(uint))},
+            {typeof(ushort?),  Expression.Constant((ushort?)1,  typeof(ushort?))},
+            {typeof(ushort),   Expression.Constant((ushort)1,   typeof(ushort))},
+            {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
+            {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
+        };
+
         /// <summary>
         /// 删除状态的,即软删除的
         /// </summary>
@@ -222,7 +251,7 @@ namespace LinqExtend.EF
                 //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
                 //    ? Expression.Constant(true, typeof(Nullable<bool>))
                 //    : Expression.Constant(true);
-             
+
                 if (!trueValue.ContainsKey(prop.PropertyType))
                 {
                     throw new ArgumentException($"Type暂不被支持.{prop.PropertyType}");
@@ -246,33 +275,6 @@ namespace LinqExtend.EF
             }
         }
 
-        private static Dictionary<Type, ConstantExpression> trueValue = new Dictionary<Type, ConstantExpression>()
-        {
-            //共计11种类型 bool + ushort    short    int    uint    char    float    double    long    ulong    decimal
-            {typeof(bool?),    Expression.Constant((bool?)true, typeof(bool?))},
-            {typeof(bool),     Expression.Constant((bool)true,  typeof(bool))},
-            {typeof(int?),     Expression.Constant((int?)1,     typeof(int?))},
-            {typeof(int),      Expression.Constant((int)1,      typeof(int))},
-            {typeof(short?),   Expression.Constant((short?)1,   typeof(short?))},
-            {typeof(short),    Expression.Constant((short)1,    typeof(short))},
-            {typeof(char?),    Expression.Constant((char?)'1',  typeof(char?))},
-            {typeof(char),     Expression.Constant((char)'1',   typeof(char))},
-            {typeof(float?),   Expression.Constant((float?)1,   typeof(float?))},
-            {typeof(float),    Expression.Constant((float)1,    typeof(float))},
-            {typeof(double?),  Expression.Constant((double?)1,  typeof(double?))},
-            {typeof(double),   Expression.Constant((double)1,   typeof(double))},
-            {typeof(long?),    Expression.Constant((long?)1,    typeof(long?))},
-            {typeof(long),     Expression.Constant((long)1,     typeof(long))},
-            {typeof(decimal?), Expression.Constant((decimal?)1, typeof(decimal?))},
-            {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
-            {typeof(uint?),    Expression.Constant((uint?)1,    typeof(uint?))},
-            {typeof(uint),     Expression.Constant((uint)1,     typeof(uint))},
-            {typeof(ushort?),  Expression.Constant((ushort?)1,  typeof(ushort?))},
-            {typeof(ushort),   Expression.Constant((ushort)1,   typeof(ushort))},
-            {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
-            {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
-        };
-    
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
@@ -312,7 +314,7 @@ namespace LinqExtend.EF
                     throw new NotSupportedException($"Unknow expression {expression.GetType()}");
                 }
 
-                var prop = type_TEntity.GetProperty(propName); 
+                var prop = type_TEntity.GetProperty(propName);
                 //ConstantExpression propValue =
                 //    prop.PropertyType == typeof(Nullable<bool>)
                 //    //TypeHelper.IsNullableType(prop.PropertyType) //  未做 性能测试, 这种更加通用
@@ -348,9 +350,46 @@ namespace LinqExtend.EF
             return IsNotDeleted(propAccessor);
         }
 
-       
+
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Func{TSource, TResult})" />
+        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
+            where TSource : class
+            where TResult : class, new()
+        {
+            return SelectMap((Func<TSource, TResult>)null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Func<TSource, TResult> selector)
+         where TSource : class
+         where TResult : class, new()
+        {
+            var lambda = SelectExtensions.SelectMap_GetExpression<TSource, TResult>(selector);
+            return lambda;
+        }
 
     }
+
+    /// <inheritdoc cref="ExpressionHelper"/>
+    public static class ExpressionExtesion
+    {
+        /// <inheritdoc cref="ExpressionHelper.SelectMap{TSource, TResult}(Func{TSource, TResult})" />
+        public static IQueryable<TResult> SelectMap<TSource, TResult>(this IQueryable<TSource> query, Func<TSource, TResult> selector)
+          where TSource : class
+          where TResult : class, new()
+        {
+            var exp = ExpressionHelper.SelectMap<TSource, TResult>(selector);
+            IQueryable<TResult> querySelect = query.Select(exp);
+            return querySelect;
+        }
+    }
+
 
     #region 泛型类
     /// <inheritdoc cref="ExpressionHelper"/>
@@ -399,7 +438,11 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsNotSoftDelete<TEntity, TPropType>(propAccessor);
         }
 
-    } 
-    #endregion
-
+        /// <inheritdoc cref="ExpressionHelper.SelectMap{TSource, TResult}(Func{TSource, TResult})" />
+        public static Expression<Func<TEntity, TResult>> SelectMap<TResult>()
+            where TResult : class, new()
+        {
+            return ExpressionHelper.SelectMap<TEntity, TResult>();
+        }
+    }
 }
