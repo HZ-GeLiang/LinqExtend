@@ -185,29 +185,35 @@ namespace LinqExtend.EF
 
         private static Dictionary<Type, ConstantExpression> trueValue = new Dictionary<Type, ConstantExpression>()
         {
-            //共计11种类型 bool + ushort    short    int    uint    char    float    double    long    ulong    decimal
-            {typeof(bool?),    Expression.Constant((bool?)true, typeof(bool?))},
             {typeof(bool),     Expression.Constant((bool)true,  typeof(bool))},
-            {typeof(int?),     Expression.Constant((int?)1,     typeof(int?))},
-            {typeof(int),      Expression.Constant((int)1,      typeof(int))},
-            {typeof(short?),   Expression.Constant((short?)1,   typeof(short?))},
-            {typeof(short),    Expression.Constant((short)1,    typeof(short))},
-            {typeof(char?),    Expression.Constant((char?)'1',  typeof(char?))},
+            {typeof(bool?),    Expression.Constant((bool?)true, typeof(bool?))},
             {typeof(char),     Expression.Constant((char)'1',   typeof(char))},
-            {typeof(float?),   Expression.Constant((float?)1,   typeof(float?))},
-            {typeof(float),    Expression.Constant((float)1,    typeof(float))},
-            {typeof(double?),  Expression.Constant((double?)1,  typeof(double?))},
-            {typeof(double),   Expression.Constant((double)1,   typeof(double))},
-            {typeof(long?),    Expression.Constant((long?)1,    typeof(long?))},
-            {typeof(long),     Expression.Constant((long)1,     typeof(long))},
-            {typeof(decimal?), Expression.Constant((decimal?)1, typeof(decimal?))},
-            {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
-            {typeof(uint?),    Expression.Constant((uint?)1,    typeof(uint?))},
-            {typeof(uint),     Expression.Constant((uint)1,     typeof(uint))},
-            {typeof(ushort?),  Expression.Constant((ushort?)1,  typeof(ushort?))},
+            {typeof(char?),    Expression.Constant((char?)'1',   typeof(char?))},
+
+            //11种数字
+            {typeof(sbyte),    Expression.Constant((sbyte)1,    typeof(sbyte))}, //-128,127
+            {typeof(byte),     Expression.Constant((byte)1,      typeof(byte))}, //0,255
+            {typeof(short),    Expression.Constant((short)1,    typeof(short))}, //-32768,32767
             {typeof(ushort),   Expression.Constant((ushort)1,   typeof(ushort))},
-            {typeof(ulong?),   Expression.Constant((ulong?)1,   typeof(ulong?))},
-            {typeof(ulong),    Expression.Constant((ulong)1,    typeof(ulong))},
+            {typeof(int),      Expression.Constant((int)1,      typeof(int))},
+            {typeof(uint),     Expression.Constant((uint)1,      typeof(uint))},
+            {typeof(long),     Expression.Constant((long)1,     typeof(long))},
+            {typeof(ulong),    Expression.Constant((ulong)1,   typeof(ulong))},
+            {typeof(float),    Expression.Constant((float)1,    typeof(float))},
+            {typeof(double),   Expression.Constant((double)1,   typeof(double))},
+            {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
+
+            {typeof(sbyte?),    Expression.Constant((sbyte?)1,    typeof(sbyte?))}, 
+            {typeof(byte?),     Expression.Constant((byte?)1,      typeof(byte?))}, 
+            {typeof(short?),    Expression.Constant((short?)1,    typeof(short?))}, 
+            {typeof(ushort?),   Expression.Constant((ushort?)1,   typeof(ushort?))},
+            {typeof(int?),      Expression.Constant((int?)1,      typeof(int?))},
+            {typeof(uint?),     Expression.Constant((uint?)1,      typeof(uint?))},
+            {typeof(long?),     Expression.Constant((long?)1,     typeof(long?))},
+            {typeof(ulong?),    Expression.Constant((ulong?)1,   typeof(ulong?))},
+            {typeof(float?),    Expression.Constant((float?)1,    typeof(float?))},
+            {typeof(double?),   Expression.Constant((double?)1,   typeof(double?))},
+            {typeof(decimal?),  Expression.Constant((decimal?)1,  typeof(decimal?))},
         };
 
         /// <summary>
