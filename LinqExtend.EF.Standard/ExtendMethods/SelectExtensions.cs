@@ -1,89 +1,19 @@
-﻿using LinqExtend.ExtendMethods;
+﻿using LinqExtend.EF.ExtendMethods;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
 namespace LinqExtend
 {
     /// <summary>
     /// Select的扩展
     /// </summary>
-    public static class SelectExtensions
+    internal static class SelectExtensions
     {
-        public static IEnumerable<TResult> Select<TResult>(this DataColumnCollection dataColumns, Func<DataColumn, TResult> selector)
-        {
-            if (selector == null)
-            {
-                return Enumerable.Empty<TResult>();
-            }
 
-            var list = new List<TResult>() { };
-
-            foreach (DataColumn item in dataColumns)
-            {
-                list.Add(selector(item));
-            }
-
-            return list;
-        }
-
-        public static IEnumerable<TResult> Select<TResult>(this DataRowCollection rows, Func<DataRow, TResult> selector)
-        {
-            if (selector == null)
-            {
-                return Enumerable.Empty<TResult>();
-            }
-
-            var list = new List<TResult>() { };
-
-            foreach (DataRow item in rows)
-            {
-                list.Add(selector(item));
-            }
-
-            return list;
-        }
-
-        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
-            where TSource : class 
-            where TResult : class, new()
-            => SelectMap<TSource, TResult>(source, null);
-
-        private static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector = null)
-            where TSource : class 
-            where TResult : class, new()
-        {
-            if (source == null)
-            {
-                return Enumerable.Empty<TResult>();
-            }
-
-            var lambda = SelectMap_GetExpression<TSource, TResult>(selector);
-
-            var methodPara = new object[] { source, lambda.Compile() };
-
-            var SelectMehtod =
-                    typeof(System.Linq.Enumerable)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .First(mi => mi.Name == "Select"
-                        && mi.GetParameters().Length == 2
-                        && mi.GetParameters().Last().ParameterType.GenericTypeArguments.Length == 2);
-
-            IEnumerable<TResult> list = (IEnumerable<TResult>)
-                SelectMehtod.MakeGenericMethod(
-                    new Type[] { typeof(TSource), typeof(TResult) }
-                ).Invoke(null, methodPara);
-
-            return list;
-        }
-
-        private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Func<TSource, TResult> selector)
-            where TSource : class 
+        //这段代码要同步于 LinqExtend.Standard 的 SelectExtensions.cs 的 SelectMap_GetExpression 方法
+        public static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Func<TSource, TResult> selector)
+            where TSource : class
             where TResult : class, new()
         {
 
