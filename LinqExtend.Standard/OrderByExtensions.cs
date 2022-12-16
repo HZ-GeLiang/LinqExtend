@@ -468,7 +468,7 @@ namespace LinqExtend
                     {
                         //Expression<Func<test, int>> lambda = a => string.IsNullOrEmpty(a.Name) ? 0 : Convert.ToInt32(a.Name);
 
-                        //下面的 a 要外面丢进来 ,不然会提示variable '' of type '' referenced from scope '', but it is not defined
+                        //下面的 a 要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
                         //var type_TEntity = typeof(TSource);
                         //var parameterExp = Expression.Parameter(type_TEntity, orderExpression.Parameters[0].Name);// "a"
 

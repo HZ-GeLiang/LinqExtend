@@ -35,36 +35,28 @@ namespace LinqExtend.Test
                 new People (){ Id =2 , Age =2 , Name="2"},
             };
 
+            //比较系统API的方法
+            //系统自带的2个方法的使用demo
+            var resultSelect = peoples.Select(a => new PeopleDto
             {
-                //系统自带的2个方法的使用demo
-                var result = peoples.Select(a => new PeopleDto
+                Id = a.Id,
+                Age = a.Age,
+            }).ToList(); //自带的Select
+
+            var resultEnumerable = Enumerable.Select(peoples, delegate (People a)
+            {
+                return new PeopleDto
                 {
                     Id = a.Id,
-                    Age = a.Age,
-                }).ToList(); //自带的Select
+                    Age = a.Age
+                };
+            }).ToList(); //自带的Select
 
-                var list = Enumerable.Select(peoples, delegate (People a)
-                {
-                    return new PeopleDto
-                    {
-                        Id = a.Id,
-                        Age = a.Age
-                    };
-                }).ToList(); //自带的Select
-
-                CollectionAssert.AreEqual(result, list);
-            }
+            CollectionAssert.AreEqual(resultSelect, resultEnumerable);
 
             {
-                //peoples 是 Enumerable 对象
-                //扩展的方法, 没有automaper 那一步映射
                 var list = peoples.SelectMap<People, PeopleDto>().ToList();
-
-                CollectionAssert.AreEqual(list, new List<PeopleDto>()
-                {
-                    new PeopleDto(){ Id =1 , Age=1},
-                    new PeopleDto(){ Id =2 , Age=2},
-                });
+                CollectionAssert.AreEqual(list, resultSelect);
             }
 
             {
@@ -72,8 +64,34 @@ namespace LinqExtend.Test
                 var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+                    Age = 18,
 
                 }).ToList();
+
+                CollectionAssert.AreEqual(list, new List<PeopleDto>()
+                {
+                    new PeopleDto(){ Id =1 , Age=18},
+                    new PeopleDto(){ Id =2 , Age=18},
+                });
+
+            }
+
+
+            {
+
+                var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
+                {
+                    //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+                    Age = a.Age * 2,
+
+                }).ToList();
+
+                CollectionAssert.AreEqual(list, new List<PeopleDto>()
+                {
+                    new PeopleDto(){ Id =1 , Age=2},
+                    new PeopleDto(){ Id =2 , Age=4},
+                });
+
             }
 
         }
