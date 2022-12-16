@@ -203,9 +203,9 @@ namespace LinqExtend.EF
             {typeof(double),   Expression.Constant((double)1,   typeof(double))},
             {typeof(decimal),  Expression.Constant((decimal)1,  typeof(decimal))},
 
-            {typeof(sbyte?),    Expression.Constant((sbyte?)1,    typeof(sbyte?))}, 
-            {typeof(byte?),     Expression.Constant((byte?)1,      typeof(byte?))}, 
-            {typeof(short?),    Expression.Constant((short?)1,    typeof(short?))}, 
+            {typeof(sbyte?),    Expression.Constant((sbyte?)1,    typeof(sbyte?))},
+            {typeof(byte?),     Expression.Constant((byte?)1,      typeof(byte?))},
+            {typeof(short?),    Expression.Constant((short?)1,    typeof(short?))},
             {typeof(ushort?),   Expression.Constant((ushort?)1,   typeof(ushort?))},
             {typeof(int?),      Expression.Constant((int?)1,      typeof(int?))},
             {typeof(uint?),     Expression.Constant((uint?)1,      typeof(uint?))},
@@ -451,4 +451,6 @@ namespace LinqExtend.EF
             return ExpressionHelper.SelectMap<TEntity, TResult>();
         }
     }
+
+    #endregion
 }
