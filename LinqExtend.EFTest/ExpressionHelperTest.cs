@@ -213,7 +213,6 @@ FROM [T_Books] AS [t]");
         [TestMethod]
         public void SelectMap_object2Linq_Test()
         {
-
             return;//因为  LinqExtend.Standard 中的 还未完成. 
             using TestDbContext ctx = new TestDbContext();
 

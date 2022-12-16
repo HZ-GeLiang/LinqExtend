@@ -1,4 +1,5 @@
 ﻿using LinqExtend.ExtendMethods;
+using LinqExtend.Handle;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -50,12 +51,14 @@ namespace LinqExtend
         }
 
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
-            where TSource : class 
+            where TSource : class
             where TResult : class, new()
-            => SelectMap<TSource, TResult>(source, null);
+        {
+            return SelectMap<TSource, TResult>(source, (Expression<Func<TSource, TResult>>)null);
+        }
 
-        private static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector = null)
-            where TSource : class 
+        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector)
+            where TSource : class
             where TResult : class, new()
         {
             if (source == null)
@@ -82,25 +85,36 @@ namespace LinqExtend
             return list;
         }
 
-        private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Func<TSource, TResult> selector)
-            where TSource : class 
+
+
+        private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Expression<Func<TSource, TResult>> selector)
+            where TSource : class
             where TResult : class, new()
         {
-
-            var propsSource = typeof(TSource).GetProperties().ToHashSet(a => a.Name);
-            var propsResult = typeof(TResult).GetProperties().ToHashSet(a => a.Name);
-            var propsCommon = propsSource.Intersect(propsResult); //TSource 和 TResult 的相同属性
+            var process = new SelectMapProcess<TSource, TResult>();
 
             var parameterExp = Expression.Parameter(typeof(TSource), "a");
-            MemberBinding[] bindings = new MemberBinding[propsCommon.Count()];
+            List<MemberBinding> bindings = new List<MemberBinding>(process.BuildInCommon.Count());
 
-            var i = 0;
-            foreach (var propertyName in propsCommon)
+            /*计划支持
+               一个类对象/一个匿名对象中的属性类型允许为自定义类, 
+                    但是自定义中如果又出现了自定义类, 针对这种情况. 需要修改代码
+
+               属性映射优先级:
+               内置类型的属性 > 自定义类的类型属性
+               相同组别的属性按顺序逐个处理
+            */
+
+            if (selector != null)
             {
-                //if (selector != null)
-                //{
-                //   todo: 部分属性按配置的来, 没有配置的按约定的走
-                //}
+
+            }
+
+            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty(); 
+
+            foreach (var propertyName in unmappedBuildInProperty)
+            {
+                process.DealWithBuildInProperty(propertyName);
 
                 //todo: 计划支持类型不一致时的情况: ToList<T> 的实现参考...
 
@@ -131,11 +145,14 @@ namespace LinqExtend
                 //      propertyInfo.SetValue(model, new_colValue);
                 // }
 
-                bindings[i++] =
-                    Expression.Bind(
-                        typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
-                        Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
-                    );
+
+                var memberAssignment = Expression.Bind(
+                    typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
+                    Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
+                );
+
+                bindings.Add(memberAssignment);
+
             }
 
             MemberInitExpression memberInitExpression =
@@ -157,8 +174,6 @@ namespace LinqExtend
                 );
 
             return lambda;
-
         }
-
     }
 }

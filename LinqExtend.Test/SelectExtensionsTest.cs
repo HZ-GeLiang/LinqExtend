@@ -56,6 +56,7 @@ namespace LinqExtend.Test
             }
 
             {
+                //peoples 是 Enumerable 对象
                 //扩展的方法, 没有automaper 那一步映射
                 var list = peoples.SelectMap<People, PeopleDto>().ToList();
 
@@ -66,13 +67,18 @@ namespace LinqExtend.Test
                 });
             }
 
+            {
+
+                var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
+                {
+                    //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+
+                }).ToList();
+            }
+
         }
 
-        [TestMethod]
-        public void SelectMap_Queryable()
-        {
-            //todo:
-        }
+        //[TestMethod] public void SelectMap_Queryable() { } //这部分在 LinqExtend.EF.Standard 中
 
     }
 }
