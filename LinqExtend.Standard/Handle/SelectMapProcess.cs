@@ -50,6 +50,15 @@ namespace LinqExtend.Handle
         /// <param name="PropertyName"></param>
         public void DealWithBuildInProperty(string PropertyName)
         {
+            if (SensitiveField.Default.Contains(PropertyName))
+            {
+                //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
+                var msg = $@"Warning:{PropertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(msg);
+                Console.ResetColor();
+            }
+
             BuildInPropertyProcessList.Add(PropertyName);
         }
 
@@ -84,6 +93,24 @@ namespace LinqExtend.Handle
                                 ) == 0;
                    });
         }
+
+    }
+
+    /// <summary>
+    /// 敏感的
+    /// </summary>
+    public class SensitiveField
+    {
+        /// <summary>
+        /// 敏感字符
+        /// </summary> 
+        public static SortedSet<string> Default = new SortedSet<string>()
+        {
+            "Password",
+            "pwd",
+            "salt",
+        };//集合中区分大小写
+
 
     }
 

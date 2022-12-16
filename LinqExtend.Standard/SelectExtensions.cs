@@ -93,7 +93,17 @@ namespace LinqExtend
         {
             var process = new SelectMapProcess<TSource, TResult>();
 
-            var parameterExp = Expression.Parameter(typeof(TSource), "a");
+            ParameterExpression parameterExp;
+            if (selector == null)
+            {
+                parameterExp = Expression.Parameter(typeof(TSource), "a");
+            }
+            else
+            {
+                //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
+                parameterExp = selector.Parameters[0];
+            }
+
             List<MemberBinding> bindings = new List<MemberBinding>(process.BuildInCommon.Count());
 
             /*计划支持
@@ -107,10 +117,25 @@ namespace LinqExtend
 
             if (selector != null)
             {
+                var body = selector.Body;
+                if (body is System.Linq.Expressions.MemberInitExpression memberInitExpression)
+                {
+                    foreach (var item in memberInitExpression.Bindings)
+                    {
+                        var propertyName = item.Member.Name;
+                        process.DealWithBuildInProperty(propertyName);
+                    }
 
+                    bindings.AddRange(memberInitExpression.Bindings);
+                    int c = 3;
+                }
+                else
+                {
+                    throw new NotSupportedException("当前selector的写法暂不支持,请修改程序或提issue");
+                }
             }
 
-            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty(); 
+            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty();
 
             foreach (var propertyName in unmappedBuildInProperty)
             {
@@ -155,25 +180,27 @@ namespace LinqExtend
 
             }
 
-            MemberInitExpression memberInitExpression =
-                Expression.MemberInit(
-                    Expression.New(typeof(TResult)),
-                    bindings
-                );
+            {
+                MemberInitExpression memberInitExpression =
+                    Expression.MemberInit(
+                        Expression.New(typeof(TResult)),
+                        bindings
+                    );
 
-            Type genericType_arg2 = typeof(TResult);
-            Type genericType = typeof(Func<,>);
-            Type[] templateTypeSet = new[] { typeof(TSource), genericType_arg2 };
-            Type implementType = genericType.MakeGenericType(templateTypeSet);
+                Type genericType_arg2 = typeof(TResult);
+                Type genericType = typeof(Func<,>);
+                Type[] templateTypeSet = new[] { typeof(TSource), genericType_arg2 };
+                Type implementType = genericType.MakeGenericType(templateTypeSet);
 
-            var lambda = (Expression<Func<TSource, TResult>>)
-                Expression.Lambda(
-                    implementType,
-                    memberInitExpression,
-                    new ParameterExpression[1] { parameterExp }
-                );
+                var lambda = (Expression<Func<TSource, TResult>>)
+                    Expression.Lambda(
+                        implementType,
+                        memberInitExpression,
+                        new ParameterExpression[1] { parameterExp }
+                    );
 
-            return lambda;
+                return lambda;
+            }
         }
     }
 }
