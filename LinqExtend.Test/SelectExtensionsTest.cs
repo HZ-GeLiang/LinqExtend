@@ -164,8 +164,14 @@ namespace LinqExtend.Test
                 Assert.AreEqual(dto, new OrderShopDto()
                 {
                     ShopName = shop.Name,
+
                     UserId = 1,
-                    //Id = 1,
+
+                    Id = order.Id,
+                    ShopId = order.ShopId,
+                    PaymentTime = order.PaymentTime,
+
+                    PubTime = shop.PubTime 
                 });
             }
         }
