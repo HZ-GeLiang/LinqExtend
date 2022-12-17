@@ -16,83 +16,81 @@ namespace LinqExtend.Handle
         {
             Source = new PropertyGroup<TSource>();
             Result = new PropertyGroup<TResult>();
-            BuildInCommon = GetBuildInCommonPropertyName();
         }
 
         public PropertyGroup<TSource> Source { get; set; }
         public PropertyGroup<TResult> Result { get; set; }
 
-        /// <summary>
-        /// 相同的内置属性名
-        /// </summary>
-        public IEnumerable<string> BuildInCommon { get; set; }
-
-        /// <summary>
-        /// 内置的公共属性名
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<string> GetBuildInCommonPropertyName()
-        {
-            var source = Source.GetBuildInPropertyName();
-            var result = Result.GetBuildInPropertyName();
-            var common = source.Intersect(result); //TSource 和 TResult 的相同属性
-            return common;
-        }
 
         /// <summary>
         /// 已经处理过的内置类型的属性
         /// </summary>
-        public List<string> BuildInPropertyProcessList { get; } = new List<string>();
+        public SortedSet<string> BuildInPropertyProcessList { get; } = new SortedSet<string>();
 
         /// <summary>
         /// 添加处理过的内置类型的属性
         /// </summary>
-        /// <param name="PropertyName"></param>
-        public void DealWithBuildInProperty(string PropertyName)
+        /// <param name="propertyName"></param>
+        public void DealWithBuildInProperty(string propertyName)
         {
-            if (SensitiveField.Default.Contains(PropertyName))
+            if (SensitiveField.Default.Contains(propertyName))
             {
                 //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
-                var msg = $@"Warning:{PropertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
+                var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine(msg);
                 Console.ResetColor();
             }
 
-            BuildInPropertyProcessList.Add(PropertyName);
+            BuildInPropertyProcessList.Add(propertyName);
         }
 
         /// <summary>
         /// 未映射过的内置类型的属性
         /// </summary>
+        /// <param name="rank">{rank}等公民</param>
         /// <returns></returns>
-        public List<string> GetUnmappedBuildInProperty()
+        public List<string> GetUnmappedBuildInProperty(int rank)
         {
-            //差集, 获得 BuildInCommon 中独有的
             var list = new List<string>();
+
+            //差集, 获得 BuildInCommon 中独有的
+            var BuildInCommon = GetBuildInCommonPropertyName(rank);
             foreach (var item in BuildInCommon)
             {
-                var isProcess = IsInignoreCase(item, BuildInPropertyProcessList);
+                var isProcess = BuildInPropertyProcessList.Contains(item); // 不区分大小写的
                 if (isProcess)
                 {
                     continue;
                 }
                 list.Add(item);
-
             }
             return list;
         }
 
-        private bool IsInignoreCase(string thisValue, IEnumerable<string> values)
+        /// <summary>
+        /// 相同的内置属性名
+        /// </summary>
+        /// <param name="rank"></param>
+        /// <returns></returns>
+        private IEnumerable<string> GetBuildInCommonPropertyName(int rank)
         {
-            return values != null &&
-                   values.Any(value =>
-                   {
-                       return string.Compare(
-                                    thisValue, value, StringComparison.OrdinalIgnoreCase
-                                ) == 0;
-                   });
+            var source = Source.GetBuildInPropertyName(rank);
+            var result = Result.GetBuildInPropertyName(rank);
+            var common = source.Intersect(result); //TSource 和 TResult 的相同属性
+            return common;
         }
+
+        //private bool IsInignoreCase(string thisValue, IEnumerable<string> values)
+        //{
+        //    return values != null &&
+        //           values.Any(value =>
+        //           {
+        //               return string.Compare(
+        //                            thisValue, value, StringComparison.OrdinalIgnoreCase
+        //                        ) == 0;
+        //           });
+        //}
 
     }
 
@@ -110,12 +108,28 @@ namespace LinqExtend.Handle
             "pwd",
             "salt",
         };//集合中区分大小写
-
-
     }
 
-    internal class PropertyGroup<T> where T : class
+
+    internal class PropertyGroup
     {
+        public PropertyGroup(Type type)
+        {
+            BuildIn = new List<PropertyInfo>();
+            Custom = new List<PropertyInfo>();
+            foreach (var item in type.GetProperties())
+            {
+                if (_buildInType.Contains(item.PropertyType))
+                {
+                    BuildIn.Add(item);
+                }
+                else
+                {
+                    Custom.Add(item);
+                }
+            }
+        }
+
         private static HashSet<Type> _buildInType = new HashSet<Type>()  {
 
             typeof(bool),
@@ -155,23 +169,6 @@ namespace LinqExtend.Handle
             typeof(Guid?),
         };
 
-        public PropertyGroup()
-        {
-            BuildIn = new List<PropertyInfo>();
-            Custom = new List<PropertyInfo>();
-            foreach (var item in typeof(T).GetProperties())
-            {
-                if (_buildInType.Contains(item.PropertyType))
-                {
-                    BuildIn.Add(item);
-                }
-                else
-                {
-                    Custom.Add(item);
-                }
-            }
-        }
-
         /// <summary>
         /// 内置类型
         /// </summary>
@@ -191,10 +188,58 @@ namespace LinqExtend.Handle
             return false;
         }
 
+        /// <inheritdoc cref="GetBuildInPropertyName(int)"/>
         public IEnumerable<string> GetBuildInPropertyName()
         {
-            var list = BuildIn.Select(a => a.Name);
-            return list;
+            return GetBuildInPropertyName(1);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rank">从1开始</param>
+        /// <returns></returns>
+        public IEnumerable<string> GetBuildInPropertyName(int rank)
+        {
+            if (rank <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rank) + "是从1开始的");
+            }
+            if (rank > 2)
+            {
+                throw new ArgumentOutOfRangeException(nameof(rank) + "目前最大支持2级");
+            }
+            if (rank == 1)
+            {
+                var list = BuildIn.Select(a => a.Name);
+                return list;
+            }
+
+            if (rank == 2)
+            {
+                IEnumerable<string> list = new List<string>(Custom.Count);
+                foreach (var item in Custom)
+                {
+                    var collection = new PropertyGroup(item.PropertyType).GetBuildInPropertyName();
+                    ((List<string>)list).AddRange(collection);
+                }
+
+                list = list.Distinct();
+                return list;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(rank) + "当前值无效");
+        }
+    }
+
+    /// <summary>
+    /// 属性分类解析
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    internal class PropertyGroup<T> : PropertyGroup where T : class
+    {
+        public PropertyGroup() : base(typeof(T))
+        {
         }
     }
 

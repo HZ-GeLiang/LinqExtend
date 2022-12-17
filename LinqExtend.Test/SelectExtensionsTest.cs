@@ -1,5 +1,6 @@
 ﻿using LinqExtend.Test.Model;
 using System;
+using System.Collections;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
@@ -76,7 +77,6 @@ namespace LinqExtend.Test
 
             }
 
-
             {
 
                 var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
@@ -94,9 +94,58 @@ namespace LinqExtend.Test
 
             }
 
+            {
+                var shop = new Shop()
+                {
+                    Id = 1,
+                    Name = "shop1",
+                    Price = 1,
+                    PubTime = new DateTime(2011, 1, 1)
+                };
+
+                var order = new Order()
+                {
+                    Id = 1,
+                    ShopId = 1,
+                    PaymentTime = new DateTime(2011, 1, 2)
+                };
+
+                var dy = new { order, shop, UserId = 1 };
+
+                var sourceList = dy.MakeList();
+                var dto = sourceList.SelectMap(a => new OrderShopDto
+                {
+                    //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+
+                    ShopName = a.shop.Name,
+
+                    //未指定的 属性 ,
+                    //匹配内置属性匹配,  UserId ,
+                    //然后按自定义属性 a.Order , a.shop 依次匹配
+
+                }).First();
+
+
+                Assert.AreEqual(dto, new OrderShopDto()
+                {
+                    Id = 1,
+                });
+            }
+
         }
 
         //[TestMethod] public void SelectMap_Queryable() { } //这部分在 LinqExtend.EF.Standard 中
 
+    }
+
+    public static class TypeExtensionMethod
+    {
+        public static List<T> MakeList<T>(this T data)
+        {
+            Type type = typeof(List<>).MakeGenericType(data.GetType());
+            List<T> list = (List<T>)Activator.CreateInstance(type);
+            list.Add(data);
+            return list;
+        }
     }
 }
