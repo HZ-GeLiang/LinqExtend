@@ -85,8 +85,6 @@ namespace LinqExtend
             return list;
         }
 
-
-
         private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(Expression<Func<TSource, TResult>> selector)
             where TSource : class
             where TResult : class, new()
@@ -104,7 +102,7 @@ namespace LinqExtend
                 parameterExp = selector.Parameters[0];
             }
 
-            List<MemberBinding> bindings = new List<MemberBinding>(process.BuildInCommon.Count());
+            List<MemberBinding> bindings = new List<MemberBinding>();
 
             /*计划支持
                一个类对象/一个匿名对象中的属性类型允许为自定义类, 
@@ -127,7 +125,7 @@ namespace LinqExtend
                     }
 
                     bindings.AddRange(memberInitExpression.Bindings);
-                    int c = 3;
+
                 }
                 else
                 {
@@ -135,8 +133,9 @@ namespace LinqExtend
                 }
             }
 
-            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty();
+            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty(rank: 1);
 
+            //1等公民的处理
             foreach (var propertyName in unmappedBuildInProperty)
             {
                 process.DealWithBuildInProperty(propertyName);
@@ -180,6 +179,13 @@ namespace LinqExtend
 
             }
 
+            //2等公民的处理 
+            var unmappedBuildInPropertyLv2 = process.GetUnmappedBuildInProperty(rank: 2);
+            foreach (var propertyName in unmappedBuildInPropertyLv2)
+            {
+                Console.WriteLine(propertyName);
+            }
+
             {
                 MemberInitExpression memberInitExpression =
                     Expression.MemberInit(
@@ -203,4 +209,8 @@ namespace LinqExtend
             }
         }
     }
+
+
+
+
 }
