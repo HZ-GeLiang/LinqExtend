@@ -140,36 +140,6 @@ namespace LinqExtend
             {
                 process.DealWithBuildInProperty(propertyName);
 
-                //todo: 计划支持类型不一致时的情况: ToList<T> 的实现参考...
-
-                // if (propertyInfo.PropertyType.IsEnum)
-                // {
-                //     propertyInfo.SetValue(model, Enum.ToObject(propertyInfo.PropertyType, colValue));
-                //     continue;
-                // }
-                // if (propertyInfo.DeclaringType == colValue.GetType())
-                // {
-                //     propertyInfo.SetValue(model, colValue);
-                //     continue;
-                // }
-                // if (propertyInfo.PropertyType == typeof(string))
-                // {
-                //     propertyInfo.SetValue(model, colValue.ToString());
-                //     continue;
-                // }
-
-                // else //ChangeType 转换失败会异常
-                // { 
-                //                        
-                //#if DEBUG
-                //      var new_colValue = ChangeType(propertyInfo, colValue, propertyInfo.PropertyType);
-                //#else
-                //      var new_colValue = ChangeType(colValue, propertyInfo.PropertyType);
-                //#endif
-                //      propertyInfo.SetValue(model, new_colValue);
-                // }
-
-
                 var memberAssignment = Expression.Bind(
                     typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
                     Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
@@ -209,8 +179,4 @@ namespace LinqExtend
             }
         }
     }
-
-
-
-
 }
