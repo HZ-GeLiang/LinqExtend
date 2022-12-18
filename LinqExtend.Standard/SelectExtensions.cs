@@ -77,7 +77,9 @@ namespace LinqExtend
             }
 
             var selectorLast = autoMap ? GetSelectorLast<TSource, TResult>() : null;
-            var lambda = SelectMap_GetExpression<TSource, TResult>(selector, selectorLast);
+            var lambda = SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
+
+            var log = GetSelectMapLog(bindings);
 
             var methodPara = new object[] { source, lambda.Compile() };
 
@@ -103,16 +105,34 @@ namespace LinqExtend
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector">硬编码部分</param>
         /// <param name="selectorLast">最后兜底部分的处理</param>
+        /// <param name="bindings">映射关系</param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
         private static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(
                 Expression<Func<TSource, TResult>> selector,
-                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast
+                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
+                out List<MemberBinding> bindings
             )
             where TSource : class
             where TResult : class, new()
         {
-            List<MemberBinding> bindings = new List<MemberBinding>();
+            var parameterExp = selector == null
+                  ? Expression.Parameter(typeof(TSource), "a")
+                  : selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
+            bindings = SelectMap_GetExpression_GetBindings(selector, selectorLast, parameterExp);
+            var lambda = GetLambda<TSource, TResult>(bindings, parameterExp);
+            return lambda;
+        }
+
+        private static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
+            Expression<Func<TSource, TResult>> selector,
+            Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
+            ParameterExpression parameterExp
+         )
+         where TSource : class
+         where TResult : class, new()
+        {
+            var bindings = new List<MemberBinding>();
             var process = new SelectMapProcess<TSource, TResult>();
 
             /*计划支持
@@ -130,10 +150,6 @@ namespace LinqExtend
                 bindings.AddRange(selector_bindings);
             }
 
-            var parameterExp = selector == null
-                  ? Expression.Parameter(typeof(TSource), "a")
-                  : selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
-
             var autoMap_bindings = GetBindings(parameterExp, process);
             if (autoMap_bindings != null)
             {
@@ -146,8 +162,8 @@ namespace LinqExtend
                 bindings.AddRange(last_bindings);
             }
 
-            var lambda = GetLambda<TSource, TResult>(bindings, parameterExp);
-            return lambda;
+            return bindings;
+
         }
 
 
@@ -251,10 +267,9 @@ namespace LinqExtend
                     {
                         var objProcess = kv.Value;
 
-                        //objProcess中propertyName是未处理过的
                         if (
                             (!objProcess.BuildInPropertyProcessList.ContainsKey(propertyName)) ||
-                            objProcess.BuildInPropertyProcessList[propertyName] == true
+                            objProcess.BuildInPropertyProcessList[propertyName] == true //objProcess中propertyName是未处理过的
                         )
                         {
                             continue;
@@ -269,7 +284,8 @@ namespace LinqExtend
                             customDict[kv.Key].DealWithBuildInProperty(propertyName);
                             process.DealWithBuildInProperty(propertyName, check: false);
 
-                            Console.WriteLine($@"{objType}:{propertyName}");
+                            var debugTxt = $@"{objType}:{propertyName}";
+                            Console.WriteLine(debugTxt);
 
                             var objName = kv.Key.Name; //order
 
@@ -282,6 +298,7 @@ namespace LinqExtend
                             );
 
                             bindings.Add(memberAssignment);
+                            break;// 防止被下一个 kv对象 处理
                         }
                     }
                 }
@@ -314,6 +331,24 @@ namespace LinqExtend
                 );
             return lambda;
         }
+
+
+        private static string GetSelectMapLog(List<MemberBinding> bindings)
+        {
+            if (bindings == null)
+            {
+                return "";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach (MemberBinding binding in bindings)
+            {
+                sb.AppendLine($@"{binding}");
+            }
+            var log = sb.ToString();
+            return log;
+        }
+
 
     }
 }

@@ -144,7 +144,7 @@ namespace LinqExtend.Test
 
                 var order = new Order()
                 {
-                    Id = 1,
+                    Id = 3,
                     ShopId = 1,
                     PaymentTime = new DateTime(2011, 1, 2)
                 };
@@ -164,14 +164,13 @@ namespace LinqExtend.Test
                 Assert.AreEqual(dto, new OrderShopDto()
                 {
                     ShopName = shop.Name,
-
-                    UserId = 1,
+                    UserId = dy.UserId,
 
                     Id = order.Id,
                     ShopId = order.ShopId,
                     PaymentTime = order.PaymentTime,
 
-                    PubTime = shop.PubTime 
+                    PubTime = shop.PubTime
                 });
             }
         }
