@@ -79,8 +79,9 @@ namespace LinqExtend
             var selectorLast = autoMap ? SelectMapHelper.GetSelectorLast<TSource, TResult>() : null;
             var lambda = SelectMapHelper.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
 
+#if DEBUG
             var log = SelectMapHelper.GetSelectMapLog(bindings);
-
+#endif
             var methodPara = new object[] { source, lambda.Compile() };
 
             var SelectMehtod =

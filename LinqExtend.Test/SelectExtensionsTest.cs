@@ -24,9 +24,7 @@ namespace LinqExtend.Test
             Assert.AreEqual(1, ids.First());
             Assert.AreEqual(2, ids.Last());
         }
-
-
-
+         
         [TestMethod]
         public void SelectMap_Enumerable()
         {

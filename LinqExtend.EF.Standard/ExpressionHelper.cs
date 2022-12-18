@@ -1,5 +1,6 @@
 ﻿using LinqExtend.EF.Consts;
 using LinqExtend.EF.ExtendMethods;
+using LinqExtend.EF.Handle;
 using LinqExtend.EF.Helper;
 using System;
 using System.Collections;
@@ -357,13 +358,14 @@ namespace LinqExtend.EF
         }
 
 
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(Func{TSource, TResult})" />
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
             where TSource : class
             where TResult : class, new()
         {
-            return SelectMap((Func<TSource, TResult>)null);
+            return SelectMap<TSource, TResult>(null, false);
         }
+
 
         /// <summary>
         /// 
@@ -371,12 +373,19 @@ namespace LinqExtend.EF
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector"></param>
+        /// <param name="autoMap"></param>
         /// <returns></returns>
-        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Func<TSource, TResult> selector)
+        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Expression<Func<TSource, TResult>> selector, bool autoMap)
          where TSource : class
          where TResult : class, new()
         {
-            var lambda = SelectExtensions.SelectMap_GetExpression<TSource, TResult>(selector);
+
+            var selectorLast = autoMap ? SelectMapHelper.GetSelectorLast<TSource, TResult>() : null;
+            var lambda = SelectMapHelper.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
+#if DEBUG
+            var log = SelectMapHelper.GetSelectMapLog(bindings);
+#endif
+
             return lambda;
         }
 
@@ -385,12 +394,28 @@ namespace LinqExtend.EF
     /// <inheritdoc cref="ExpressionHelper"/>
     public static class ExpressionExtesion
     {
-        /// <inheritdoc cref="ExpressionHelper.SelectMap{TSource, TResult}(Func{TSource, TResult})" />
-        public static IQueryable<TResult> SelectMap<TSource, TResult>(this IQueryable<TSource> query, Func<TSource, TResult> selector)
+
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
+        public static IQueryable<TResult> SelectMap<TSource, TResult>(
+                this IQueryable<TSource> query,
+                Expression<Func<TSource, TResult>> selector
+            )
           where TSource : class
           where TResult : class, new()
         {
-            var exp = ExpressionHelper.SelectMap<TSource, TResult>(selector);
+            return SelectMap(query,selector,false);
+        }
+
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
+        public static IQueryable<TResult> SelectMap<TSource, TResult>(
+                this IQueryable<TSource> query,
+                Expression<Func<TSource, TResult>> selector,
+                bool autoMap
+            )
+          where TSource : class
+          where TResult : class, new()
+        {
+            var exp = ExpressionHelper.SelectMap<TSource, TResult>(selector, autoMap);
             IQueryable<TResult> querySelect = query.Select(exp);
             return querySelect;
         }

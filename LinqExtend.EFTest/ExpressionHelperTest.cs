@@ -1,6 +1,8 @@
 ﻿using LinqExtend.EF;
 using LinqExtend.EF.Test.EF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -213,23 +215,23 @@ FROM [T_Books] AS [t]");
         [TestMethod]
         public void SelectMap_object2Linq_Test()
         {
-            return;//因为  LinqExtend.Standard 中的 还未完成. 
+            //return;//因为  LinqExtend.Standard 中的 还未完成. 
             using TestDbContext ctx = new TestDbContext();
 
             var query_tmp = from b in ctx.Books
                             select new { b = b, key = "_key" };
 
-
             var query = query_tmp.Select(a => new BookDto()
             {
+                Key = "_key",
                 Id = a.b.Id,
                 PubTime = a.b.PubTime,
                 Price = a.b.Price,
-                Publisher = a.b.Publisher
+                Publisher = a.b.Publisher,
             });
 
-            var sql = query.ToQueryString();
-            Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+            var sql_query = query.ToQueryString();
+            Assert.AreEqual(sql_query, $@"SELECT N'_key' AS [Key], [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
 
             var queryList = query.ToList();
@@ -238,15 +240,24 @@ FROM [T_Books] AS [t]");
             var selectMapQuery = query_tmp.SelectMap(a => new BookDto
             {
                 //规则            
-
                 Key = a.key
 
-            });
+            }, autoMap: true);
+
+            /* 详细的 SelectMap 如下
+Key = a.key
+Id = a.b.Id
+PubTime = a.b.PubTime
+Price = a.b.Price
+Publisher = a.b.Publisher
+            */
+
             var sql_selectMap = selectMapQuery.ToQueryString();
 
+            Assert.AreEqual(sql_selectMap, $@"SELECT N'_key' AS [Key], [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
+
             var selectMapList = selectMapQuery.ToList();
-
-
             CollectionAssert.AreEqual(queryList, selectMapList);
 
         }
