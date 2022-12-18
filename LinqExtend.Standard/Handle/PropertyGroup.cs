@@ -1,5 +1,7 @@
-﻿using System;
+﻿using LinqExtend.Config;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -112,13 +114,20 @@ namespace LinqExtend.Handle
         /// <param name="check"></param>
         public void DealWithBuildInProperty(string propertyName, bool check)
         {
-            if (check && SensitiveField.Default.Contains(propertyName))
+            if (check)
             {
-                //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
-                var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(msg);
-                Console.ResetColor();
+                if (LinqExtendConfig.EnabledSensitiveField)
+                {
+                    if (SensitiveField.Default.Contains(propertyName))
+                    {
+                        //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
+                        var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine(msg);
+                        //Debug.WriteLine(msg);
+                        Console.ResetColor();
+                    }
+                }
             }
 
             if (BuildInPropertyProcessList.ContainsKey(propertyName))
