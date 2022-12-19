@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace LinqExtend.EF.Handle
@@ -65,8 +66,22 @@ namespace LinqExtend.EF.Handle
             BuildIn = new List<PropertyInfo>();
             Custom = new List<PropertyInfo>();
             All = type.GetProperties();
+
+            var isRepeat = new HashSet<string>();
             foreach (var item in All)
             {
+                if (isRepeat.Contains(item.Name))
+                {
+                    continue;
+                }
+                else
+                {
+                    isRepeat.Add(item.Name);
+                }
+                if (item.CanWrite == false) // 属性为Id=>1的这种写法
+                {
+                    continue;
+                }
                 if (_buildInType.Contains(item.PropertyType))
                 {
                     BuildIn.Add(item);
@@ -77,7 +92,12 @@ namespace LinqExtend.EF.Handle
                 }
             }
 
+
+            //Issus01
+            //BuildInPropertyProcessList = BuildIn.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
+
             BuildInPropertyProcessList = BuildIn.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
+
         }
 
 
