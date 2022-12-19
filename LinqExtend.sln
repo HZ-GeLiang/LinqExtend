@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{920B66CC-E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{43B171AC-C874-41A9-AEFA-AE7C20782615}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Issus", "ConsoleApp1\Issus.csproj", "{6AA61DDF-006A-4C1D-862E-2A8BE513565A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{FC5EC455-3B20-40C7-9872-292DA602550D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC5EC455-3B20-40C7-9872-292DA602550D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC5EC455-3B20-40C7-9872-292DA602550D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA61DDF-006A-4C1D-862E-2A8BE513565A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA61DDF-006A-4C1D-862E-2A8BE513565A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA61DDF-006A-4C1D-862E-2A8BE513565A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA61DDF-006A-4C1D-862E-2A8BE513565A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
