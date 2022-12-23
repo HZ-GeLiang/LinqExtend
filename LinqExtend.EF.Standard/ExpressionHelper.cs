@@ -363,7 +363,7 @@ namespace LinqExtend.EF
             where TSource : class
             where TResult : class, new()
         {
-            return SelectMap<TSource, TResult>(null, false);
+            return SelectMap<TSource, TResult>(null);
         }
 
 
@@ -372,18 +372,17 @@ namespace LinqExtend.EF
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="selector"></param>
-        /// <param name="autoMap"></param>
+        /// <param name="selector">硬编码部分</param>
         /// <returns></returns>
-        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Expression<Func<TSource, TResult>> selector, bool autoMap)
+        public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Expression<Func<TSource, TResult>> selector)
          where TSource : class
          where TResult : class, new()
         {
 
-            var selectorLast = autoMap ? SelectMapHelper.GetSelectorLast<TSource, TResult>() : null;
-            var lambda = SelectMapHelper.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
+            var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
+            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
 #if DEBUG
-            var log = SelectMapHelper.GetSelectMapLog(bindings);
+            var log = SelectMapMain.GetSelectMapLog(bindings);
 #endif
 
             return lambda;
@@ -394,8 +393,7 @@ namespace LinqExtend.EF
     /// <inheritdoc cref="ExpressionHelper"/>
     public static class ExpressionExtesion
     {
-
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}})" />
         public static IQueryable<TResult> SelectMap<TSource, TResult>(
                 this IQueryable<TSource> query,
                 Expression<Func<TSource, TResult>> selector
@@ -403,19 +401,7 @@ namespace LinqExtend.EF
           where TSource : class
           where TResult : class, new()
         {
-            return SelectMap(query,selector,false);
-        }
-
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
-        public static IQueryable<TResult> SelectMap<TSource, TResult>(
-                this IQueryable<TSource> query,
-                Expression<Func<TSource, TResult>> selector,
-                bool autoMap
-            )
-          where TSource : class
-          where TResult : class, new()
-        {
-            var exp = ExpressionHelper.SelectMap<TSource, TResult>(selector, autoMap);
+            var exp = ExpressionHelper.SelectMap<TSource, TResult>(selector);
             IQueryable<TResult> querySelect = query.Select(exp);
             return querySelect;
         }

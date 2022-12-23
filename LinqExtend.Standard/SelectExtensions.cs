@@ -19,7 +19,7 @@ namespace LinqExtend
     /// </summary>
     public static class SelectExtensions
     {
-        public static IEnumerable<TResult> Select<TResult>(this DataColumnCollection dataColumns, Func<DataColumn, TResult> selector)
+        public static IEnumerable<TResult> Select<TResult>(this DataColumnCollection columnCollection, Func<DataColumn, TResult> selector)
         {
             if (selector == null)
             {
@@ -28,7 +28,7 @@ namespace LinqExtend
 
             var list = new List<TResult>() { };
 
-            foreach (DataColumn item in dataColumns)
+            foreach (DataColumn item in columnCollection)
             {
                 list.Add(selector(item));
             }
@@ -36,7 +36,7 @@ namespace LinqExtend
             return list;
         }
 
-        public static IEnumerable<TResult> Select<TResult>(this DataRowCollection rows, Func<DataRow, TResult> selector)
+        public static IEnumerable<TResult> Select<TResult>(this DataRowCollection rowCollection, Func<DataRow, TResult> selector)
         {
             if (selector == null)
             {
@@ -45,7 +45,7 @@ namespace LinqExtend
 
             var list = new List<TResult>() { };
 
-            foreach (DataRow item in rows)
+            foreach (DataRow item in rowCollection)
             {
                 list.Add(selector(item));
             }
@@ -53,21 +53,23 @@ namespace LinqExtend
             return list;
         }
 
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(IEnumerable{TSource}, Expression{Func{TSource, TResult}})"/>
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
             where TSource : class
             where TResult : class, new()
         {
-            return SelectMap<TSource, TResult>(source, (Expression<Func<TSource, TResult>>)null, false);
+            return SelectMap<TSource, TResult>(source, (Expression<Func<TSource, TResult>>)null);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="selector">硬编码部分</param>
+        /// <returns></returns>
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector)
-            where TSource : class
-            where TResult : class, new()
-        {
-            return SelectMap<TSource, TResult>(source, selector, false);
-        }
-
-        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector, bool autoMap)
             where TSource : class
             where TResult : class, new()
         {
@@ -76,11 +78,11 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
-            var selectorLast = autoMap ? SelectMapHelper.GetSelectorLast<TSource, TResult>() : null;
-            var lambda = SelectMapHelper.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
+            var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
+            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
 
 #if DEBUG
-            var log = SelectMapHelper.GetSelectMapLog(bindings);
+            var log = SelectMapMain.GetSelectMapLog(bindings);
 #endif
             var methodPara = new object[] { source, lambda.Compile() };
 
@@ -98,7 +100,6 @@ namespace LinqExtend
 
             return list;
         }
-
 
     }
 }
