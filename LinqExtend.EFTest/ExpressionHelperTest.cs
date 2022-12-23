@@ -242,7 +242,7 @@ FROM [T_Books] AS [t]");
                 //规则            
                 Key = a.key
 
-            }, autoMap: true);
+            });
 
             /* 详细的 SelectMap 如下
 Key = a.key

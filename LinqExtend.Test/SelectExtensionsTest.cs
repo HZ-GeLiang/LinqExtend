@@ -157,7 +157,7 @@ namespace LinqExtend.Test
                     //匹配内置属性:  UserId ,
                     //无法处理的属性: Id ,ShopId ,PaymentTime 
                     //按自定义属性 a.Order , a.shop 依次匹配
-                }, autoMap: true).First();
+                }).First();
 
                 Assert.AreEqual(dto, new OrderShopDto()
                 {

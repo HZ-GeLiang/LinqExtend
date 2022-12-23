@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace LinqExtend.EF.Handle
+namespace LinqExtend.Handle
 {
-    internal class SelectMapHelper
+    internal class SelectMapMain
     {
         /// <summary>
         /// 返回一个Expression
@@ -94,7 +94,7 @@ namespace LinqExtend.EF.Handle
             }
 
             var body = selector.Body;
-            if (body is MemberInitExpression memberInitExpression)
+            if (body is System.Linq.Expressions.MemberInitExpression memberInitExpression)
             {
                 foreach (var item in memberInitExpression.Bindings)
                 {
@@ -179,7 +179,7 @@ namespace LinqExtend.EF.Handle
                         var objProcess = kv.Value;
 
                         if (
-                            !objProcess.BuildInPropertyProcessList.ContainsKey(propertyName) ||
+                            (!objProcess.BuildInPropertyProcessList.ContainsKey(propertyName)) ||
                             objProcess.BuildInPropertyProcessList[propertyName] == true //objProcess中propertyName是未处理过的
                         )
                         {
