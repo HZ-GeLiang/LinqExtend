@@ -357,15 +357,13 @@ namespace LinqExtend.EF
             return IsNotDeleted(propAccessor);
         }
 
-
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}}, bool)" />
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}})" />
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
             where TSource : class
             where TResult : class, new()
         {
             return SelectMap<TSource, TResult>(null);
         }
-
 
         /// <summary>
         /// 
@@ -378,7 +376,6 @@ namespace LinqExtend.EF
          where TSource : class
          where TResult : class, new()
         {
-
             var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
             var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
 #if DEBUG
@@ -393,7 +390,7 @@ namespace LinqExtend.EF
     /// <inheritdoc cref="ExpressionHelper"/>
     public static class ExpressionExtesion
     {
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}})" />
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(IQueryable{TSource}, Expression{Func{TSource, TResult}})" />
         public static IQueryable<TResult> SelectMap<TSource, TResult>(
                 this IQueryable<TSource> query,
                 Expression<Func<TSource, TResult>> selector

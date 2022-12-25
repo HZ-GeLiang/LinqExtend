@@ -15,13 +15,11 @@ namespace LinqExtend.Handle
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
         /// <param name="selector">硬编码部分</param>
-        /// <param name="selectorLast">最后兜底部分的处理</param>
         /// <param name="bindings">映射关系</param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
         public static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(
                 Expression<Func<TSource, TResult>> selector,
-                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
                 out List<MemberBinding> bindings
             )
             where TSource : class
@@ -30,21 +28,31 @@ namespace LinqExtend.Handle
             var parameterExp = selector == null
                   ? Expression.Parameter(typeof(TSource), "a")
                   : selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
-            bindings = SelectMap_GetExpression_GetBindings(selector, selectorLast, parameterExp);
+
+            bindings = SelectMap_GetExpression_GetBindings(selector, parameterExp);
             var lambda = GetLambda<TSource, TResult>(bindings, parameterExp);
             return lambda;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="selector"></param>
+        /// <param name="parameterExp"></param>
+        /// <returns></returns>
         public static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
             Expression<Func<TSource, TResult>> selector,
-            Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
             ParameterExpression parameterExp
          )
-         where TSource : class
-         where TResult : class, new()
+            where TSource : class
+            where TResult : class, new()
         {
             var bindings = new List<MemberBinding>();
             var process = new SelectMapProcess<TSource, TResult>();
+
+            Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = GetSelectorLast<TSource, TResult>();
 
             /*计划支持
                一个类对象/一个匿名对象中的属性类型允许为自定义类, 
@@ -139,7 +147,7 @@ namespace LinqExtend.Handle
             return bindings;
         }
 
-        //第三部分 
+        //第三部分,最后兜底部分的处理(自动映射,二等公民)
         public static List<MemberBinding> GetBindings<TSource, TResult>(
                 Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
                 ParameterExpression parameterExp,
@@ -156,10 +164,15 @@ namespace LinqExtend.Handle
             return bindings;
         }
 
-        //第三部分的处理逻辑
+        /// <summary>
+        /// 第三部分的处理逻辑:自动映射
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
         public static Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> GetSelectorLast<TSource, TResult>()
-         where TSource : class
-         where TResult : class, new()
+            where TSource : class
+            where TResult : class, new()
         {
             Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = (parameterExp, process) =>
             {
@@ -172,7 +185,9 @@ namespace LinqExtend.Handle
 
                 foreach (var propertyName in unmappedPropertyNameList)
                 {
+#if DEBUG
                     Console.WriteLine(propertyName);
+#endif
 
                     foreach (var kv in customDict)
                     {
@@ -195,9 +210,10 @@ namespace LinqExtend.Handle
                             customDict[kv.Key].DealWithBuildInProperty(propertyName);
                             process.DealWithBuildInProperty(propertyName, check: false);
 
+#if DEBUG
                             var debugTxt = $@"{objType}:{propertyName}";
                             Console.WriteLine(debugTxt);
-
+#endif
                             var objName = kv.Key.Name; //order
 
                             var exp = Expression.Property(parameterExp, objName);//a.order
