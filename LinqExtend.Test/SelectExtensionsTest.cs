@@ -24,7 +24,7 @@ namespace LinqExtend.Test
             Assert.AreEqual(1, ids.First());
             Assert.AreEqual(2, ids.Last());
         }
-         
+
         [TestMethod]
         public void SelectMap_Enumerable()
         {
@@ -59,7 +59,7 @@ namespace LinqExtend.Test
             }
 
             {
-
+                //固定值
                 var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
@@ -76,7 +76,7 @@ namespace LinqExtend.Test
             }
 
             {
-
+                //表达式
                 var list = peoples.SelectMap<People, PeopleDto>(a => new PeopleDto
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
@@ -92,45 +92,14 @@ namespace LinqExtend.Test
 
             }
 
-            {
-                var shop = new Shop()
-                {
-                    Id = 1,
-                    Name = "shop1",
-                    Price = 1,
-                    PubTime = new DateTime(2011, 1, 1)
-                };
-
-                var order = new Order()
-                {
-                    Id = 1,
-                    ShopId = 1,
-                    PaymentTime = new DateTime(2011, 1, 2)
-                };
-
-                var dy = new { order, shop, UserId = 1 };
-
-                var dto = dy.MakeList().SelectMap(a => new OrderShopDto
-                {
-                    //有规则的写规则, 不在规则里面的按属性名一一对象来处理
-                    ShopName = a.shop.Name,
-                    //未指定的 属性 ,
-                    //匹配内置属性:  UserId ,
-                    //无法处理的属性: Id ,ShopId ,PaymentTime 
-                }).First();
-
-                Assert.AreEqual(dto, new OrderShopDto()
-                {
-                    ShopName = shop.Name,
-                    UserId = 1,
-                });
-            }
+           
 
         }
 
         [TestMethod]
         public void SelectMap_Enumerable_2等公民对象的处理()
         {
+
             {
                 var shop = new Shop()
                 {
@@ -142,39 +111,43 @@ namespace LinqExtend.Test
 
                 var order = new Order()
                 {
-                    Id = 3,
+                    Id = 1,
                     ShopId = 1,
                     PaymentTime = new DateTime(2011, 1, 2)
                 };
 
                 var dy = new { order, shop, UserId = 1 };
-
+                SelectExtensions.OnSelectMapLogTo = mapperLog =>
+                {
+                    Console.WriteLine(mapperLog);
+                };
                 var dto = dy.MakeList().SelectMap(a => new OrderShopDto
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
                     ShopName = a.shop.Name,
                     //未指定的 属性 ,
                     //匹配内置属性:  UserId ,
-                    //无法处理的属性: Id ,ShopId ,PaymentTime 
-                    //按自定义属性 a.Order , a.shop 依次匹配
+                    //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
+                    //按 class 属性的先后顺序  a.Order , a.shop 依次匹配
                 }).First();
 
                 Assert.AreEqual(dto, new OrderShopDto()
                 {
-                    ShopName = shop.Name,
-                    UserId = dy.UserId,
+                    ShopName = dy.shop.Name,
 
-                    Id = order.Id,
-                    ShopId = order.ShopId,
-                    PaymentTime = order.PaymentTime,
+                    // 内置属性
+                    UserId = dy.UserId, 
 
-                    PubTime = shop.PubTime
+                    //按 class 属性的先后顺序  a.Order , a.shop 依次匹配
+                    Id = dy.order.Id,
+                    ShopId = dy.order.ShopId,
+                    PaymentTime = dy.order.PaymentTime,
+                    PubTime = dy.shop.PubTime,
                 });
             }
         }
 
         //[TestMethod] public void SelectMap_Queryable() { } //这部分在 LinqExtend.EF.Standard 中
-
     }
 
     public static class TypeExtensionMethod

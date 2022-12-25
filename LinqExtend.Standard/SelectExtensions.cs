@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -78,12 +79,14 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
-            var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
-            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
+            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, out var bindings);
 
-#if DEBUG
-            var log = SelectMapMain.GetSelectMapLog(bindings);
-#endif
+            if (OnSelectMapLogTo != null)
+            {
+                string log = SelectMapMain.GetSelectMapLog(bindings);
+                OnSelectMapLogTo.Invoke(log);
+            }
+
             var methodPara = new object[] { source, lambda.Compile() };
 
             var SelectMehtod =
@@ -97,9 +100,14 @@ namespace LinqExtend
                 SelectMehtod.MakeGenericMethod(
                     new Type[] { typeof(TSource), typeof(TResult) }
                 ).Invoke(null, methodPara);
-
             return list;
         }
+
+
+        /// <summary>
+        /// 获得SelectMap映射的日志情况
+        /// </summary>
+        public static Action<string> OnSelectMapLogTo { get; set; }
 
     }
 }
