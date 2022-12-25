@@ -69,8 +69,9 @@ namespace LinqExtend
         /// <typeparam name="TResult"></typeparam>
         /// <param name="source"></param>
         /// <param name="selector">硬编码部分</param>
+        /// <param name="isAutoFill">默认值: IEnumerable:false ,  IQuerable:true</param>
         /// <returns></returns>
-        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector)
+        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector, bool isAutoFill = false)
             where TSource : class
             where TResult : class, new()
         {
@@ -79,13 +80,13 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
-            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, out var bindings);
-
-            if (OnSelectMapLogTo != null)
-            {
-                string log = SelectMapMain.GetSelectMapLog(bindings);
-                OnSelectMapLogTo.Invoke(log);
-            }
+            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
+                    new GetExpressionArgs<TSource, TResult>(
+                        selector: selector,
+                        OnSelectMapLogTo: SelectExtensions.OnSelectMapLogTo,
+                        sourceType: SelectMapSourceType.IEnumerable,
+                        isAutoFill: isAutoFill                         
+                    ));
 
             var methodPara = new object[] { source, lambda.Compile() };
 
@@ -108,6 +109,16 @@ namespace LinqExtend
         /// 获得SelectMap映射的日志情况
         /// </summary>
         public static Action<string> OnSelectMapLogTo { get; set; }
+        /*public static Action<string> OnSelectMapLogTo  
+            get
+            {
+                return SelectMapMain.OnSelectMapLogTo;
+            }
+            set
+            {
+                SelectMapMain.OnSelectMapLogTo = value;
+            }
+        }*/
 
     }
 }
