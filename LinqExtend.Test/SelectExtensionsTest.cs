@@ -117,31 +117,70 @@ namespace LinqExtend.Test
                 {
                     Console.WriteLine(mapperLog);
                 };
-                var dto = dy.MakeList().SelectMap(a => new OrderShopDto
+
                 {
-                    //有规则的写规则, 不在规则里面的按属性名一一对象来处理
-                    ShopName = a.shop.Name,
-                    //未指定的 属性 ,
-                    //匹配内置属性:  UserId ,
+                    //未开启自动映射
 
-                    //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
-                    //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
-                    //这里是 按  a.Order , a.shop 依次匹配, 
-                }).First();
+                    //开启自动映射
 
-                Assert.AreEqual(dto, new OrderShopDto()
+                    var dto = dy.MakeList().SelectMap(a => new OrderShopDto
+                    {
+                        //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+                        ShopName = a.shop.Name,
+                        //未指定的 属性 ,
+                        //匹配内置属性:  UserId ,
+
+                        //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
+                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
+                        //这里是 按  a.Order , a.shop 依次匹配, 
+                    }, false) // 默认就是false
+                    .First();
+
+                    Assert.AreEqual(dto, new OrderShopDto()
+                    {
+                        ShopName = dy.shop.Name,
+
+                        // 内置属性
+                        UserId = dy.UserId,
+
+                        ////按 class 属性的先后顺序  a.Order , a.shop 依次匹配
+                        //Id = dy.order.Id,
+                        //ShopId = dy.order.ShopId,
+                        //PaymentTime = dy.order.PaymentTime,
+                        //PubTime = dy.shop.PubTime,
+                    });
+                }
+
                 {
-                    ShopName = dy.shop.Name,
+                    //开启自动映射
 
-                    // 内置属性
-                    UserId = dy.UserId, 
+                    var dto = dy.MakeList().SelectMap(a => new OrderShopDto
+                    {
+                        //有规则的写规则, 不在规则里面的按属性名一一对象来处理
+                        ShopName = a.shop.Name,
+                        //未指定的 属性 ,
+                        //匹配内置属性:  UserId ,
 
-                    //按 class 属性的先后顺序  a.Order , a.shop 依次匹配
-                    Id = dy.order.Id,
-                    ShopId = dy.order.ShopId,
-                    PaymentTime = dy.order.PaymentTime,
-                    PubTime = dy.shop.PubTime,
-                });
+                        //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
+                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
+                        //这里是 按  a.Order , a.shop 依次匹配, 
+                    }, true)//手动开启
+                    .First();
+
+                    Assert.AreEqual(dto, new OrderShopDto()
+                    {
+                        ShopName = dy.shop.Name,
+
+                        // 内置属性
+                        UserId = dy.UserId,
+
+                        //按 class 属性的先后顺序  a.Order , a.shop 依次匹配
+                        Id = dy.order.Id,
+                        ShopId = dy.order.ShopId,
+                        PaymentTime = dy.order.PaymentTime,
+                        PubTime = dy.shop.PubTime,
+                    });
+                }
             }
         }
 

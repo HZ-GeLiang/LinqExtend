@@ -7,43 +7,99 @@ using System.Text;
 
 namespace LinqExtend.Handle
 {
+    /// <summary>
+    /// source数据源类型
+    /// </summary>
+    internal enum SelectMapSourceType
+    {
+        IEnumerable = 1,
+        IQuerable = 2,
+    }
+
+    internal class GetExpressionArgs<TSource, TResult>
+            where TSource : class
+            where TResult : class, new()
+    {
+
+        public GetExpressionArgs(
+            Expression<Func<TSource, TResult>> selector,
+            Action<string> OnSelectMapLogTo,
+            SelectMapSourceType sourceType,
+            bool isAutoFill
+            )
+        {
+            this.selector = selector;
+            this.OnSelectMapLogTo = OnSelectMapLogTo;
+            this.SourceType = sourceType;
+            this.IsAutoFill = isAutoFill;
+        }
+
+        /// <summary>
+        /// 硬编码部分
+        /// </summary>
+        public Expression<Func<TSource, TResult>> selector { get; set; }
+
+        /// <summary>
+        /// 获得SelectMap映射的日志情况
+        /// </summary>
+        public Action<string> OnSelectMapLogTo { get; set; }
+
+        /// <summary>
+        /// 数据源类型
+        /// </summary>
+        public SelectMapSourceType SourceType { get; }
+
+        /// <summary>
+        /// 自动填充
+        /// </summary>
+        public bool IsAutoFill { get; }
+    }
+
     internal class SelectMapMain
     {
+        ///// <summary>
+        ///// 获得SelectMap映射的日志情况
+        ///// </summary>
+        //public static Action<string> OnSelectMapLogTo { get; set; }
+
         /// <summary>
         /// 返回一个Expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="selector">硬编码部分</param>
-        /// <param name="bindings">映射关系</param>
         /// <returns></returns>
-        /// <exception cref="NotSupportedException"></exception>
         public static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(
-                Expression<Func<TSource, TResult>> selector,
-                out List<MemberBinding> bindings
+               GetExpressionArgs<TSource, TResult> args
             )
             where TSource : class
             where TResult : class, new()
         {
-            var parameterExp = selector == null
+            var parameterExp = args.selector == null
                   ? Expression.Parameter(typeof(TSource), "a")
-                  : selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
+                  : args.selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
 
-            bindings = SelectMap_GetExpression_GetBindings(selector, parameterExp);
+            var bindings = SelectMap_GetExpression_GetBindings(args, parameterExp);
+
+            if (args.OnSelectMapLogTo != null)
+            {
+                string log = SelectMapMain.GetSelectMapLog(bindings);
+                args.OnSelectMapLogTo.Invoke(log);
+            }
+
             var lambda = GetLambda<TSource, TResult>(bindings, parameterExp);
             return lambda;
         }
 
         /// <summary>
-        /// 
+        /// 获得映射关系
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="selector"></param>
+        /// <param name="args"></param> 
         /// <param name="parameterExp"></param>
         /// <returns></returns>
         public static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
-            Expression<Func<TSource, TResult>> selector,
+             GetExpressionArgs<TSource, TResult> args,
             ParameterExpression parameterExp
          )
             where TSource : class
@@ -52,7 +108,6 @@ namespace LinqExtend.Handle
             var bindings = new List<MemberBinding>();
             var process = new SelectMapProcess<TSource, TResult>();
 
-            Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = GetSelectorLast<TSource, TResult>();
 
             /*计划支持
                一个类对象/一个匿名对象中的属性类型允许为自定义类, 
@@ -63,7 +118,7 @@ namespace LinqExtend.Handle
                相同组别的属性按顺序逐个处理
             */
 
-            var selector_bindings = GetBindings(selector, process);
+            var selector_bindings = GetBindings(args, process);
             if (selector_bindings != null)
             {
                 bindings.AddRange(selector_bindings);
@@ -75,10 +130,16 @@ namespace LinqExtend.Handle
                 bindings.AddRange(autoMap_bindings);
             }
 
-            var last_bindings = GetBindings(selectorLast, parameterExp, process);
-            if (last_bindings != null)
+            if (args.IsAutoFill)
             {
-                bindings.AddRange(last_bindings);
+                //var == Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>>
+                var selectorLast = GetSelectorLast<TSource, TResult>();
+
+                var last_bindings = GetBindings(parameterExp, process, selectorLast);
+                if (last_bindings != null)
+                {
+                    bindings.AddRange(last_bindings);
+                }
             }
 
             return bindings;
@@ -88,7 +149,7 @@ namespace LinqExtend.Handle
 
         //第一部分, 硬编码部分
         public static List<MemberBinding> GetBindings<TSource, TResult>(
-                Expression<Func<TSource, TResult>> selector,
+                GetExpressionArgs<TSource, TResult> args,
                 SelectMapProcess<TSource, TResult> process
             )
             where TSource : class
@@ -96,12 +157,12 @@ namespace LinqExtend.Handle
         {
             var bindings = new List<MemberBinding>();
 
-            if (selector == null)
+            if (args.selector == null)
             {
                 return bindings;
             }
 
-            var body = selector.Body;
+            var body = args.selector.Body;
             if (body is System.Linq.Expressions.MemberInitExpression memberInitExpression)
             {
                 foreach (var item in memberInitExpression.Bindings)
@@ -149,9 +210,9 @@ namespace LinqExtend.Handle
 
         //第三部分,最后兜底部分的处理(自动映射,二等公民)
         public static List<MemberBinding> GetBindings<TSource, TResult>(
-                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
                 ParameterExpression parameterExp,
-                SelectMapProcess<TSource, TResult> process
+                SelectMapProcess<TSource, TResult> process,
+                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast
             )
             where TSource : class
             where TResult : class, new()
