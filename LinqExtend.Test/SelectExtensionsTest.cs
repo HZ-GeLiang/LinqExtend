@@ -89,11 +89,7 @@ namespace LinqExtend.Test
                     new PeopleDto(){ Id =1 , Age=2},
                     new PeopleDto(){ Id =2 , Age=4},
                 });
-
             }
-
-           
-
         }
 
         [TestMethod]
@@ -127,8 +123,10 @@ namespace LinqExtend.Test
                     ShopName = a.shop.Name,
                     //未指定的 属性 ,
                     //匹配内置属性:  UserId ,
+
                     //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
-                    //按 class 属性的先后顺序  a.Order , a.shop 依次匹配
+                    //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
+                    //这里是 按  a.Order , a.shop 依次匹配, 
                 }).First();
 
                 Assert.AreEqual(dto, new OrderShopDto()
