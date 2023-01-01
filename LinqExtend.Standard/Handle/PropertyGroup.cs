@@ -1,9 +1,16 @@
-﻿using LinqExtend.Config;
+﻿
+#if IEnumerableSource
+using LinqExtend.Config;
+#elif IQuerableSource
+using LinqExtend.EF.Config;
+#else
+#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace LinqExtend.Handle
@@ -60,6 +67,25 @@ namespace LinqExtend.Handle
             typeof(Guid?),
         };
 
+        /// <summary>
+        /// is内置类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static bool IsBuildInType(Type type)
+        {
+
+            if (type.IsEnum)
+            {
+                return true;
+            }
+            if (_buildInType.Contains(type))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public PropertyGroup(Type type)
         {
             BuildIn = new List<PropertyInfo>();
@@ -67,7 +93,7 @@ namespace LinqExtend.Handle
             All = type.GetProperties();
             foreach (var item in All)
             {
-                if (_buildInType.Contains(item.PropertyType))
+                if (IsBuildInType(item.PropertyType))
                 {
                     BuildIn.Add(item);
                 }
@@ -78,13 +104,20 @@ namespace LinqExtend.Handle
             }
 
             BuildInPropertyProcessList = BuildIn.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
+
+            CustomPropertyProcessList = Custom.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
         }
 
 
         /// <summary>
-        /// 属性处理列表(目前只处理内置类型的属性)
+        /// 内置类型的属性处理列表
         /// </summary>
         public Dictionary<string, bool> BuildInPropertyProcessList { get; }
+
+        /// <summary>
+        /// 自定义类型的属性处理列表
+        /// </summary>
+        public Dictionary<string, bool> CustomPropertyProcessList { get; }
 
         /// <summary>
         /// 内置类型
@@ -92,7 +125,7 @@ namespace LinqExtend.Handle
         public List<PropertyInfo> BuildIn { get; }
 
         /// <summary>
-        /// 定义类型类型
+        /// 自定义类型
         /// </summary>
         public List<PropertyInfo> Custom { get; }
 
@@ -101,10 +134,10 @@ namespace LinqExtend.Handle
         /// </summary>
         public PropertyInfo[] All { get; }
 
-        /// <inheritdoc cref="DealWithBuildInProperty(string, bool)"/>
+        /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
         public void DealWithBuildInProperty(string propertyName)
         {
-            DealWithBuildInProperty(propertyName, true);
+            DealPropertyWithBuildIn(propertyName, true);
         }
 
         /// <summary>
@@ -112,27 +145,65 @@ namespace LinqExtend.Handle
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="check"></param>
-        public void DealWithBuildInProperty(string propertyName, bool check)
+        public void DealPropertyWithBuildIn(string propertyName, bool check)
         {
-            if (check)
+#if IEnumerableSource
+            var checkSensitiveField = check && LinqExtendConfig.EnabledSensitiveField;
+#elif IQuerableSource
+            var checkSensitiveField = check && LinqExtendEFConfig.EnabledSensitiveField;
+#else
+            throw new Exception("未知的DefineConstants")
+#endif
+            if (checkSensitiveField)
             {
-                if (LinqExtendConfig.EnabledSensitiveField)
+                if (SensitiveField.Default.Contains(propertyName))
                 {
-                    if (SensitiveField.Default.Contains(propertyName))
-                    {
-                        //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
-                        var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine(msg);
-                        //Debug.WriteLine(msg);
-                        Console.ResetColor();
-                    }
+                    //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
+                    var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(msg);
+                    //Debug.WriteLine(msg);
+                    Console.ResetColor();
                 }
             }
 
             if (BuildInPropertyProcessList.ContainsKey(propertyName))
             {
                 BuildInPropertyProcessList[propertyName] = true;
+            }
+        }
+
+
+        /// <summary>
+        /// 添加处理过的自定义类型的属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="check"></param>
+        public void DealPropertyWithCustom(string propertyName, bool check)
+        {
+#if IEnumerableSource
+            var checkSensitiveField = check && LinqExtendConfig.EnabledSensitiveField;
+#elif IQuerableSource
+            var checkSensitiveField = check && LinqExtendEFConfig.EnabledSensitiveField;
+#else
+            throw new Exception("未知的DefineConstants")
+#endif
+            if (checkSensitiveField)
+            {
+                if (SensitiveField.Default.Contains(propertyName))
+                {
+                    //场景: 比例Password 等字段, 一般是不需要接口返回的, 此时需要注意
+                    var msg = $@"Warning:{propertyName}可能是敏感字段,敏感字段一般是不需要通过接口返回的";
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine(msg);
+                    //Debug.WriteLine(msg);
+                    Console.ResetColor();
+                }
+            }
+
+            if (CustomPropertyProcessList.ContainsKey(propertyName))
+            {
+                CustomPropertyProcessList[propertyName] = true;
             }
         }
 
@@ -145,18 +216,18 @@ namespace LinqExtend.Handle
             return false;
         }
 
-        /// <inheritdoc cref="GetBuildInPropertyName(int)"/>
+        /// <inheritdoc cref="GetPropertyNameWithBuildIn(int)"/>
         public IEnumerable<string> GetBuildInPropertyName()
         {
-            return GetBuildInPropertyName(1);
+            return GetPropertyNameWithBuildIn(rank: 1);
         }
 
         /// <summary>
-        /// 
+        /// 获得内置的属性
         /// </summary>
         /// <param name="rank">从1开始</param>
         /// <returns></returns>
-        public IEnumerable<string> GetBuildInPropertyName(int rank)
+        public IEnumerable<string> GetPropertyNameWithBuildIn(int rank)
         {
             if (rank <= 0)
             {
@@ -186,6 +257,16 @@ namespace LinqExtend.Handle
             }
 
             throw new ArgumentOutOfRangeException(nameof(rank) + "当前值无效");
+        }
+
+        /// <summary>
+        /// 获得自定义类型的属性
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<string> GetPropertyNameWithCustom()
+        {
+            var list = Custom.Select(a => a.Name);
+            return list;
         }
     }
 }

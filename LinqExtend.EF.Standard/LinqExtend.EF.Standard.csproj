@@ -28,6 +28,11 @@
 		<LangVersion>10</LangVersion>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<DefineConstants>IQuerableSource;</DefineConstants>
+	</PropertyGroup>
+
+	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 	</ItemGroup>

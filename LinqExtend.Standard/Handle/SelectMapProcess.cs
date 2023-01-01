@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
 
 namespace LinqExtend.Handle
 {
@@ -15,38 +11,55 @@ namespace LinqExtend.Handle
         {
             Source = new PropertyGroup<TSource>();
             Result = new PropertyGroup<TResult>();
-
         }
 
         public PropertyGroup<TSource> Source { get; set; }
         public PropertyGroup<TResult> Result { get; set; }
 
-
-        public void DealWithBuildInProperty(string propertyName)
+        /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
+        public void DealPropertyWithBuildIn(string propertyName)
         {
-            DealWithBuildInProperty(propertyName, true);
-        }
-
-        public void DealWithBuildInProperty(string propertyName, bool check)
-        {
-            Result.DealWithBuildInProperty(propertyName, check);
+            DealPropertyWithBuildIn(propertyName, true);
         }
 
         /// <summary>
-        /// 未映射过的内置类型的属性
+        /// 处理内置类型的属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="check"></param>
+        public void DealPropertyWithBuildIn(string propertyName, bool check)
+        {
+            Result.DealPropertyWithBuildIn(propertyName, check);
+        }
+
+        /// <inheritdoc cref="DealPropertyWithCustom(string, bool)"/>
+        public void DealPropertyWithCustom(string propertyName)
+        {
+            DealPropertyWithCustom(propertyName, true);
+        }
+
+        /// <summary>
+        /// 处理自定义类型的属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="check"></param>
+        public void DealPropertyWithCustom(string propertyName, bool check)
+        {
+            Result.DealPropertyWithCustom(propertyName, check);
+        }
+
+        /// <summary>
+        /// 未映射过的属性(内置类型)
         /// </summary>
         /// <returns></returns>
-        public List<string> GetUnmappedBuildInProperty()
+        public List<string> GetUnmappedPropertyWithBuildIn(int rank)
         {
-            var list = new List<string>();
-            var PropertyList = GetUnmappedProperty();
-
-            //一个差集的 foreach , 获得 BuildInCommon 中独有的
-            var BuildInCommon = GetBuildInCommonPropertyName(rank: 1);
+            var BuildInCommon = GetCommonPropertyNameWithBuildIn(rank);
 #if DEBUG
             var debugView = BuildInCommon.ToList();
 #endif
-            foreach (var item in BuildInCommon)
+            var result = new List<string>();
+            foreach (var item in BuildInCommon)//获得差集数据
             {
                 if (!Result.BuildInPropertyProcessList.ContainsKey(item))
                 {
@@ -59,9 +72,38 @@ namespace LinqExtend.Handle
                     continue;
                 }
 
-                list.Add(item);
+                result.Add(item);
             }
-            return list;
+            return result;
+        }
+
+        /// <summary>
+        /// 未映射过的属性(自定义类型)
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetUnmappedPropertyWithCustom()
+        {
+            var customCommon = GetCommonPropertyNameWithCustom();
+#if DEBUG
+            var debugView = customCommon.ToList();
+#endif
+            var result = new List<string>();
+            foreach (var item in customCommon)//获得差集数据
+            {
+                if (!Result.CustomPropertyProcessList.ContainsKey(item))
+                {
+                    continue;
+                }
+
+                var isProcess = Result.CustomPropertyProcessList[item]; // 不区分大小写的
+                if (isProcess)
+                {
+                    continue;
+                }
+
+                result.Add(item);
+            }
+            return result;
         }
 
         /// <summary>
@@ -80,30 +122,30 @@ namespace LinqExtend.Handle
             return list;
         }
 
+
         /// <summary>
         /// 相同的内置属性名
         /// </summary>
         /// <param name="rank">{rank}等公民</param>
         /// <returns></returns>
-        private IEnumerable<string> GetBuildInCommonPropertyName(int rank)
+        private IEnumerable<string> GetCommonPropertyNameWithBuildIn(int rank)
         {
-            var source = Source.GetBuildInPropertyName(rank);
-            var result = Result.GetBuildInPropertyName(rank);
+            var source = Source.GetPropertyNameWithBuildIn(rank);
+            var result = Result.GetPropertyNameWithBuildIn(rank);
             var common = source.Intersect(result); //TSource 和 TResult 的相同属性
             return common;
         }
 
-        //private bool IsInignoreCase(string thisValue, IEnumerable<string> values)
-        //{
-        //    return values != null &&
-        //           values.Any(value =>
-        //           {
-        //               return string.Compare(
-        //                            thisValue, value, StringComparison.OrdinalIgnoreCase
-        //                        ) == 0;
-        //           });
-        //}
-
+        /// <summary>
+        /// 相同的内置属性名
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<string> GetCommonPropertyNameWithCustom()
+        {
+            var source = Source.GetPropertyNameWithCustom();
+            var result = Result.GetPropertyNameWithCustom();
+            var common = source.Intersect(result); //TSource 和 TResult 的相同属性
+            return common;
+        }
     }
-
 }

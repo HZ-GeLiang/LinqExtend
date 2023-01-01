@@ -54,7 +54,7 @@ namespace LinqExtend
             return list;
         }
 
-        /// <inheritdoc cref="SelectMap{TSource, TResult}(IEnumerable{TSource}, Expression{Func{TSource, TResult}})"/>
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(IEnumerable{TSource}, Expression{Func{TSource, TResult}}, bool)"/>
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source)
             where TSource : class
             where TResult : class, new()
@@ -69,7 +69,7 @@ namespace LinqExtend
         /// <typeparam name="TResult"></typeparam>
         /// <param name="source"></param>
         /// <param name="selector">硬编码部分</param>
-        /// <param name="isAutoFill">默认值: IEnumerable:false ,  IQuerable:true</param>
+        /// <param name="isAutoFill"></param>
         /// <returns></returns>
         public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector, bool isAutoFill = false)
             where TSource : class
@@ -80,13 +80,18 @@ namespace LinqExtend
                 return Enumerable.Empty<TResult>();
             }
 
+#if IEnumerableSource
+
             var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
                     new GetExpressionArgs<TSource, TResult>(
                         selector: selector,
                         OnSelectMapLogTo: SelectExtensions.OnSelectMapLogTo,
-                        sourceType: SelectMapSourceType.IEnumerable,
-                        isAutoFill: isAutoFill                         
+                        isAutoFill: isAutoFill
                     ));
+#else
+
+          throw new Exception("未知的DefineConstants")
+#endif
 
             var methodPara = new object[] { source, lambda.Compile() };
 

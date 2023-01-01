@@ -1,4 +1,5 @@
-﻿using LinqExtend.Test.Model;
+﻿using LinqExtend.Test.ExtendMethods;
+using LinqExtend.Test.Model;
 using System;
 using System.Collections;
 using System.Data;
@@ -92,6 +93,7 @@ namespace LinqExtend.Test
             }
         }
 
+
         [TestMethod]
         public void SelectMap_Enumerable_2等公民对象的处理()
         {
@@ -119,8 +121,6 @@ namespace LinqExtend.Test
                 };
 
                 {
-                    //未开启自动映射
-
                     //开启自动映射
 
                     var dto = dy.MakeList().SelectMap(a => new OrderShopDto
@@ -184,17 +184,53 @@ namespace LinqExtend.Test
             }
         }
 
-        //[TestMethod] public void SelectMap_Queryable() { } //这部分在 LinqExtend.EF.Standard 中
+        [TestMethod]
+        public void SelectMap_Enumerable_支持值对象()
+        {
+            //todo: 未实现
+            return;
+
+            // 也就是 一个类里面有一个 class 对象, 
+            //注: 不支持 List  , array
+
+            var student = new Student
+            {
+                Id = 4,
+                UserName = "jones",
+                Birth = Convert.ToDateTime("2022-1-1"),
+                IsDel = false,
+                Gender = GenderEnum.BaoMi,
+                NickName = new MultilingualString("c", "e"),
+            };
+
+            SelectExtensions.OnSelectMapLogTo = mapperLog =>
+            {
+                Console.WriteLine(mapperLog);
+
+                /*
+Id = a.Id
+UserName = a.UserName
+Birth = a.Birth
+IsDel = a.IsDel
+Gender = a.Gender
+
+                 */
+            };
+
+            var dto = student.MakeList().SelectMap(a => new Student
+            {
+            }, true)
+            .First();
+            // Assert.AreEqual(dto, student);
+
+            //var ccc = new MultilingualString()
+            //{
+            //    Chinese = "c",
+            //    English = "e"
+            //};
+
+        }
+
     }
 
-    public static class TypeExtensionMethod
-    {
-        public static List<T> MakeList<T>(this T data)
-        {
-            Type type = typeof(List<>).MakeGenericType(data.GetType());
-            List<T> list = (List<T>)Activator.CreateInstance(type);
-            list.Add(data);
-            return list;
-        }
-    }
 }
