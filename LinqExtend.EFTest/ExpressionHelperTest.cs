@@ -1,12 +1,13 @@
 ﻿using LinqExtend.EF;
 using LinqExtend.EF.Test.EF;
+using LinqExtend.Test;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace LinqExtend.Test
+namespace LinqExtend.EF.Test
 {
     [TestClass]
     public class ExpressionHelperTest
@@ -219,7 +220,7 @@ FROM [T_Books] AS [t]");
             using TestDbContext ctx = new TestDbContext();
 
             var query_tmp = from b in ctx.Books
-                            select new { b = b, key = "_key" };
+                            select new { b, key = "_key" };
 
             var query = query_tmp.Select(a => new BookDto()
             {

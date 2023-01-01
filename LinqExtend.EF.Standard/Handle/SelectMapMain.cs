@@ -7,70 +7,168 @@ using System.Text;
 
 namespace LinqExtend.EF.Handle
 {
+
+
+    internal class GetExpressionArgs<TSource, TResult>
+        where TSource : class
+        where TResult : class, new()
+    {
+
+
+#if IEnumerableSource
+        public GetExpressionArgs(
+            Expression<Func<TSource, TResult>> selector,
+            Action<string> OnSelectMapLogTo,
+            bool isAutoFill
+            )
+        {
+            this.selector = selector;
+            this.OnSelectMapLogTo = OnSelectMapLogTo;
+            this.IsAutoFill = isAutoFill;
+        }
+#elif IQuerableSource
+        public GetExpressionArgs(
+            Expression<Func<TSource, TResult>> selector,
+            Action<string> OnSelectMapLogTo
+            )
+        {
+            this.selector = selector;
+            this.OnSelectMapLogTo = OnSelectMapLogTo;
+        }
+#else
+
+        private GetExpressionArgs(){
+          throw new Exception("未知的DefineConstants")
+        }
+
+#endif
+
+
+
+        /// <summary>
+        /// 硬编码部分
+        /// </summary>
+        public Expression<Func<TSource, TResult>> selector { get; set; }
+
+        /// <summary>
+        /// 获得SelectMap映射的日志情况
+        /// </summary>
+        public Action<string> OnSelectMapLogTo { get; set; }
+
+#if IEnumerableSource
+        /// <summary>
+        /// 自动填充
+        /// </summary>
+        public bool IsAutoFill { get; }
+#endif  
+    }
+
     internal class SelectMapMain
     {
+        ///// <summary>
+        ///// 获得SelectMap映射的日志情况
+        ///// </summary>
+        //public static Action<string> OnSelectMapLogTo { get; set; }
+
         /// <summary>
         /// 返回一个Expression
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="selector">硬编码部分</param>
-        /// <param name="selectorLast">最后兜底部分的处理</param>
-        /// <param name="bindings">映射关系</param>
         /// <returns></returns>
-        /// <exception cref="NotSupportedException"></exception>
         public static Expression<Func<TSource, TResult>> SelectMap_GetExpression<TSource, TResult>(
-                Expression<Func<TSource, TResult>> selector,
-                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
-                out List<MemberBinding> bindings
+               GetExpressionArgs<TSource, TResult> args
             )
             where TSource : class
             where TResult : class, new()
         {
-            var parameterExp = selector == null
+            var parameterExp = args.selector == null
                   ? Expression.Parameter(typeof(TSource), "a")
-                  : selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
-            bindings = SelectMap_GetExpression_GetBindings(selector, selectorLast, parameterExp);
+                  : args.selector.Parameters[0];  //需要外面丢进来 ,不然会提示 variable '' of type '' referenced from scope '', but it is not defined
+
+            var bindings = SelectMap_GetExpression_GetBindings(args, parameterExp);
+
+            if (args.OnSelectMapLogTo != null)
+            {
+                string log = GetSelectMapLog(bindings);
+                args.OnSelectMapLogTo.Invoke(log);
+            }
+
             var lambda = GetLambda<TSource, TResult>(bindings, parameterExp);
             return lambda;
         }
 
+        /// <summary>
+        /// 获得映射关系
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="args"></param> 
+        /// <param name="parameterExp"></param>
+        /// <returns></returns>
         public static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
-            Expression<Func<TSource, TResult>> selector,
-            Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
+            GetExpressionArgs<TSource, TResult> args,
             ParameterExpression parameterExp
          )
-         where TSource : class
-         where TResult : class, new()
+            where TSource : class
+            where TResult : class, new()
         {
             var bindings = new List<MemberBinding>();
             var process = new SelectMapProcess<TSource, TResult>();
 
-            /*计划支持
-               一个类对象/一个匿名对象中的属性类型允许为自定义类, 
-                    但是自定义中如果又出现了自定义类, 针对这种情况. 需要修改代码
-
-               属性映射优先级:
-               内置类型的属性 > 自定义类的类型属性
-               相同组别的属性按顺序逐个处理
-            */
-
-            var selector_bindings = GetBindings(selector, process);
+            var selector_bindings = GetBindings(args, process);//step1:硬编码
             if (selector_bindings != null)
             {
                 bindings.AddRange(selector_bindings);
             }
 
-            var autoMap_bindings = GetBindings(parameterExp, process);
+            var autoMap_bindings = GetBindings(parameterExp, process);//step2:根据名字自动映射(目前只处理内置类型的)
             if (autoMap_bindings != null)
             {
                 bindings.AddRange(autoMap_bindings);
             }
 
-            var last_bindings = GetBindings(selectorLast, parameterExp, process);
-            if (last_bindings != null)
+
+#if IEnumerableSource
             {
-                bindings.AddRange(last_bindings);
+
+                //todo:SelectMap_Enumerable_支持值对象
+                //1等公民的处理(自定义类型)
+                //var unmappedCustomProperty = process.GetUnmappedPropertyWithCustom();
+
+                //foreach (var propertyName in unmappedCustomProperty)
+                //{
+                //    process.DealPropertyWithCustom(propertyName);
+
+                //    //var memberAssignment = Expression.Bind(
+                //    //    typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
+                //    //    Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
+                //    //);
+
+                //    //bindings.Add(memberAssignment);
+                //}
+
+            }
+
+#endif
+
+#if IEnumerableSource
+            var _isAutoFill = args.IsAutoFill;
+#elif IQuerableSource
+            var _isAutoFill = true;
+#else
+            throw new Exception("未知的DefineConstants")
+#endif
+            if (_isAutoFill)//step3
+            {
+                //var == Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>>
+                var selectorLast = GetSelectorLast<TSource, TResult>();
+
+                var last_bindings = GetBindings(parameterExp, process, selectorLast);
+                if (last_bindings != null)
+                {
+                    bindings.AddRange(last_bindings);
+                }
             }
 
             return bindings;
@@ -78,9 +176,17 @@ namespace LinqExtend.EF.Handle
         }
 
 
-        //第一部分, 硬编码部分
+        /// <summary>
+        /// step1, 硬编码部分
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="args"></param>
+        /// <param name="process"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public static List<MemberBinding> GetBindings<TSource, TResult>(
-                Expression<Func<TSource, TResult>> selector,
+                GetExpressionArgs<TSource, TResult> args,
                 SelectMapProcess<TSource, TResult> process
             )
             where TSource : class
@@ -88,18 +194,18 @@ namespace LinqExtend.EF.Handle
         {
             var bindings = new List<MemberBinding>();
 
-            if (selector == null)
+            if (args.selector == null)
             {
                 return bindings;
             }
 
-            var body = selector.Body;
+            var body = args.selector.Body;
             if (body is MemberInitExpression memberInitExpression)
             {
                 foreach (var item in memberInitExpression.Bindings)
                 {
                     var propertyName = item.Member.Name;
-                    process.DealWithBuildInProperty(propertyName);
+                    process.DealPropertyWithBuildIn(propertyName);
                 }
 
                 bindings.AddRange(memberInitExpression.Bindings);
@@ -113,7 +219,14 @@ namespace LinqExtend.EF.Handle
 
         }
 
-        //第二部分,根据名字自动映射(目前只处理内置类型的)
+        /// <summary>
+        /// step2,根据名字自动映射(目前只处理内置类型的)
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="parameterExp"></param>
+        /// <param name="process"></param>
+        /// <returns></returns>
         public static List<MemberBinding> GetBindings<TSource, TResult>(
                 ParameterExpression parameterExp,
                 SelectMapProcess<TSource, TResult> process
@@ -122,11 +235,12 @@ namespace LinqExtend.EF.Handle
             where TResult : class, new()
         {
             var bindings = new List<MemberBinding>();
-            //1等公民的处理(目前只处理内置类型的)
-            var unmappedBuildInProperty = process.GetUnmappedBuildInProperty();
+            //1等公民的处理(内置类型)
+            var unmappedBuildInProperty = process.GetUnmappedPropertyWithBuildIn(rank: 1);
+
             foreach (var propertyName in unmappedBuildInProperty)
             {
-                process.DealWithBuildInProperty(propertyName);
+                process.DealPropertyWithBuildIn(propertyName);
 
                 var memberAssignment = Expression.Bind(
                     typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
@@ -136,14 +250,23 @@ namespace LinqExtend.EF.Handle
                 bindings.Add(memberAssignment);
             }
 
+
             return bindings;
         }
 
-        //第三部分 
+        /// <summary>
+        /// step3,最后兜底部分的处理(自动映射,二等公民)
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="parameterExp"></param>
+        /// <param name="process"></param>
+        /// <param name="selectorLast"></param>
+        /// <returns></returns>
         public static List<MemberBinding> GetBindings<TSource, TResult>(
-                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast,
                 ParameterExpression parameterExp,
-                SelectMapProcess<TSource, TResult> process
+                SelectMapProcess<TSource, TResult> process,
+                Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast
             )
             where TSource : class
             where TResult : class, new()
@@ -156,25 +279,37 @@ namespace LinqExtend.EF.Handle
             return bindings;
         }
 
-        //第三部分的处理逻辑
+        /// <summary>
+        /// 第三部分的处理逻辑:自动映射
+        /// </summary>
+        /// <typeparam name="TSource"></typeparam>
+        /// <typeparam name="TResult"></typeparam>
+        /// <returns></returns>
         public static Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> GetSelectorLast<TSource, TResult>()
-         where TSource : class
-         where TResult : class, new()
+            where TSource : class
+            where TResult : class, new()
         {
             Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = (parameterExp, process) =>
             {
                 //最后未处理的部分(目前只处理内置类型的)
                 var bindings = new List<MemberBinding>();
                 var unmappedPropertyNameList = process.GetUnmappedProperty();
-                var customCollection = process.Source.Custom;
 
-                var customDict = customCollection.ToDictionary(a => a, a => new PropertyGroup(a.PropertyType));
+                //if (unmappedPropertyNameList.Count == 0)
+                //{
+                //    return bindings;
+                //}
+                var collection = process.Source.Custom;
+
+                var dict = collection.ToDictionary(a => a, a => new PropertyGroup(a.PropertyType));
 
                 foreach (var propertyName in unmappedPropertyNameList)
                 {
+#if DEBUG
                     Console.WriteLine(propertyName);
+#endif
 
-                    foreach (var kv in customDict)
+                    foreach (var kv in dict)
                     {
                         var objProcess = kv.Value;
 
@@ -192,12 +327,13 @@ namespace LinqExtend.EF.Handle
                         {
                             var objType = kv.Key.PropertyType;
 
-                            customDict[kv.Key].DealWithBuildInProperty(propertyName);
-                            process.DealWithBuildInProperty(propertyName, check: false);
+                            dict[kv.Key].DealWithBuildInProperty(propertyName);
+                            process.DealPropertyWithBuildIn(propertyName, check: false);
 
+#if DEBUG
                             var debugTxt = $@"{objType}:{propertyName}";
                             Console.WriteLine(debugTxt);
-
+#endif
                             var objName = kv.Key.Name; //order
 
                             var exp = Expression.Property(parameterExp, objName);//a.order

@@ -377,10 +377,11 @@ namespace LinqExtend.EF
          where TResult : class, new()
         {
             var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
-            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(selector, selectorLast, out var bindings);
-#if DEBUG
-            var log = SelectMapMain.GetSelectMapLog(bindings);
-#endif
+            var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
+                new GetExpressionArgs<TSource, TResult>(
+                    selector: selector,
+                    OnSelectMapLogTo: SelectExtensions.OnSelectMapLogTo
+                ));
 
             return lambda;
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LinqExtend.Config
+namespace LinqExtend.EF.Config
 {
     public class LinqExtendEFConfig
     {
