@@ -1,0 +1,76 @@
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace LinqExtend.EF.Test.EF
+{
+
+    public record Student
+    {
+        public int Id { get; set; }
+
+        public string UserName { get; set; }
+        public DateTime Birth { get; set; }
+        public bool IsDel { get; set; }
+
+        public GenderEnum Gender { get; set; }
+        public MultilingualString NickName { get; set; }
+    }
+
+    public record MultilingualString(string Chinese, string? English);
+
+    //public record class MultilingualString
+    //{
+    //    public MultilingualString(string Chinese)
+    //    {
+    //        this.Chinese = Chinese;
+    //    }
+
+
+    //    public string Chinese { get; init; }
+    //    public string? English { get; init; }
+    //}
+
+
+    public enum GenderEnum
+    {
+        /// <summary>
+        /// 未设置
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// 男
+        /// </summary>
+        Male = 1,
+
+        /// <summary>
+        /// 女
+        /// </summary>
+        Female = 2,
+
+        /// <summary>
+        /// 保密
+        /// </summary>
+        BaoMi = 3,
+
+    }
+
+    class StudentConfig : IEntityTypeConfiguration<Student>
+    {
+        public void Configure(EntityTypeBuilder<Student> builder)
+        {
+            //对值类型单独做配置
+            builder.OwnsOne(a => a.NickName, c =>
+            {
+                c.Property(e => e.Chinese).HasMaxLength(10).IsUnicode(true);
+                c.Property(e => e.English).HasMaxLength(10).IsUnicode(false);
+            });
+        }
+    }
+
+}
