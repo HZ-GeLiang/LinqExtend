@@ -211,8 +211,6 @@ FROM [T_Books] AS [t]");
             CollectionAssert.AreEqual(queryList, selectMapList);
         }
 
-
-
         [TestMethod]
         public void SelectMap_object2Linq_Test()
         {
@@ -262,6 +260,51 @@ FROM [T_Books] AS [t]");
             CollectionAssert.AreEqual(queryList, selectMapList);
 
         }
+
+
+
+        [TestMethod]
+        public void SelectMap_值类型_Test()
+        {
+            //return;//因为  LinqExtend.Standard 中的 还未完成. 
+            using TestDbContext ctx = new TestDbContext();
+
+            var query_tmp = from b in ctx.Students
+                            select new { b };
+
+            var query_list = query_tmp.ToList();
+
+            SelectExtensions.OnSelectMapLogTo = mapperLog =>
+            {
+                Console.WriteLine(mapperLog);
+            };
+            var selectMapQuery = query_tmp.SelectMap(a => new Student
+            {
+                //NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
+
+            });
+
+            /* 详细的 SelectMap 如下
+Id = a.b.Id
+UserName = a.b.UserName
+Birth = a.b.Birth
+IsDel = a.b.IsDel
+Gender = a.b.Gender
+NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
+             
+            */
+
+            var sql_selectMap = selectMapQuery.ToQueryString();
+
+            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
+FROM [Students] AS [s]");
+
+            var selectMapList = selectMapQuery.ToList();
+            CollectionAssert.AreEqual(query_list, selectMapList);
+
+        }
+
+
 
         [TestMethod]
         public void Main()
