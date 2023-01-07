@@ -8,6 +8,23 @@ using System.Threading.Tasks;
 
 namespace LinqExtend.EF.Test.EF
 {
+    public class StudentDto
+    {
+        public int Id { get; set; }
+
+        public string UserName { get; set; }
+        public GenderEnum Gender { get; set; }
+        public MultilingualStringDto NickName { get; set; }
+    }
+
+    public record class MultilingualStringDto
+    {      
+        public string Chinese { get; init; }
+        public string? English { get; init; }
+        public string? English2 { get; init; }
+    }
+
+
 
     public record Student
     {
@@ -54,8 +71,7 @@ namespace LinqExtend.EF.Test.EF
         //private MultilingualString() { }
 
         public string Chinese { get; init; }
-        public string? English { get; init; }
-        public string? English2 { get; init; }
+        public string? English { get; init; } 
     }
 
 
