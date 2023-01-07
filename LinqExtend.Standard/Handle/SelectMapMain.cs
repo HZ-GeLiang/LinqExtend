@@ -38,7 +38,7 @@ namespace LinqExtend.Handle
 #else
 
         private GetExpressionArgs(){
-          throw new Exception("未知的DefineConstants")
+          throw new Exception("未知的DefineConstants");
         }
 
 #endif
@@ -157,7 +157,7 @@ namespace LinqExtend.Handle
 #elif IQuerableSource
             var _isAutoFill = true;
 #else
-            throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
 #endif
             if (_isAutoFill)//step3
             {

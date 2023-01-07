@@ -21,19 +21,41 @@ namespace LinqExtend.EF.Test.EF
         public MultilingualString NickName { get; set; }
     }
 
-    public record MultilingualString(string Chinese, string? English);
+    //public record MultilingualString(string Chinese, string? English);
 
-    //public record class MultilingualString
-    //{
-    //    public MultilingualString(string Chinese)
-    //    {
-    //        this.Chinese = Chinese;
-    //    }
+    public record class MultilingualString
+    {
+        //case1
+        //public MultilingualString() { }
+
+        //case2
+        public MultilingualString(string chinese)
+        {
+            this.Chinese = chinese;
+        }
+
+        //case3
+        //public MultilingualString(string chinese, string english)
+        //{
+        //    this.Chinese = chinese;
+        //    this.English = english;
+        //}
+
+        //case4, 同 case2 , 内不只获得公共的
+        //private MultilingualString() { }
+
+        //public MultilingualString(string chinese)
+        //{
+        //    this.Chinese = chinese;
+        //}
 
 
-    //    public string Chinese { get; init; }
-    //    public string? English { get; init; }
-    //}
+        //case5, 暂不支持
+        //private MultilingualString() { }
+
+        public string Chinese { get; init; }
+        public string? English { get; init; }
+    }
 
 
     public enum GenderEnum

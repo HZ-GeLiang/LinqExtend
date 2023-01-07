@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace LinqExtend.EF.Handle
@@ -15,6 +16,26 @@ namespace LinqExtend.EF.Handle
 
         public PropertyGroup<TSource> Source { get; set; }
         public PropertyGroup<TResult> Result { get; set; }
+
+
+        /// <summary>
+        /// 处理属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        public void DealPropertyWithAuto(string propertyName)
+        {
+            //if (Result.IsBuildIn(propertyName))
+            //{
+            //    DealPropertyWithBuildIn(propertyName);
+            //}
+            //else
+            //{
+            //    DealPropertyWithCustom(propertyName);
+            //}
+
+            Result.DealPropertyWithAuto(propertyName);
+        }
+
 
         /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
         public void DealPropertyWithBuildIn(string propertyName)
@@ -66,7 +87,7 @@ namespace LinqExtend.EF.Handle
                     continue;
                 }
 
-                var isProcess = Result.BuildInPropertyProcessList[item]; // 不区分大小写的
+                var isProcess = Result.BuildInPropertyProcessList[item].IsProcess; // 不区分大小写的
                 if (isProcess)
                 {
                     continue;
@@ -95,7 +116,7 @@ namespace LinqExtend.EF.Handle
                     continue;
                 }
 
-                var isProcess = Result.CustomPropertyProcessList[item]; // 不区分大小写的
+                var isProcess = Result.CustomPropertyProcessList[item].IsProcess; // 不区分大小写的
                 if (isProcess)
                 {
                     continue;
@@ -104,22 +125,6 @@ namespace LinqExtend.EF.Handle
                 result.Add(item);
             }
             return result;
-        }
-
-        /// <summary>
-        /// 未映射的属性
-        /// </summary>
-        public List<string> GetUnmappedProperty()
-        {
-            var list = new List<string>();
-            foreach (var item in Result.BuildInPropertyProcessList)
-            {
-                if (item.Value == false)
-                {
-                    list.Add(item.Key);
-                }
-            }
-            return list;
         }
 
 

@@ -152,7 +152,7 @@ namespace LinqExtend.Handle
 #elif IQuerableSource
             var checkSensitiveField = check && LinqExtendEFConfig.EnabledSensitiveField;
 #else
-            throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
 #endif
             if (checkSensitiveField)
             {
@@ -186,7 +186,7 @@ namespace LinqExtend.Handle
 #elif IQuerableSource
             var checkSensitiveField = check && LinqExtendEFConfig.EnabledSensitiveField;
 #else
-            throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
 #endif
             if (checkSensitiveField)
             {
