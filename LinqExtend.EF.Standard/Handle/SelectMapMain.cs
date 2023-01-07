@@ -431,6 +431,9 @@ namespace LinqExtend.EF.Handle
                         var list = process.Result.CustomPropertyProcessList[propertyName]
                                                 .PropertyGroup.BuildInPropertyProcessList;
 
+                        var exp_customPropertyType = exp_customPropertyName.Type;
+                        var exp_customProperty_props = exp_customPropertyType.GetProperties();
+
                         foreach (var itemProperty in list)
                         {
                             if (itemProperty.Value.IsProcess == true)
@@ -438,27 +441,24 @@ namespace LinqExtend.EF.Handle
                                 continue;
                             }
 
-                            //todo:
-                            //如果 exp_customPropertyName 中没有 itemProperty.Value.Name, 那么需要跳过
-                            //也就是实体类的属性在数据源中不存在
-
-                            if (exp_customPropertyName.Member != null)
-                            {// 属性存在
-
-                                //请注意，Member 属性也可能返回一个字段，因此您可能需要检查返回的 MemberInfo 对象是否是一个属性。要这样做，您可以使用 MemberInfo 类的 MemberType 属性：
-                                if (exp_customPropertyName.Member.MemberType == MemberTypes.Property)
-                                {
-                                    // 属性存在
-                                }
+                            var exp_customProperty = exp_customPropertyType.GetProperty(itemProperty.Value.Name);
+                            if (exp_customProperty  == null)
+                            {
+                                //如果 exp_customPropertyName 中没有 itemProperty.Value.Name, 那么需要跳过
+                                //也就是实体类的属性在数据源中不存在
+                                continue;
                             }
 
-
-                            var propInit = Expression.Bind(
-                                customPropertyType.GetProperty(itemProperty.Value.Name),//"English"
+                            var propInit_left = customPropertyType.GetProperty(itemProperty.Value.Name);//"English"
+                            var propInit_right =
                                 Expression.MakeMemberAccess(
                                     exp_customPropertyName,
-                                    customPropertyType.GetProperty(itemProperty.Value.Name)//"English"
-                                )
+                                    exp_customProperty //"English"
+                                );
+
+                            var propInit = Expression.Bind(
+                                propInit_left,
+                                propInit_right
                             );
 
                             MemberInit_Right.Add(propInit);

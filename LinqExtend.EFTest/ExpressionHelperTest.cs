@@ -272,13 +272,20 @@ FROM [T_Books] AS [t]");
             var query_tmp = from b in ctx.Students
                             select new { b };
 
+            query_tmp.Select(a => new
+            {
+                a.b.NickName.Chinese
+            });
+
+
             SelectExtensions.OnSelectMapLogTo = mapperLog =>
             {
                 Console.WriteLine(mapperLog);
             };
 
-            var selectMapQuery = query_tmp.SelectMap(a => new Student
+            var selectMapQuery = query_tmp.SelectMap(a => new StudentDto
             {
+
                 //NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
                 //NickName = new MultilingualString()
                 //{
@@ -300,8 +307,8 @@ NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
 
             var sql_selectMap = selectMapQuery.ToQueryString();
 
-//            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
-//FROM [Students] AS [s]");
+            //            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
+            //FROM [Students] AS [s]");
 
             var selectMapList = selectMapQuery.ToList();
 
