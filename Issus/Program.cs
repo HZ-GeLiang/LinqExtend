@@ -2,4 +2,5 @@
 
 using Issus;
 
-Issus01.Test();
+//Issus01.Test();
+//Issus02.Test();
