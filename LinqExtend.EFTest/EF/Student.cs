@@ -18,10 +18,17 @@ namespace LinqExtend.EF.Test.EF
     }
 
     public record class MultilingualStringDto
-    {      
+    {
+        //case1 第二个属性没有
+        public MultilingualStringDto(string chinese, string eng)
+        {
+            this.Chinese = chinese;
+            this.English = eng;
+        }
+
         public string Chinese { get; init; }
         public string? English { get; init; }
-        public string? English2 { get; init; }
+        //public string? English2 { get; init; }
     }
 
 
@@ -71,7 +78,7 @@ namespace LinqExtend.EF.Test.EF
         //private MultilingualString() { }
 
         public string Chinese { get; init; }
-        public string? English { get; init; } 
+        public string? English { get; init; }
     }
 
 
