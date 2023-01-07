@@ -90,7 +90,7 @@ namespace LinqExtend
                     ));
 #else
 
-          throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
 #endif
 
             var methodPara = new object[] { source, lambda.Compile() };

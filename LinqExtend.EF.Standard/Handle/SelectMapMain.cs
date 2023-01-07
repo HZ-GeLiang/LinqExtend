@@ -4,11 +4,13 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Runtime.Serialization;
+using System.Data.Common;
+using System.Collections;
+using System.Xml.Linq;
 
 namespace LinqExtend.EF.Handle
 {
-
-
     internal class GetExpressionArgs<TSource, TResult>
         where TSource : class
         where TResult : class, new()
@@ -36,14 +38,11 @@ namespace LinqExtend.EF.Handle
             this.OnSelectMapLogTo = OnSelectMapLogTo;
         }
 #else
-
         private GetExpressionArgs(){
-          throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
         }
 
 #endif
-
-
 
         /// <summary>
         /// 硬编码部分
@@ -157,7 +156,7 @@ namespace LinqExtend.EF.Handle
 #elif IQuerableSource
             var _isAutoFill = true;
 #else
-            throw new Exception("未知的DefineConstants")
+            throw new Exception("未知的DefineConstants");
 #endif
             if (_isAutoFill)//step3
             {
@@ -170,11 +169,8 @@ namespace LinqExtend.EF.Handle
                     bindings.AddRange(last_bindings);
                 }
             }
-
             return bindings;
-
         }
-
 
         /// <summary>
         /// step1, 硬编码部分
@@ -205,7 +201,8 @@ namespace LinqExtend.EF.Handle
                 foreach (var item in memberInitExpression.Bindings)
                 {
                     var propertyName = item.Member.Name;
-                    process.DealPropertyWithBuildIn(propertyName);
+                    //process.DealPropertyWithBuildIn(propertyName);
+                    process.DealPropertyWithAuto(propertyName);
                 }
 
                 bindings.AddRange(memberInitExpression.Bindings);
@@ -216,7 +213,6 @@ namespace LinqExtend.EF.Handle
             }
 
             return bindings;
-
         }
 
         /// <summary>
@@ -249,8 +245,6 @@ namespace LinqExtend.EF.Handle
 
                 bindings.Add(memberAssignment);
             }
-
-
             return bindings;
         }
 
@@ -291,31 +285,27 @@ namespace LinqExtend.EF.Handle
         {
             Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = (parameterExp, process) =>
             {
-                //最后未处理的部分(目前只处理内置类型的)
                 var bindings = new List<MemberBinding>();
-                var unmappedPropertyNameList = process.GetUnmappedProperty();
+                var dict_PropertyListWithSourceCustom =
+                    process.Source.Custom
+                    .ToDictionary(a => a, a => new PropertyGroup(a.PropertyType));
 
-                //if (unmappedPropertyNameList.Count == 0)
-                //{
-                //    return bindings;
-                //}
-                var collection = process.Source.Custom;
+                //最后未处理的部分(内置类型的)
+                var unmappedPropertyNameList = process.Result.BuildInPropertyProcessList
+                                                .Where(a => a.Value.IsProcess == false)
+                                                .Select(a => a.Value)
+                                                ;
 
-                var dict = collection.ToDictionary(a => a, a => new PropertyGroup(a.PropertyType));
-
-                foreach (var propertyName in unmappedPropertyNameList)
+                foreach (var property in unmappedPropertyNameList)
                 {
-#if DEBUG
-                    Console.WriteLine(propertyName);
-#endif
-
-                    foreach (var kv in dict)
+                    var propertyName = property.Name;
+                    foreach (var kv in dict_PropertyListWithSourceCustom)
                     {
                         var objProcess = kv.Value;
 
                         if (
-                            !objProcess.BuildInPropertyProcessList.ContainsKey(propertyName) ||
-                            objProcess.BuildInPropertyProcessList[propertyName] == true //objProcess中propertyName是未处理过的
+                            objProcess.BuildInPropertyProcessList.ContainsKey(propertyName) == false ||
+                            objProcess.BuildInPropertyProcessList[propertyName].IsProcess == true //objProcess中propertyName是未处理过的
                         )
                         {
                             continue;
@@ -327,7 +317,7 @@ namespace LinqExtend.EF.Handle
                         {
                             var objType = kv.Key.PropertyType;
 
-                            dict[kv.Key].DealWithBuildInProperty(propertyName);
+                            dict_PropertyListWithSourceCustom[kv.Key].DealPropertyWithBuildIn(propertyName);
                             process.DealPropertyWithBuildIn(propertyName, check: false);
 
 #if DEBUG
@@ -335,7 +325,6 @@ namespace LinqExtend.EF.Handle
                             Console.WriteLine(debugTxt);
 #endif
                             var objName = kv.Key.Name; //order
-
                             var exp = Expression.Property(parameterExp, objName);//a.order
 
                             //添加 binding
@@ -349,6 +338,144 @@ namespace LinqExtend.EF.Handle
                         }
                     }
                 }
+
+#if IQuerableSource
+                //最后未处理的部分(自定义类型的)
+                var unmappedPropertyNameList_Custom = process.Result.CustomPropertyProcessList
+                                                .Where(a => a.Value.IsProcess == false)
+                                                .Select(a => a.Value)
+                                                ;
+
+                foreach (var customProperty in unmappedPropertyNameList_Custom)
+                {
+                    var propertyName = customProperty.Name;
+
+                    foreach (var kv in dict_PropertyListWithSourceCustom)
+                    {
+                        if (kv.Key.PropertyType.GetProperty(propertyName) == null)
+                        {
+                            continue;
+                        }
+
+                        var classType = customProperty.PropertyInfo.PropertyType;
+
+                        MemberExpression exp = Expression.Property(parameterExp, kv.Key);//a.b
+                        MemberExpression customPropertyName = Expression.Property(exp, propertyName);//a.b.NickName
+
+                        var ctors = classType.GetConstructors();//获得 public的
+                        ConstructorInfo MemberInit_new_left = null;
+                        List<MemberExpression> MemberInit_new_right = new List<MemberExpression>();
+
+                        if (ctors.Length == 0) // 没有 pulic 的构造器
+                        {
+                            throw new Exception($@"暂不支持没有构造函数的类. 类:{classType.FullName}");
+                            //  object instance  = FormatterServices.GetUninitializedObject(classType);
+                        }
+                        else
+                        {
+                            ConstructorInfo constructor = ctors.First();
+                            ParameterInfo[] parameters = constructor.GetParameters();
+
+                            if (parameters.Length == 0)
+                            {
+                                MemberInit_new_left = classType.GetConstructor(new Type[] { });
+                            }
+                            else
+                            {
+                                var _ConstructorTypes = new List<Type>();
+
+                                for (int i = 0; i < parameters.Length; i++)
+                                {
+                                    ParameterInfo parameter = parameters[i];
+                                    _ConstructorTypes.Add(parameter.ParameterType);
+
+                                    string parameterName = process.Result.GetPropertyInfoWithCustom(propertyName, parameter.Name)?.Name; // 因为下面是区分大小写的, 所以要根据构造参数参数名去换取真正的属性名
+
+                                    if (parameterName != null)
+                                    {
+                                        MemberInit_new_right.Add(
+                                           Expression.MakeMemberAccess(
+                                               Expression.MakeMemberAccess(exp,
+                                                   process.Result.Type.GetProperty(propertyName)
+                                               ),
+                                               classType.GetProperty(parameterName)//要注意大小写
+                                           )
+                                        );
+                                        process.Result.DealPropertyWithCustom(propertyName, parameter.Name);
+                                    }
+                                }
+
+                                MemberInit_new_left = classType.GetConstructor(_ConstructorTypes.ToArray());
+
+                            }
+                        }
+
+
+                        NewExpression MemberInit_Left =
+                            Expression.New(
+                                MemberInit_new_left,
+                                MemberInit_new_right
+                            );
+
+                        var MemberInit_Right = new List<MemberAssignment>();
+
+                        //遍历当前自定义类中被赋值的属性
+
+                        var list = process.Result.CustomPropertyProcessList[propertyName]
+                                                .PropertyGroup.BuildInPropertyProcessList;
+
+                        foreach (var itemProperty in list)
+                        {
+             
+                            if (itemProperty.Value.IsProcess == true)
+                            {
+                                continue;
+                            }
+
+                            var propInit = Expression.Bind(
+                                classType.GetProperty(itemProperty.Value.Name),//"English"
+                                Expression.MakeMemberAccess(
+                                    customPropertyName,
+                                    classType.GetProperty(itemProperty.Value.Name)//"English"
+                                )
+                            );
+
+                            MemberInit_Right.Add(propInit);
+                            process.Result.DealPropertyWithCustom(propertyName, itemProperty.Value.Name);
+
+                        }
+
+
+                        {
+
+
+                            //======
+
+                            //dict_PropertyListWithSourceCustom[customProperty.PropertyInfo].DealWithBuildInProperty(parameter.Name);
+                            //var exp = Expression.Property(parameterExp, parameter.Name);//a.order
+
+                            //invokeParas[i] = exp.Member;//a.b.NickName.Chinese, 
+                        }
+
+                        //添加 binding
+                        var bind_right =
+                            Expression.MemberInit(
+                                MemberInit_Left,
+                                MemberInit_Right
+                            );
+
+
+                        MemberAssignment memberAssignment = Expression.Bind(
+                           typeof(TResult).GetProperty(propertyName),
+                           bind_right
+                        );
+
+                        bindings.Add(memberAssignment);
+
+                    }
+                    break;
+                }
+#endif
                 return bindings;
             };
 

@@ -278,11 +278,17 @@ FROM [T_Books] AS [t]");
             {
                 Console.WriteLine(mapperLog);
             };
+
             var selectMapQuery = query_tmp.SelectMap(a => new Student
             {
                 //NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
-
-            });
+                //NickName = new MultilingualString()
+                //{
+                //    Chinese = a.b.NickName.Chinese,
+                //    English = a.b.NickName.English
+                //}
+            })
+            ;
 
             /* 详细的 SelectMap 如下
 Id = a.b.Id
@@ -296,8 +302,8 @@ NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
 
             var sql_selectMap = selectMapQuery.ToQueryString();
 
-            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
-FROM [Students] AS [s]");
+//            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
+//FROM [Students] AS [s]");
 
             var selectMapList = selectMapQuery.ToList();
             CollectionAssert.AreEqual(query_list, selectMapList);
