@@ -55,6 +55,7 @@ namespace LinqExtend.EF.Test.EF
 
         public string Chinese { get; init; }
         public string? English { get; init; }
+        public string? English2 { get; init; }
     }
 
 
