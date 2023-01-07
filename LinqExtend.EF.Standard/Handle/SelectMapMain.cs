@@ -348,27 +348,35 @@ namespace LinqExtend.EF.Handle
 
                 foreach (var customProperty in unmappedPropertyNameList_Custom)
                 {
-                    var propertyName = customProperty.Name;
+                    /*
+                    //NickName = new MultilingualString(a.b.NickName.Chinese)
+                    //{ 
+                    //    English = a.b.NickName.English
+                    //}
+                    */
+
+                    var propertyName = customProperty.Name; //NickName
 
                     foreach (var kv in dict_PropertyListWithSourceCustom)
                     {
-                        if (kv.Key.PropertyType.GetProperty(propertyName) == null)
+                        var customPropertyInfo = kv.Key.PropertyType.GetProperty(propertyName);//NickName
+                        if (customPropertyInfo == null)
                         {
                             continue;
                         }
 
-                        var classType = customProperty.PropertyInfo.PropertyType;
-
                         MemberExpression exp = Expression.Property(parameterExp, kv.Key);//a.b
-                        MemberExpression customPropertyName = Expression.Property(exp, propertyName);//a.b.NickName
+                        MemberExpression exp_customPropertyName = Expression.Property(exp, propertyName);//a.b.NickName
 
-                        var ctors = classType.GetConstructors();//获得 public的
+                        var customPropertyType = customProperty.PropertyInfo.PropertyType; //MultilingualString
+                        //var customPropertyType2 = customPropertyInfo.PropertyType; //和上面等价
+                        var ctors = customPropertyType.GetConstructors();//获得 public的
                         ConstructorInfo MemberInit_new_left = null;
                         List<MemberExpression> MemberInit_new_right = new List<MemberExpression>();
 
                         if (ctors.Length == 0) // 没有 pulic 的构造器
                         {
-                            throw new Exception($@"暂不支持没有构造函数的类. 类:{classType.FullName}");
+                            throw new Exception($@"暂不支持没有构造函数的类. 类:{customPropertyType.FullName}");
                             //  object instance  = FormatterServices.GetUninitializedObject(classType);
                         }
                         else
@@ -378,7 +386,7 @@ namespace LinqExtend.EF.Handle
 
                             if (parameters.Length == 0)
                             {
-                                MemberInit_new_left = classType.GetConstructor(new Type[] { });
+                                MemberInit_new_left = customPropertyType.GetConstructor(new Type[] { });
                             }
                             else
                             {
@@ -398,18 +406,17 @@ namespace LinqExtend.EF.Handle
                                                Expression.MakeMemberAccess(exp,
                                                    process.Result.Type.GetProperty(propertyName)
                                                ),
-                                               classType.GetProperty(parameterName)//要注意大小写
+                                               customPropertyType.GetProperty(parameterName)//要注意大小写
                                            )
                                         );
                                         process.Result.DealPropertyWithCustom(propertyName, parameter.Name);
                                     }
                                 }
 
-                                MemberInit_new_left = classType.GetConstructor(_ConstructorTypes.ToArray());
+                                MemberInit_new_left = customPropertyType.GetConstructor(_ConstructorTypes.ToArray());
 
                             }
                         }
-
 
                         NewExpression MemberInit_Left =
                             Expression.New(
@@ -426,17 +433,31 @@ namespace LinqExtend.EF.Handle
 
                         foreach (var itemProperty in list)
                         {
-             
                             if (itemProperty.Value.IsProcess == true)
                             {
                                 continue;
                             }
 
+                            //todo:
+                            //如果 exp_customPropertyName 中没有 itemProperty.Value.Name, 那么需要跳过
+                            //也就是实体类的属性在数据源中不存在
+
+                            if (exp_customPropertyName.Member != null)
+                            {// 属性存在
+
+                                //请注意，Member 属性也可能返回一个字段，因此您可能需要检查返回的 MemberInfo 对象是否是一个属性。要这样做，您可以使用 MemberInfo 类的 MemberType 属性：
+                                if (exp_customPropertyName.Member.MemberType == MemberTypes.Property)
+                                {
+                                    // 属性存在
+                                }
+                            }
+
+
                             var propInit = Expression.Bind(
-                                classType.GetProperty(itemProperty.Value.Name),//"English"
+                                customPropertyType.GetProperty(itemProperty.Value.Name),//"English"
                                 Expression.MakeMemberAccess(
-                                    customPropertyName,
-                                    classType.GetProperty(itemProperty.Value.Name)//"English"
+                                    exp_customPropertyName,
+                                    customPropertyType.GetProperty(itemProperty.Value.Name)//"English"
                                 )
                             );
 
@@ -444,26 +465,12 @@ namespace LinqExtend.EF.Handle
                             process.Result.DealPropertyWithCustom(propertyName, itemProperty.Value.Name);
 
                         }
-
-
-                        {
-
-
-                            //======
-
-                            //dict_PropertyListWithSourceCustom[customProperty.PropertyInfo].DealWithBuildInProperty(parameter.Name);
-                            //var exp = Expression.Property(parameterExp, parameter.Name);//a.order
-
-                            //invokeParas[i] = exp.Member;//a.b.NickName.Chinese, 
-                        }
-
                         //添加 binding
                         var bind_right =
                             Expression.MemberInit(
                                 MemberInit_Left,
                                 MemberInit_Right
                             );
-
 
                         MemberAssignment memberAssignment = Expression.Bind(
                            typeof(TResult).GetProperty(propertyName),
@@ -478,7 +485,6 @@ namespace LinqExtend.EF.Handle
 #endif
                 return bindings;
             };
-
             return selectorLast;
         }
 
