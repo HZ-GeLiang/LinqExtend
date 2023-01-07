@@ -8,6 +8,8 @@ using System.Runtime.Serialization;
 using System.Data.Common;
 using System.Collections;
 using System.Xml.Linq;
+using System.Data;
+using LinqExtend.EF.ExtendMethods;
 
 namespace LinqExtend.EF.Handle
 {
@@ -367,12 +369,13 @@ namespace LinqExtend.EF.Handle
 
                         MemberExpression exp = Expression.Property(parameterExp, kv.Key);//a.b
                         MemberExpression exp_customPropertyName = Expression.Property(exp, propertyName);//a.b.NickName
+                        Type exp_customPropertyType = exp_customPropertyName.Type;
 
                         var customPropertyType = customProperty.PropertyInfo.PropertyType; //MultilingualString
                         //var customPropertyType2 = customPropertyInfo.PropertyType; //和上面等价
                         var ctors = customPropertyType.GetConstructors();//获得 public的
                         ConstructorInfo MemberInit_new_left = null;
-                        List<MemberExpression> MemberInit_new_right = new List<MemberExpression>();
+                        List<Expression> MemberInit_new_right = new List<Expression>();
 
                         if (ctors.Length == 0) // 没有 pulic 的构造器
                         {
@@ -392,6 +395,20 @@ namespace LinqExtend.EF.Handle
                             {
                                 var _ConstructorTypes = new List<Type>();
 
+                                //bool allPropertyIsExists = true;// 构造函数中的所有参数名都能按名字匹配到属性名(忽略大小写)
+                                //for (int i = 0; i < parameters.Length; i++)
+                                //{
+                                //    ParameterInfo parameter = parameters[i];
+                                //    string parameterName = process.Result.GetPropertyInfoWithCustom(propertyName, parameter.Name)?.Name; // 因为下面是区分大小写的, 所以要根据构造参数参数名去换取真正的属性名
+
+                                //    if (parameterName == null)
+                                //    {
+                                //        allPropertyIsExists = false;
+                                //        break;
+                                //    }
+                                //}
+
+
                                 for (int i = 0; i < parameters.Length; i++)
                                 {
                                     ParameterInfo parameter = parameters[i];
@@ -402,14 +419,27 @@ namespace LinqExtend.EF.Handle
                                     if (parameterName != null)
                                     {
                                         MemberInit_new_right.Add(
-                                           Expression.MakeMemberAccess(
-                                               Expression.MakeMemberAccess(exp,
-                                                   process.Result.Type.GetProperty(propertyName)
-                                               ),
-                                               customPropertyType.GetProperty(parameterName)//要注意大小写
-                                           )
+                                            Expression.MakeMemberAccess(
+                                                Expression.MakeMemberAccess(exp,
+                                                    exp.Type.GetProperty(propertyName)
+                                                ),
+                                                exp_customPropertyType.GetProperty(parameterName) //要注意大小写
+                                            )
                                         );
                                         process.Result.DealPropertyWithCustom(propertyName, parameter.Name);
+                                    }
+                                    else
+                                    {
+                                        if (parameter.ParameterType.IsClass)
+                                        {
+                                            var ConstantValue = parameter.ParameterType.GetDefaultValue();
+                                            MemberInit_new_right.Add(Expression.Constant(ConstantValue, parameter.ParameterType));
+                                        }
+                                        else
+                                        {
+                                            var ConstantValue = parameter.ParameterType.GetDefaultValue();
+                                            MemberInit_new_right.Add(Expression.Constant(ConstantValue));
+                                        }
                                     }
                                 }
 
@@ -431,7 +461,7 @@ namespace LinqExtend.EF.Handle
                         var list = process.Result.CustomPropertyProcessList[propertyName]
                                                 .PropertyGroup.BuildInPropertyProcessList;
 
-                        var exp_customPropertyType = exp_customPropertyName.Type;
+
                         var exp_customProperty_props = exp_customPropertyType.GetProperties();
 
                         foreach (var itemProperty in list)
@@ -442,7 +472,7 @@ namespace LinqExtend.EF.Handle
                             }
 
                             var exp_customProperty = exp_customPropertyType.GetProperty(itemProperty.Value.Name);
-                            if (exp_customProperty  == null)
+                            if (exp_customProperty == null)
                             {
                                 //如果 exp_customPropertyName 中没有 itemProperty.Value.Name, 那么需要跳过
                                 //也就是实体类的属性在数据源中不存在

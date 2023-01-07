@@ -37,5 +37,30 @@ namespace LinqExtend.EF.ExtendMethods
 #endif
         }
 
+        public static object GetDefaultValue(this Type type)
+        {
+            Type d1 = typeof(TypeExtensions.TypeHelper<>);
+            Type[] typeArgs = { type };
+            Type constructed = d1.MakeGenericType(typeArgs);
+            MethodInfo method = constructed.GetMethod("GetValueOrDefault");
+            var value = method.Invoke(null, null);
+
+            //如果是非静态方法 这样写
+            //object instance = Activator.CreateInstance(constructed);
+            //var value = method.Invoke(instance, null);
+
+            return value;
+        }
+
+
+        internal class TypeHelper<T>
+        {
+            private static readonly T value;
+            public static T GetValueOrDefault()
+            {
+                return (T)value;
+            }
+        }
     }
+
 }
