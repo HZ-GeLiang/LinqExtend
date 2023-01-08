@@ -2,5 +2,9 @@
 
 using Issus;
 
+
 //Issus01.Test();
 //Issus02.Test();
+
+Console.WriteLine("Hello, World!");
+

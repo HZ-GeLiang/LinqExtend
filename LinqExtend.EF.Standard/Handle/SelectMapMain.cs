@@ -4,12 +4,9 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Runtime.Serialization;
-using System.Data.Common;
-using System.Collections;
-using System.Xml.Linq;
-using System.Data;
+#if IQuerableSource
 using LinqExtend.EF.ExtendMethods;
+#endif
 
 namespace LinqExtend.EF.Handle
 {

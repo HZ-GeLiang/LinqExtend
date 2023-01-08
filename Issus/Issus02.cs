@@ -14,8 +14,6 @@ namespace Issus
 
     internal class Issus02
     {
-
-
         public static void Test()
         {
             //3. 自动映射的时候, 框架无法根据 eng 来找到 English属性, 所以,  eng 的值就会自动设置为null.

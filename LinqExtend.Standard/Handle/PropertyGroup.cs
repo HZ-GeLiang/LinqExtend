@@ -1,8 +1,10 @@
-﻿
-#if IEnumerableSource
+﻿#if IEnumerableSource
+using LinqExtend;
 using LinqExtend.Config;
+using LinqExtend.ExtendMethods;
 #elif IQuerableSource
 using LinqExtend.EF.Config;
+using LinqExtend.EF.ExtendMethods;
 #else
 #endif
 using System;
@@ -12,9 +14,48 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Xml.Linq;
 
 namespace LinqExtend.Handle
 {
+    /// <summary>
+    /// 属性处理信息
+    /// </summary>
+    internal class PropertyProcessInfo
+    {
+        public PropertyProcessInfo(string Name, PropertyInfo PropertyInfo)
+        {
+            this.Name = Name;
+            this.PropertyInfo = PropertyInfo;
+            IsProcess = false;
+            PropertyGroup = null;
+        }
+
+        /// <summary>
+        /// 属性的名字
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// 是否处理过了
+        /// </summary>
+        public bool IsProcess { get; private set; }
+
+        public PropertyInfo PropertyInfo { get; private set; }
+
+        public PropertyGroup PropertyGroup { get; private set; }
+
+        public void SetIsProcess()
+        {
+            IsProcess = true;
+        }
+
+        public void SetPropertyGroup(Type customType)
+        {
+            PropertyGroup = new PropertyGroup(customType);
+        }
+    }
+
     ///<inheritdoc />
     internal class PropertyGroup<T> : PropertyGroup where T : class
     {
@@ -74,7 +115,6 @@ namespace LinqExtend.Handle
         /// <returns></returns>
         private static bool IsBuildInType(Type type)
         {
-
             if (type.IsEnum)
             {
                 return true;
@@ -86,38 +126,77 @@ namespace LinqExtend.Handle
             return false;
         }
 
+        public Type Type { get; private set; }
         public PropertyGroup(Type type)
         {
+            Type = type;
             BuildIn = new List<PropertyInfo>();
             Custom = new List<PropertyInfo>();
-            All = type.GetProperties();
-            foreach (var item in All)
+            BuildInPropertyProcessList = new Dictionary<string, PropertyProcessInfo>(StringComparer.OrdinalIgnoreCase);
+            CustomPropertyProcessList = new Dictionary<string, PropertyProcessInfo>(StringComparer.OrdinalIgnoreCase);
+            foreach (PropertyInfo item in type.GetProperties())
             {
+                //这个if 不能添加
+                //if (item.CanWrite == false)
+                //{
+                //    continue;
+                //}
+
                 if (IsBuildInType(item.PropertyType))
                 {
                     BuildIn.Add(item);
+                    AddToPropertyProcessList(BuildInPropertyProcessList, item);
                 }
                 else
                 {
                     Custom.Add(item);
+                    var propertyProcessInfo = AddToPropertyProcessList(CustomPropertyProcessList, item);
+                    propertyProcessInfo.SetPropertyGroup(item.PropertyType);
                 }
             }
+        }
 
-            BuildInPropertyProcessList = BuildIn.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
-
-            CustomPropertyProcessList = Custom.ToDictionary(a => a.Name, a => false, StringComparer.OrdinalIgnoreCase);
+        private PropertyProcessInfo AddToPropertyProcessList(
+                Dictionary<string, PropertyProcessInfo> dict,
+                PropertyInfo property)
+        {
+            var propertyProcessInfo = new PropertyProcessInfo(property.Name, property);
+            try
+            {
+                dict.Add(property.Name, propertyProcessInfo);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new Exception($@"框架约束: 类中的属性不允许出现重名的(不区分大小写).类:{GetClassName()},属性:{property.Name}", ex);
+            }
+            return propertyProcessInfo;
         }
 
 
         /// <summary>
+        /// 获得类名
+        /// </summary>
+        /// <returns></returns>
+        private string GetClassName()
+        {
+            var type = Type;
+            if (Type.IsGenericType() && Type.GenericTypeArguments.Length == 1)
+            {
+                type = Type.GenericTypeArguments[0];
+            }
+            var className = type.FullName;
+            return className;
+        }
+
+        /// <summary>
         /// 内置类型的属性处理列表
         /// </summary>
-        public Dictionary<string, bool> BuildInPropertyProcessList { get; }
+        public Dictionary<string, PropertyProcessInfo> BuildInPropertyProcessList { get; }
 
         /// <summary>
         /// 自定义类型的属性处理列表
         /// </summary>
-        public Dictionary<string, bool> CustomPropertyProcessList { get; }
+        public Dictionary<string, PropertyProcessInfo> CustomPropertyProcessList { get; }
 
         /// <summary>
         /// 内置类型
@@ -134,8 +213,54 @@ namespace LinqExtend.Handle
         /// </summary>
         public PropertyInfo[] All { get; }
 
+
+        /// <summary>
+        /// is内置属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public bool IsBuildIn(string propertyName)
+        {
+            if (BuildInPropertyProcessList.ContainsKey(propertyName))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// is自定义属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public bool IsCustom(string propertyName)
+        {
+            if (CustomPropertyProcessList.ContainsKey(propertyName))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 处理属性
+        /// </summary>
+        /// <param name="propertyName"></param>
+        public void DealPropertyWithAuto(string propertyName)
+        {
+            if (IsBuildIn(propertyName))
+            {
+                DealPropertyWithBuildIn(propertyName);
+            }
+            else
+            {
+                DealPropertyWithCustom(propertyName);
+            }
+        }
+
+
         /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
-        public void DealWithBuildInProperty(string propertyName)
+        public void DealPropertyWithBuildIn(string propertyName)
         {
             DealPropertyWithBuildIn(propertyName, true);
         }
@@ -169,8 +294,47 @@ namespace LinqExtend.Handle
 
             if (BuildInPropertyProcessList.ContainsKey(propertyName))
             {
-                BuildInPropertyProcessList[propertyName] = true;
+                BuildInPropertyProcessList[propertyName].SetIsProcess();
             }
+        }
+
+        /// <inheritdoc cref="DealPropertyWithCustom(string, bool)"/>
+        public void DealPropertyWithCustom(string propertyName)
+        {
+            DealPropertyWithCustom(propertyName, true);
+        }
+
+        public void DealPropertyWithCustom(string CustomPropertyName, string buildInPropertyName)
+        {
+            if (CustomPropertyProcessList.ContainsKey(CustomPropertyName))
+            {
+                //CustomPropertyProcessList[CustomPropertyName].IsProcess = true;
+                var PropertyGroup = CustomPropertyProcessList[CustomPropertyName].PropertyGroup;
+                if (PropertyGroup.BuildInPropertyProcessList.ContainsKey(buildInPropertyName))
+                {
+                    PropertyGroup.BuildInPropertyProcessList[buildInPropertyName].SetIsProcess();
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// 从自定义类中获得属性信息
+        /// </summary>
+        /// <param name="CustomPropertyName"></param>
+        /// <param name="buildInPropertyName"></param>
+        /// <returns></returns>
+        public PropertyInfo GetPropertyInfoWithCustom(string CustomPropertyName, string buildInPropertyName)
+        {
+            if (CustomPropertyProcessList.ContainsKey(CustomPropertyName))
+            {
+                var PropertyGroup = CustomPropertyProcessList[CustomPropertyName].PropertyGroup;
+                if (PropertyGroup.BuildInPropertyProcessList.ContainsKey(buildInPropertyName))
+                {
+                    return PropertyGroup.BuildInPropertyProcessList[buildInPropertyName].PropertyInfo;
+                }
+            }
+            return null;
         }
 
 
@@ -181,6 +345,7 @@ namespace LinqExtend.Handle
         /// <param name="check"></param>
         public void DealPropertyWithCustom(string propertyName, bool check)
         {
+
 #if IEnumerableSource
             var checkSensitiveField = check && LinqExtendConfig.EnabledSensitiveField;
 #elif IQuerableSource
@@ -203,7 +368,7 @@ namespace LinqExtend.Handle
 
             if (CustomPropertyProcessList.ContainsKey(propertyName))
             {
-                CustomPropertyProcessList[propertyName] = true;
+                CustomPropertyProcessList[propertyName].SetIsProcess();
             }
         }
 
