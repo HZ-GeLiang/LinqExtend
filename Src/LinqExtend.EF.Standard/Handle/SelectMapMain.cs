@@ -4,8 +4,8 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using LinqExtend.EF.ExtensionMethod;
 #if IQuerableSource
-using LinqExtend.EF.ExtendMethods;
 #endif
 
 namespace LinqExtend.EF.Handle

@@ -1,5 +1,4 @@
 ﻿using LinqExtend.EF.Consts;
-using LinqExtend.EF.ExtendMethods;
 using LinqExtend.EF.Handle;
 using LinqExtend.EF.Helper;
 using System;

@@ -1,5 +1,4 @@
-﻿using LinqExtend.ExtendMethods;
-using LinqExtend.Handle;
+﻿using LinqExtend.Handle;
 using System;
 using System.Collections;
 using System.Collections.Generic;

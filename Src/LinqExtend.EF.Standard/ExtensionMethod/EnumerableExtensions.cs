@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace LinqExtend.EF.ExtendMethods
+namespace LinqExtend.EF.ExtensionMethod
 {
     internal static partial class IEnumerableExtensions
     {

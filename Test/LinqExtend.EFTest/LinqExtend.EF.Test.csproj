@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!--<PackageReference Include="LinqExtend.EF" Version="0.0.1" />-->
+		<!--<PackageReference Include="LinqExtend.EF" Version="0.0.4" />-->
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
 		<PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
@@ -26,7 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LinqExtend.EF.Standard\LinqExtend.EF.Standard.csproj" />
+	  <ProjectReference Include="..\..\Src\LinqExtend.EF.Standard\LinqExtend.EF.Standard.csproj" />
 	</ItemGroup>
-
+ 
 </Project>

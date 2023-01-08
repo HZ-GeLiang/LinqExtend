@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace LinqExtend.ExtendMethods
+namespace LinqExtend.ExtensionMethod
 {
     internal static class ClassPropertyCompareExtensions
     {
@@ -43,8 +43,8 @@ namespace LinqExtend.ExtendMethods
 
         public static string Demo_映射情况分析<TSource, TResult>() where TSource : class where TResult : class, new()
         {
-            List<string> list1 = ClassPropertyCompareExtensions.GetCommonProps<TSource, TResult>();
-            List<string> list2 = ClassPropertyCompareExtensions.GetExceptProps<TSource, TResult>();
+            List<string> list1 = GetCommonProps<TSource, TResult>();
+            List<string> list2 = GetExceptProps<TSource, TResult>();
 
             StringBuilder sb = new StringBuilder();
 

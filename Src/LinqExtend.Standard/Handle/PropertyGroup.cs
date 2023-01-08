@@ -1,7 +1,7 @@
 ﻿#if IEnumerableSource
 using LinqExtend;
 using LinqExtend.Config;
-using LinqExtend.ExtendMethods;
+using LinqExtend.ExtensionMethod;
 #elif IQuerableSource
 using LinqExtend.EF.Config;
 using LinqExtend.EF.ExtendMethods;
