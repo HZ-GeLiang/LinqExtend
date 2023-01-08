@@ -264,7 +264,7 @@ FROM [T_Books] AS [t]");
 
 
         [TestMethod]
-        public void SelectMap_值类型_Test()
+        public void SelectMap_值类型_Test_Case1()
         {
             //return;//因为  LinqExtend.Standard 中的 还未完成. 
             using TestDbContext ctx = new TestDbContext();
@@ -277,15 +277,15 @@ FROM [T_Books] AS [t]");
                 a.b.NickName.Chinese
             });
 
+            string _mapperLog = "";
 
             SelectExtensions.OnSelectMapLogTo = mapperLog =>
             {
-                Console.WriteLine(mapperLog);
+                _mapperLog = mapperLog;
             };
 
             var selectMapQuery = query_tmp.SelectMap(a => new StudentDto
             {
-
                 //NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
                 //NickName = new MultilingualString()
                 //{
@@ -295,26 +295,13 @@ FROM [T_Books] AS [t]");
             })
             ;
 
-            /* 详细的 SelectMap 如下
-Id = a.b.Id
-UserName = a.b.UserName
-Birth = a.b.Birth
-IsDel = a.b.IsDel
-Gender = a.b.Gender
-NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
-             
-            */
-
             var sql_selectMap = selectMapQuery.ToQueryString();
 
-            //            Assert.AreEqual(sql_selectMap, $@"SELECT [s].[NickName_Chinese], [s].[NickName_English], [s].[Id], [s].[UserName], [s].[Birth], [s].[IsDel], [s].[Gender]
-            //FROM [Students] AS [s]");
-
-            var selectMapList = selectMapQuery.ToList();
-
-            int d = 2;
-            //CollectionAssert.AreEqual( , selectMapList);
-
+            Assert.AreEqual(_mapperLog, $@"Id = a.b.Id
+UserName = a.b.UserName
+Gender = a.b.Gender
+NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b.NickName.English}}
+");
         }
 
 
