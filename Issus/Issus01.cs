@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Issus
 {
+    /*
+       继承的类有属性重复的问题
+       实际场景: 忘了, 这里的注释是后补的. . .
+    */
     internal class Issus01
     {
         public static void Test()
@@ -13,10 +17,8 @@ namespace Issus
             var props1 = typeof(A).GetProperties();
             var props2 = typeof(A2).GetProperties();
             var props3 = typeof(A3).GetProperties(); //Id重复
-            
-            Console.WriteLine("Hello, World!");
-        }
 
+        }
 
         public class A : B
         {
