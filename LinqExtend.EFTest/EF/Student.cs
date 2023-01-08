@@ -19,7 +19,7 @@ namespace LinqExtend.EF.Test.EF
 
     public record class MultilingualStringDto
     {
-        //case1 第二个属性没有
+        //case1 构造器的第二个参数名找不到属性
         public MultilingualStringDto(string chinese, string eng)
         {
             this.Chinese = chinese;
