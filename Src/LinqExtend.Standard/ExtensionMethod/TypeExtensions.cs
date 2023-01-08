@@ -6,9 +6,8 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace LinqExtend.EF.ExtendMethods
+namespace LinqExtend.ExtensionMethod
 {
-
     internal static class TypeExtensions
     {
 
@@ -18,7 +17,7 @@ namespace LinqExtend.EF.ExtendMethods
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static Type? GetFirstGenericType(this Type type)
+        public static Type GetFirstGenericType(this Type type)
         {
             if (!type.IsGenericType || type.GenericTypeArguments.Length <= 0)
             {
@@ -39,7 +38,7 @@ namespace LinqExtend.EF.ExtendMethods
 
         public static object GetDefaultValue(this Type type)
         {
-            Type d1 = typeof(TypeExtensions.TypeHelper<>);
+            Type d1 = typeof(TypeHelper<>);
             Type[] typeArgs = { type };
             Type constructed = d1.MakeGenericType(typeArgs);
             MethodInfo method = constructed.GetMethod("GetValueOrDefault");
@@ -58,7 +57,7 @@ namespace LinqExtend.EF.ExtendMethods
             private static readonly T value;
             public static T GetValueOrDefault()
             {
-                return (T)value;
+                return value;
             }
         }
     }

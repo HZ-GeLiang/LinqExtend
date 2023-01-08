@@ -4,7 +4,7 @@ using LinqExtend.Config;
 using LinqExtend.ExtendMethods;
 #elif IQuerableSource
 using LinqExtend.EF.Config;
-using LinqExtend.EF.ExtendMethods;
+using LinqExtend.EF.ExtensionMethod;
 #else
 #endif
 using System;

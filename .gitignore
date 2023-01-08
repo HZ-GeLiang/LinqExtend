@@ -1,11 +1,10 @@
 ﻿################################################################################
 # 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
 ################################################################################
-
-/.vs/LinqExtend
-/.vs/LinqExtend/v17
-/.vs/ProjectEvaluation
-/*/obj
+ 
+/.vs
 /*/bin
-/LinqExtend.Standard/LinqExtend.Standard.xml
-/LinqExtend.EFTest/Migrations
+/*/*/bin
+/*/obj
+/*/*/obj
+/Test/LinqExtend.EFTest/Migrations
