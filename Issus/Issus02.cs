@@ -39,11 +39,14 @@ namespace Issus
             public string? English { get; init; }
             public string? English2 { get; } //1. 这个字段是自己额外创建的, 不属于数据库字段 , 然后这个字段值是在构造函数初始化的时候就生产好了, 
 
-            // 6. 解决方法:
-            // 把
+            // 6. 解决方法:(2选1)
+            // 6.1把
             // public string? English2 { get; }
             // 调整为
             //public string? English2 => this.English ?? "" + "_" + this.English ?? "";
+            // 6.2自己手动的初始化这个属性,完成数据绑定
+            //todo: 手动初始化 custom 类的, 内部的任何属性将不处理.
+
         }
 
         public record class MultilingualString
