@@ -1,3 +1,4 @@
 ﻿
 
-selectMap 的指定映射要排除 有 System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute 的属性. (虽然不排除也没事)
+selectMap 的自动映射要排除 
+	System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute 的属性. (虽然不排除也没事)
