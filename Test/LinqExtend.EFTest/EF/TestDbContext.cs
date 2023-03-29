@@ -25,7 +25,7 @@ namespace LinqExtend.EF.Test.EF
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var connStr = "Data Source = 127.0.0.1 ; Initial Catalog = LinqExtend.EFTest; Integrated Security = True";
+                var connStr = "Data Source = 127.0.0.1 ; Initial Catalog = LinqExtend2EFTest; Integrated Security = True";
                 optionsBuilder.UseSqlServer(connStr);
             }
         }

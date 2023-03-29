@@ -12,7 +12,7 @@ namespace LinqExtend.EF.Handle
 {
     internal class GetExpressionArgs<TSource, TResult>
         where TSource : class
-        where TResult : class, new()
+        where TResult : class
     {
 
 
@@ -78,7 +78,7 @@ namespace LinqExtend.EF.Handle
                GetExpressionArgs<TSource, TResult> args
             )
             where TSource : class
-            where TResult : class, new()
+            where TResult : class
         {
             var parameterExp = args.selector == null
                   ? Expression.Parameter(typeof(TSource), "a")
@@ -109,7 +109,7 @@ namespace LinqExtend.EF.Handle
             ParameterExpression parameterExp
          )
             where TSource : class
-            where TResult : class, new()
+            where TResult : class
         {
             var bindings = new List<MemberBinding>();
             var process = new SelectMapProcess<TSource, TResult>();
@@ -185,7 +185,7 @@ namespace LinqExtend.EF.Handle
                 SelectMapProcess<TSource, TResult> process
             )
             where TSource : class
-            where TResult : class, new()
+            where TResult : class
         {
             var bindings = new List<MemberBinding>();
 
@@ -227,7 +227,7 @@ namespace LinqExtend.EF.Handle
                 SelectMapProcess<TSource, TResult> process
             )
             where TSource : class
-            where TResult : class, new()
+            where TResult : class 
         {
             var bindings = new List<MemberBinding>();
             //1等公民的处理(内置类型)
@@ -262,7 +262,7 @@ namespace LinqExtend.EF.Handle
                 Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast
             )
             where TSource : class
-            where TResult : class, new()
+            where TResult : class 
         {
             if (selectorLast == null)
             {
@@ -280,7 +280,7 @@ namespace LinqExtend.EF.Handle
         /// <returns></returns>
         public static Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> GetSelectorLast<TSource, TResult>()
             where TSource : class
-            where TResult : class, new()
+            where TResult : class 
         {
             Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = (parameterExp, process) =>
             {
@@ -517,7 +517,7 @@ namespace LinqExtend.EF.Handle
 
         public static Expression<Func<TSource, TResult>> GetLambda<TSource, TResult>(List<MemberBinding> bindings, ParameterExpression parameterExp)
           where TSource : class
-          where TResult : class, new()
+          where TResult : class 
         {
             MemberInitExpression memberInitExpression =
                 Expression.MemberInit(

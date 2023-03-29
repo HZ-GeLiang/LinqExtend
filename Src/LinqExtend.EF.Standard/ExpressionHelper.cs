@@ -359,7 +359,7 @@ namespace LinqExtend.EF
         /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}})" />
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
             where TSource : class
-            where TResult : class, new()
+            where TResult : class 
         {
             return SelectMap<TSource, TResult>(null);
         }
@@ -373,7 +373,7 @@ namespace LinqExtend.EF
         /// <returns></returns>
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Expression<Func<TSource, TResult>> selector)
          where TSource : class
-         where TResult : class, new()
+         where TResult : class 
         {
             var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
             var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
