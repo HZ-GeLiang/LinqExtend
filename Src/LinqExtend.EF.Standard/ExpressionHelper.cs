@@ -359,13 +359,13 @@ namespace LinqExtend.EF
         /// <inheritdoc cref="SelectMap{TSource, TResult}(Expression{Func{TSource, TResult}})" />
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>()
             where TSource : class
-            where TResult : class 
+            where TResult : class
         {
             return SelectMap<TSource, TResult>(null);
         }
 
         /// <summary>
-        /// 
+        /// 映射为另一个对象
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
@@ -373,7 +373,7 @@ namespace LinqExtend.EF
         /// <returns></returns>
         public static Expression<Func<TSource, TResult>> SelectMap<TSource, TResult>(Expression<Func<TSource, TResult>> selector)
          where TSource : class
-         where TResult : class 
+         where TResult : class
         {
             var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
             var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
@@ -383,6 +383,42 @@ namespace LinqExtend.EF
                 ));
 
             return lambda;
+        }
+
+        public static Expression<Func<TSource, object[]>> SelectMap<TSource>(params string[] propNames)
+          where TSource : class
+        {
+            var typeSource = typeof(TSource);
+            ParameterExpression exParameter = Expression.Parameter(typeSource);
+
+            NewArrayExpression newArrayExp;
+            Expression<Func<TSource, object[]>> selectExpression;
+            if (propNames == null || !propNames.Any())
+            {
+                newArrayExp = Expression.NewArrayInit(typeof(object), new Expression[0]);
+                selectExpression = Expression.Lambda<Func<TSource, object[]>>(newArrayExp, exParameter);
+            }
+            else
+            {
+                List<Expression> exProps = new List<Expression>();
+                foreach (string propName in propNames)
+                {
+                    var prop = typeSource.GetProperty(propName);
+                    if (prop == null)
+                    {
+                        continue;
+                    }
+
+                    Expression exProp = Expression.Convert(Expression.MakeMemberAccess(exParameter, prop), typeof(object));
+                    exProps.Add(exProp);
+                }
+                Expression[] initializers = exProps.ToArray();
+                newArrayExp = Expression.NewArrayInit(typeof(object), initializers);
+                selectExpression = Expression.Lambda<Func<TSource, object[]>>(newArrayExp, exParameter);
+            }
+
+
+            return selectExpression;
         }
 
     }
