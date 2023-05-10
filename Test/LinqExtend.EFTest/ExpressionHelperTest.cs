@@ -178,23 +178,33 @@ namespace LinqExtend.EF.Test
         {
             using TestDbContext ctx = new TestDbContext();
 
-            var query = ctx.Books.Select(a => new BookDto()
-            {
-                Id = a.Id,
-                PubTime = a.PubTime,
-                Price = a.Price,
-                Publisher = a.Publisher
-            });
+            List<BookDto>? queryList;
 
-            var sql = query.ToQueryString();
-            Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+            {
+                // 手动编写映射
+                var query = ctx.Books.Select(a => new BookDto()
+                {
+                    Id = a.Id,
+                    PubTime = a.PubTime,
+                    Price = a.Price,
+                    Publisher = a.Publisher
+                });
+
+                var sql = query.ToQueryString();
+                Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
-            var queryList = query.ToList();
-
+                queryList = query.ToList();
+            }
 
             {
+
+                //使用 SelectMap 创建表达式
+                //1:分开写
                 var exp = ExpressionHelper.SelectMap<Book, BookDto>();
                 var selectMapQuery = ctx.Books.Select(exp);
+
+                //1:直接写里面
+                //var selectMapQuery = ctx.Books.Select(ExpressionHelper.SelectMap<Book, BookDto>());
                 var sql_selectMap = selectMapQuery.ToQueryString();
                 Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
@@ -204,33 +214,12 @@ FROM [T_Books] AS [t]");
                 CollectionAssert.AreEqual(queryList, selectMapList);
 
             }
-
-            {
-                var selectMapQuery = ctx.Books
-                   .Select(ExpressionHelper.SelectMap<Book, BookDto>())
-                   ;
-                var sql_selectMap = selectMapQuery.ToQueryString();
-                Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
-FROM [T_Books] AS [t]");
-
-                var selectMapList = selectMapQuery.ToList();
-
-                CollectionAssert.AreEqual(queryList, selectMapList);
-            }
-
 
             {
                 //通过泛型封装, 动态的查询出想要的dto
                 var props = typeof(BookDto).GetProperties().Select(p => p.Name).ToArray();
-                ctx.Set<Book>().Select(ExpressionHelper.SelectMap<Book>(props));
-            }
-
-            {
-                //可以单独的拆开
-                var props = typeof(BookDto).GetProperties().Select(p => p.Name).ToArray();
-                var selectMapQuery = ctx.Books
-                  .Select(ExpressionHelper.SelectMap<Book>(props))
-                  ;
+                var selectMapQuery  =  ctx.Set<Book>().Select(ExpressionHelper.SelectMap<Book>(props));
+ 
                 var sql_selectMap = selectMapQuery.ToQueryString();
                 Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
