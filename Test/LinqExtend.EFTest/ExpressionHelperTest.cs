@@ -218,8 +218,10 @@ FROM [T_Books] AS [t]");
             {
                 //通过泛型封装, 动态的查询出想要的dto
                 var props = typeof(BookDto).GetProperties().Select(p => p.Name).ToArray();
-                var selectMapQuery  =  ctx.Set<Book>().Select(ExpressionHelper.SelectMap<Book>(props));
- 
+
+                //selectMapQuery是 BookDto 和 Book 共同的属性
+                var selectMapQuery = ctx.Set<Book>().Select(ExpressionHelper.SelectMap<Book>(props));
+
                 var sql_selectMap = selectMapQuery.ToQueryString();
                 Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
