@@ -24,9 +24,15 @@
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<RepositoryType>github</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>0.0.7</Version>
+		<Version>0.0.8</Version>
 		<LangVersion>10</LangVersion>
+
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="docs\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<DefineConstants>IEnumerableSource;</DefineConstants>
