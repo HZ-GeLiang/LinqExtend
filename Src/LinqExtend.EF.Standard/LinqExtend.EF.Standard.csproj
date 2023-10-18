@@ -20,18 +20,23 @@
 		<PackageId>LinqExtend.EF</PackageId>
 		<Description>EFHelper</Description>
 		<PackageProjectUrl>https://github.com/HZ-GeLiang/LinqExtend</PackageProjectUrl>
-		<PackageTags>LinqExtend, EFHelper, Linq</PackageTags>
+		<PackageTags>LinqExtend, EFHelper, Linq, OrmHelper</PackageTags>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<RepositoryType>github</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Version>0.0.6</Version>
 		<LangVersion>10</LangVersion>
+
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<DefineConstants>IQuerableSource;</DefineConstants>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<None Include="docs\README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

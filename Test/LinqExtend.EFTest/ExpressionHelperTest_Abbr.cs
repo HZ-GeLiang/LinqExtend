@@ -1,11 +1,6 @@
 ﻿using LinqExtend.EF.Test.EF;
 using LinqExtend.Test;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static LinqExtend.EF.ExpressionHelper<Book>;// 利用语法
 
@@ -41,9 +36,9 @@ namespace LinqExtend.EF.Test
 
             var sql2 = ctx.Books
                 .Where(IsEmpty(b => b.Publisher))// 利用语法,进行简写
-                .ToQueryString();
-
-            Assert.AreEqual(sql1, sql2);
+            .ToQueryString();
+             
+            Assert.AreEqual(sql1, sql2); //([t].[Publisher] IS NULL) OR([t].[Publisher] LIKE N'')
         }
 
 

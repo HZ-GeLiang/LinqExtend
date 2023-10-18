@@ -33,10 +33,10 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsDeleted<TEntity, TPropType>(propAccessor);
         }
 
-        /// <inheritdoc cref="ExpressionHelper.IsSoftDelete{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        /// <inheritdoc cref="ExpressionHelper.IsSoftDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsSoftDelete<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
-            return ExpressionHelper.IsSoftDelete<TEntity, TPropType>(propAccessor);
+            return ExpressionHelper.IsSoftDeleted<TEntity, TPropType>(propAccessor);
         }
 
         /// <inheritdoc cref="ExpressionHelper.IsNotDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
@@ -45,10 +45,10 @@ namespace LinqExtend.EF
             return ExpressionHelper.IsNotDeleted<TEntity, TPropType>(propAccessor);
         }
 
-        /// <inheritdoc cref="ExpressionHelper.IsNotSoftDelete{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
+        /// <inheritdoc cref="ExpressionHelper.IsNotSoftDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
         public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
-            return ExpressionHelper.IsNotSoftDelete<TEntity, TPropType>(propAccessor);
+            return ExpressionHelper.IsNotSoftDeleted<TEntity, TPropType>(propAccessor);
         }
 
         /// <inheritdoc cref="ExpressionHelper.SelectMap{TSource, TResult}()" />

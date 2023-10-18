@@ -276,7 +276,7 @@ namespace LinqExtend.EF
         }
 
         /// <inheritdoc cref="IsDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})"/>
-        public static Expression<Func<TEntity, bool>> IsSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        public static Expression<Func<TEntity, bool>> IsSoftDeleted<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             return IsDeleted(propAccessor);
         }
@@ -345,7 +345,7 @@ namespace LinqExtend.EF
         }
 
         /// <inheritdoc cref="IsNotDeleted{TEntity, TPropType}(Expression{Func{TEntity, TPropType}})" />
-        public static Expression<Func<TEntity, bool>> IsNotSoftDelete<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
+        public static Expression<Func<TEntity, bool>> IsNotSoftDeleted<TEntity, TPropType>(Expression<Func<TEntity, TPropType>> propAccessor)
         {
             return IsNotDeleted(propAccessor);
         }
@@ -416,7 +416,4 @@ namespace LinqExtend.EF
         }
 
     }
-
-
-  
 }
