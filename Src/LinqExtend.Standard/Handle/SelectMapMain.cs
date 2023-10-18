@@ -17,6 +17,13 @@ namespace LinqExtend.Handle
 
 
 #if IEnumerableSource
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <param name="OnSelectMapLogTo"></param>
+        /// <param name="isAutoFill">自动填充</param>
         public GetExpressionArgs(
             Expression<Func<TSource, TResult>> selector,
             Action<string> OnSelectMapLogTo,
@@ -27,7 +34,9 @@ namespace LinqExtend.Handle
             this.OnSelectMapLogTo = OnSelectMapLogTo;
             IsAutoFill = isAutoFill;
         }
+
 #elif IQuerableSource
+
         public GetExpressionArgs(
             Expression<Func<TSource, TResult>> selector,
             Action<string> OnSelectMapLogTo
@@ -36,7 +45,9 @@ namespace LinqExtend.Handle
             this.selector = selector;
             this.OnSelectMapLogTo = OnSelectMapLogTo;
         }
+
 #else
+
         private GetExpressionArgs(){
             throw new Exception("未知的DefineConstants");
         }
