@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -39,7 +38,7 @@ namespace LinqExtend
         public static string AggregateToString(this DataRowCollection source, string columnName, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
-            if (!source.Any())
+            if (!source.AnyEnhance())
             {
                 return string.Empty;
             }
@@ -74,7 +73,7 @@ namespace LinqExtend
         public static string AggregateToString(this DataRowCollection source, Func<DataRow, dynamic> content, string separator)
         {
             if (source is null) throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
-            if (!source.Any())
+            if (!source.AnyEnhance())
             {
                 return string.Empty;
             }
