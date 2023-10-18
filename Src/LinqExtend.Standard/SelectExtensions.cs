@@ -53,7 +53,15 @@ namespace LinqExtend
             where TSource : class
             where TResult : class, new()
         {
-            return SelectMap<TSource, TResult>(source, (Expression<Func<TSource, TResult>>)null);
+            return SelectMap<TSource, TResult>(source, (Expression<Func<TSource, TResult>>)null, false);
+        }
+
+        /// <inheritdoc cref="SelectMap{TSource, TResult}(IEnumerable{TSource}, Expression{Func{TSource, TResult}}, bool)"/>
+        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector)
+            where TSource : class
+            where TResult : class, new()
+        {
+            return SelectMap(source, selector, false);
         }
 
         /// <summary>
@@ -63,9 +71,9 @@ namespace LinqExtend
         /// <typeparam name="TResult"></typeparam>
         /// <param name="source"></param>
         /// <param name="selector">硬编码部分</param>
-        /// <param name="isAutoFill"></param>
+        /// <param name="isAutoFill">自动填充</param>
         /// <returns></returns>
-        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector, bool isAutoFill = false)
+        public static IEnumerable<TResult> SelectMap<TSource, TResult>(this IEnumerable<TSource> source, Expression<Func<TSource, TResult>> selector, bool isAutoFill)
             where TSource : class
             where TResult : class, new()
         {
