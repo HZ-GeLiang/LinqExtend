@@ -24,7 +24,7 @@
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<RepositoryType>github</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>0.0.8</Version>
+		<Version>0.0.9</Version>
 		<LangVersion>10</LangVersion>
 
 		<PackageReadmeFile>README.md</PackageReadmeFile>
