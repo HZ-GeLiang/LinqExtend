@@ -56,6 +56,20 @@ namespace LinqExtend.Test
                 Assert.AreEqual(str1, "'1','2','3'");
 
             }
+
+
+            {
+                var peopleList = new List<People>()
+                    {
+                        new People {Id = 1},
+                        new People {Id = 2},
+                        new People {Id = 3},
+                    };
+
+                var str1 = peopleList.AggregateToString(a => $@"{a.Id}", "\r\n");
+                Assert.AreEqual(str1, "1\r\n2\r\n3");
+
+            }
         }
     }
 }
