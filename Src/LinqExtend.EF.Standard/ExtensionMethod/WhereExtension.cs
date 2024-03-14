@@ -64,7 +64,7 @@ namespace LinqExtend.EF.ExtensionMethod
         /// <param name="propertySelector"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static IQueryable<TSource> WhereNotValue<TSource, TProperty>(this IQueryable<TSource> query,
+        public static IQueryable<TSource> WhereNoValue<TSource, TProperty>(this IQueryable<TSource> query,
             Expression<Func<TSource, TProperty>> propertySelector)
         {
             //把 sql语句 IsNull(字段, "") = "" 对应的表达式 Expression<Func<TSource, bool>> exp = a => (a.字段 ?? "") == ""; 翻译成对应的表达式树
@@ -117,21 +117,8 @@ namespace LinqExtend.EF.ExtensionMethod
             }
         }
 
-        public static IQueryable<TSource> WhereIfNotValue<TSource, TProperty>(this IQueryable<TSource> query,
-            bool condition, Expression<Func<TSource, TProperty>> propertySelector)
-        {
-            if (condition)
-            {
-                return query.WhereNotValue(propertySelector);
-            }
-            else
-            {
-                return query;
-            }
-        }
-
         public static IQueryable<TSource> WhereIfHasValue<TSource, TProperty>(this IQueryable<TSource> query,
-           bool condition, Expression<Func<TSource, TProperty>> propertySelector)
+          bool condition, Expression<Func<TSource, TProperty>> propertySelector)
         {
             if (condition)
             {
@@ -143,7 +130,17 @@ namespace LinqExtend.EF.ExtensionMethod
             }
         }
 
+        public static IQueryable<TSource> WhereIfNoValue<TSource, TProperty>(this IQueryable<TSource> query,
+            bool condition, Expression<Func<TSource, TProperty>> propertySelector)
+        {
+            if (condition)
+            {
+                return query.WhereNoValue(propertySelector);
+            }
+            else
+            {
+                return query;
+            }
+        }
     }
-
-
 }
