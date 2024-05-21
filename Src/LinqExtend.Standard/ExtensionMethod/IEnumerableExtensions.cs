@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace LinqExtend.ExtensionMethod
 {
     internal static partial class IEnumerableExtensions
-    {        
+    {
         internal static HashSet<TResult> ToHashSet<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, TResult> selector)
         {
             if (selector is null) throw new ArgumentNullException($"{nameof(selector)}参数不能为空", nameof(selector));

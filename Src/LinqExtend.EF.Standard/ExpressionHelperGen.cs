@@ -15,13 +15,13 @@ namespace LinqExtend.EF
             return ExpressionHelper.MakeEqual<TEntity, T2>(propAccessor, compareObject);
         }
 
-        /// <inheritdoc cref="ExpressionHelper.IsEmpty{TEntity}(Expression{Func{TEntity, string}})"/>     
+        /// <inheritdoc cref="ExpressionHelper.IsEmpty{TEntity}(Expression{Func{TEntity, string}})"/>
         public static Expression<Func<TEntity, bool>> IsEmpty(Expression<Func<TEntity, string>> propAccessor)
         {
             return ExpressionHelper.IsEmpty<TEntity>(propAccessor);
         }
 
-        /// <inheritdoc cref="ExpressionHelper.IsNotEmpty{TEntity}(Expression{Func{TEntity, string}})"/>     
+        /// <inheritdoc cref="ExpressionHelper.IsNotEmpty{TEntity}(Expression{Func{TEntity, string}})"/>
         public static Expression<Func<TEntity, bool>> IsNotEmpty(Expression<Func<TEntity, string>> propAccessor)
         {
             return ExpressionHelper.IsNotEmpty<TEntity>(propAccessor);

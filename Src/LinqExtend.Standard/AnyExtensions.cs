@@ -22,7 +22,7 @@ namespace LinqExtend
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>
-        /// <returns></returns> 
+        /// <returns></returns>
         public static bool AnyEnhance<TSource>(this IEnumerable<TSource> source) => source?.Any() ?? false;
 
         public static bool AnyEnhance<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate)

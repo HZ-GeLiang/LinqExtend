@@ -131,8 +131,8 @@ namespace LinqExtend.Test
                         //匹配内置属性:  UserId ,
 
                         //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
-                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
-                        //这里是 按  a.Order , a.shop 依次匹配, 
+                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序
+                        //这里是 按  a.Order , a.shop 依次匹配,
                     }, false) // 默认就是false
                     .First();
 
@@ -162,8 +162,8 @@ namespace LinqExtend.Test
                         //匹配内置属性:  UserId ,
 
                         //无法处理的属性: Id ,ShopId ,PaymentTime ,PubTime
-                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序 
-                        //这里是 按  a.Order , a.shop 依次匹配, 
+                        //从2等公民对象中解析,解析顺序为 class 属性的先后顺序
+                        //这里是 按  a.Order , a.shop 依次匹配,
                     }, true)//手动开启
                     .First();
 
@@ -190,7 +190,7 @@ namespace LinqExtend.Test
             //todo: 未实现
             return;
 
-            // 也就是 一个类里面有一个 class 对象, 
+            // 也就是 一个类里面有一个 class 对象,
             //注: 不支持 List  , array
 
             var student = new Student

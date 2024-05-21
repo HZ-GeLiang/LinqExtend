@@ -250,7 +250,7 @@ FROM [T_Books] AS [t]");
         [TestMethod]
         public void SelectMap_object2Linq_Test()
         {
-            //return;//因为  LinqExtend.Standard 中的 还未完成. 
+            //return;//因为  LinqExtend.Standard 中的 还未完成.
             using TestDbContext ctx = new TestDbContext();
 
             var query_tmp = from b in ctx.Books
@@ -273,7 +273,7 @@ FROM [T_Books] AS [t]");
 
             var selectMapQuery = query_tmp.SelectMap(a => new BookDto
             {
-                //规则            
+                //规则
                 Key = a.key
 
             });
@@ -301,7 +301,7 @@ FROM [T_Books] AS [t]");
         [TestMethod]
         public void SelectMap_值类型_Test_Case1()
         {
-            //return;//因为  LinqExtend.Standard 中的 还未完成. 
+            //return;//因为  LinqExtend.Standard 中的 还未完成.
             using TestDbContext ctx = new TestDbContext();
 
             var query_tmp = from b in ctx.Students

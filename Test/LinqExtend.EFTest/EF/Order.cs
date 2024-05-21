@@ -8,14 +8,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class Order
 {
     [Key]
-    public long Id { get; set; } 
- 
+    public long Id { get; set; }
+
     [Required]
-    public long ShopId { get; set; } 
+    public long ShopId { get; set; }
 
 
     public DateTime PaymentTime { get; set; }
-    
+
 
 }
- 

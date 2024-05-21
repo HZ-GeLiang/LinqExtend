@@ -73,7 +73,7 @@ namespace LinqExtend.Test
         public static string GetSql_IsDeleted_Test3(TestDbContext ctx)
         {
             //bool? 的2种写法
-            var sql1 = ctx.Books 
+            var sql1 = ctx.Books
               .Where(b => b.IsDel3 == 1) //兼顾 int? 和 int
               .ToQueryString();
             return sql1;
@@ -82,7 +82,7 @@ namespace LinqExtend.Test
         public static string GetSql_IsDeleted_Test4(TestDbContext ctx)
         {
             //bool 共2种写法
-            var sql1 = ctx.Books 
+            var sql1 = ctx.Books
               .Where(b => b.IsDel4 == 1)  //兼顾 int? 和 int
               .ToQueryString();
             return sql1;
@@ -111,7 +111,7 @@ namespace LinqExtend.Test
         public static string GetSql_IsNotDeleted_Test3(TestDbContext ctx)
         {
             //bool? 的2种写法
-            var sql1 = ctx.Books 
+            var sql1 = ctx.Books
               .Where(b => b.IsDel3 != 1) //兼顾 int? 和 int
               .ToQueryString();
             return sql1;
@@ -120,7 +120,7 @@ namespace LinqExtend.Test
         public static string GetSql_IsNotDeleted_Test4(TestDbContext ctx)
         {
             //bool 共2种写法
-            var sql1 = ctx.Books 
+            var sql1 = ctx.Books
               .Where(b => b.IsDel4 != 1)//兼顾 int? 和 int
               .ToQueryString();
             return sql1;

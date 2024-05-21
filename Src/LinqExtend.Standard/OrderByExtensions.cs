@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Linq.Expressions;
-using LinqExtend.Consts; 
+using LinqExtend.Consts;
 
 namespace LinqExtend
 {
@@ -159,12 +159,12 @@ namespace LinqExtend
             {
                 // new 匿名类
                 arguments = newExpression.Arguments; //ReadOnlyCollection<Expression>
-                members = newExpression.Members;//ReadOnlyCollection<System.Reflection.MemberInfo>  
+                members = newExpression.Members;//ReadOnlyCollection<System.Reflection.MemberInfo>
             }
             else if (orderExpression.Body is System.Linq.Expressions.MemberInitExpression memberInitExpression)
             {
                 // new 一个具体的类
-                arguments = memberInitExpression.Bindings; //ReadOnlyCollection<MemberBinding> 
+                arguments = memberInitExpression.Bindings; //ReadOnlyCollection<MemberBinding>
                 members = null;
             }
             else
@@ -187,10 +187,10 @@ namespace LinqExtend
             {
                 eachCount++;
 
-                // System.Linq.Expressions.PropertyExpression 
+                // System.Linq.Expressions.PropertyExpression
                 if (argument.GetType().FullName == ConstTypeFullName.PropertyExpression)
                 {
-                    // s.OrderByCustom(a => new { a.Name }); 
+                    // s.OrderByCustom(a => new { a.Name });
                     var propertyName = argument.Member.Name;
                     var parameterExp = Expression.Parameter(type_TEntity, orderExpression.Parameters[0].Name);// "a"
                     var propertyExp = Expression.Property(parameterExp, propertyName);//a.UserNickName

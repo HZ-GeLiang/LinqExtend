@@ -9,4 +9,4 @@ public class Shop
     public string Name { get; set; }//单价
     public double Price { get; set; }//单价
 
-} 
+}

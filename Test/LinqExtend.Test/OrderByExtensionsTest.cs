@@ -120,7 +120,7 @@
             // 单个字段
             var orderResult2 = tests
                 .OrderByExpression(a => new { a.Name })
-                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6 
+                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -148,7 +148,7 @@
             // 多字段
             var orderResult2 = tests
                 .OrderByExpression(a => new { Name = Convert.ToInt32(a.Name), Id = a.Id })
-                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4 
+                .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4
 
             Assert.AreEqual(orderResult2, orderResult);
         }
@@ -181,7 +181,7 @@
 
             var orderResult3 = tests
               .OrderByExpression(a => new { Name = string.IsNullOrEmpty(a.Name) ? -1 : Convert.ToInt32(a.Name), a.Id })
-              .AggregateToString(a => a.Id, ","); // 准确结果应该是   5 1 6 2 3 4 
+              .AggregateToString(a => a.Id, ","); // 准确结果应该是   5 1 6 2 3 4
 
             Assert.AreEqual(orderResult3, "5,1,6,2,3,4");
         }
@@ -221,7 +221,7 @@
                    a.Name
                })
                .OrderByExpression(a => new { a.Name })
-               .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6 
+               .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 2 4 3 6
 
                 Assert.AreEqual(orderResult2, orderResult);
             }
@@ -285,7 +285,7 @@
                         Id = a.Id,
                         Name = Convert.ToInt32(a.Name),
                     })
-                    .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4 
+                    .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4
             });
 
         }

@@ -156,7 +156,7 @@ namespace LinqExtend
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <param name="source"></param>

@@ -74,8 +74,8 @@ namespace LinqExtend.Handle
             typeof(bool),
             typeof(bool?),
             typeof(char),
-            typeof(char?),  
-            
+            typeof(char?),
+
             //11种数字
             typeof(sbyte),
             typeof(byte),

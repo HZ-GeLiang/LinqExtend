@@ -37,7 +37,7 @@ namespace LinqExtend.EF.Test
             var sql2 = ctx.Books
                 .Where(IsEmpty(b => b.Publisher))// 利用语法,进行简写
             .ToQueryString();
-             
+
             Assert.AreEqual(sql1, sql2); //([t].[Publisher] IS NULL) OR([t].[Publisher] LIKE N'')
         }
 

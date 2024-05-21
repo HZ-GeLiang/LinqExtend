@@ -19,7 +19,7 @@ namespace LinqExtend.Handle
 #if IEnumerableSource
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="selector"></param>
         /// <param name="OnSelectMapLogTo"></param>
@@ -69,7 +69,7 @@ namespace LinqExtend.Handle
         /// 自动填充
         /// </summary>
         public bool IsAutoFill { get; }
-#endif  
+#endif
     }
 
     internal class SelectMapMain
@@ -112,7 +112,7 @@ namespace LinqExtend.Handle
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="args"></param> 
+        /// <param name="args"></param>
         /// <param name="parameterExp"></param>
         /// <returns></returns>
         public static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
@@ -360,7 +360,7 @@ namespace LinqExtend.Handle
                 {
                     /*
                     //NickName = new MultilingualString(a.b.NickName.Chinese)
-                    //{ 
+                    //{
                     //    English = a.b.NickName.English
                     //}
                     */

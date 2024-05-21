@@ -6,7 +6,7 @@ namespace LinqExtend.EF.Handle
 {
     internal class SelectMapProcess<TSource, TResult>
         where TSource : class
-        where TResult : class 
+        where TResult : class
     {
         public SelectMapProcess()
         {

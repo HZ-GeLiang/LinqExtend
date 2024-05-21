@@ -14,7 +14,7 @@ namespace LinqExtend.EF.Handle
     {
         /// <summary>
         /// 敏感字符
-        /// </summary> 
+        /// </summary>
         public static SortedSet<string> Default = new SortedSet<string>()
         {
             "Password",

@@ -2,7 +2,7 @@
 using System.Text;
 
 namespace LinqExtend.Test
-{ 
+{
     [TestClass]
     public class AnyExtensionsTest
     {
@@ -16,7 +16,7 @@ namespace LinqExtend.Test
             Assert.AreEqual(new StringBuilder("1").AnyEnhance(), true);
 
             Assert.AreEqual("".AnyEnhance(), false);
-            Assert.AreEqual("1".AnyEnhance(), true); 
+            Assert.AreEqual("1".AnyEnhance(), true);
         }
 
     }

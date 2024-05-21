@@ -116,7 +116,7 @@ namespace LinqExtend
         /// 获得SelectMap映射的日志情况
         /// </summary>
         public static Action<string> OnSelectMapLogTo { get; set; }
-        /*public static Action<string> OnSelectMapLogTo  
+        /*public static Action<string> OnSelectMapLogTo
             get
             {
                 return SelectMapMain.OnSelectMapLogTo;

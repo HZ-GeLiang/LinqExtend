@@ -58,7 +58,7 @@ namespace LinqExtend.EF.Handle
         /// 自动填充
         /// </summary>
         public bool IsAutoFill { get; }
-#endif  
+#endif
     }
 
     internal class SelectMapMain
@@ -101,7 +101,7 @@ namespace LinqExtend.EF.Handle
         /// </summary>
         /// <typeparam name="TSource"></typeparam>
         /// <typeparam name="TResult"></typeparam>
-        /// <param name="args"></param> 
+        /// <param name="args"></param>
         /// <param name="parameterExp"></param>
         /// <returns></returns>
         public static List<MemberBinding> SelectMap_GetExpression_GetBindings<TSource, TResult>(
@@ -227,7 +227,7 @@ namespace LinqExtend.EF.Handle
                 SelectMapProcess<TSource, TResult> process
             )
             where TSource : class
-            where TResult : class 
+            where TResult : class
         {
             var bindings = new List<MemberBinding>();
             //1等公民的处理(内置类型)
@@ -262,7 +262,7 @@ namespace LinqExtend.EF.Handle
                 Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast
             )
             where TSource : class
-            where TResult : class 
+            where TResult : class
         {
             if (selectorLast == null)
             {
@@ -280,7 +280,7 @@ namespace LinqExtend.EF.Handle
         /// <returns></returns>
         public static Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> GetSelectorLast<TSource, TResult>()
             where TSource : class
-            where TResult : class 
+            where TResult : class
         {
             Func<ParameterExpression, SelectMapProcess<TSource, TResult>, List<MemberBinding>> selectorLast = (parameterExp, process) =>
             {
@@ -349,7 +349,7 @@ namespace LinqExtend.EF.Handle
                 {
                     /*
                     //NickName = new MultilingualString(a.b.NickName.Chinese)
-                    //{ 
+                    //{
                     //    English = a.b.NickName.English
                     //}
                     */
@@ -517,7 +517,7 @@ namespace LinqExtend.EF.Handle
 
         public static Expression<Func<TSource, TResult>> GetLambda<TSource, TResult>(List<MemberBinding> bindings, ParameterExpression parameterExp)
           where TSource : class
-          where TResult : class 
+          where TResult : class
         {
             MemberInitExpression memberInitExpression =
                 Expression.MemberInit(

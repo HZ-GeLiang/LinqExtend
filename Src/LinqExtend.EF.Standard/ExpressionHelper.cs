@@ -74,7 +74,7 @@ namespace LinqExtend.EF
         }
 
         /// <summary>
-        /// 是空的,没有值 (这个没有值是语义上的) 
+        /// 是空的,没有值 (这个没有值是语义上的)
         /// </summary>
         /// <typeparam name="TEntity"></typeparam>
         /// <param name="propAccessor"></param>
@@ -90,8 +90,8 @@ namespace LinqExtend.EF
             if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
             {
                 var type_TEntity = typeof(TEntity);
-                //var p1 = Expression.Parameter(type_TEntity,"b");                
-                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+                //var p1 = Expression.Parameter(type_TEntity,"b");
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法
 
                 string propName;
 
@@ -141,8 +141,8 @@ namespace LinqExtend.EF
             if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
             {
                 var type_TEntity = typeof(TEntity);
-                //var p1 = Expression.Parameter(type_TEntity,"b");                
-                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+                //var p1 = Expression.Parameter(type_TEntity,"b");
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法
 
                 string propName;
 
@@ -231,7 +231,7 @@ namespace LinqExtend.EF
             if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
             {
                 var type_TEntity = typeof(TEntity);
-                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法
 
                 string propName;
 
@@ -300,7 +300,7 @@ namespace LinqExtend.EF
             if (expression.GetType().FullName == ExpressionFullNameSpaceConst.Property)
             {
                 var type_TEntity = typeof(TEntity);
-                var p1 = propAccessor.Parameters.Single();//等价上面的写法 
+                var p1 = propAccessor.Parameters.Single();//等价上面的写法
 
                 string propName;
 

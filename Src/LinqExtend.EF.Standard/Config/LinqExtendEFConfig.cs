@@ -12,6 +12,6 @@ namespace LinqExtend.EF.Config
         /// <summary>
         /// 启用敏感字段,EF下默认是true
         /// </summary>
-        public static bool EnabledSensitiveField = true; 
+        public static bool EnabledSensitiveField = true;
     }
 }
