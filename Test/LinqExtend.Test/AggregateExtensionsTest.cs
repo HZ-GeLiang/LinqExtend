@@ -1,7 +1,4 @@
-﻿using System.Data;
-using System.Text;
-
-namespace LinqExtend.Test
+﻿namespace LinqExtend.Test
 {
 
     [TestClass]

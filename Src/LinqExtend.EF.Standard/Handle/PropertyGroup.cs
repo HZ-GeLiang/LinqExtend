@@ -9,12 +9,8 @@ using LinqExtend.EF.ExtensionMethod;
 #endif
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
-using System.Xml.Linq;
 
 namespace LinqExtend.EF.Handle
 {

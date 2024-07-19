@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LinqExtend.ExtensionMethod
+﻿namespace LinqExtend.ExtensionMethod
 {
     internal static partial class StringExtensions
     {

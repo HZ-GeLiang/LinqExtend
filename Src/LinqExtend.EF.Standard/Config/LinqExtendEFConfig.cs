@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LinqExtend.EF.Config
+﻿namespace LinqExtend.EF.Config
 {
     /// <summary>
     /// 用于配置的一个文件

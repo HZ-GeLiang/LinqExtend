@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Issus
+﻿namespace Issus
 {
     /*
     一个框架层面无法解决的情况.

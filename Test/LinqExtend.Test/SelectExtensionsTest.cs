@@ -1,10 +1,6 @@
 ﻿using LinqExtend.Test.ExtendMethods;
 using LinqExtend.Test.Model;
-using System;
-using System.Collections;
 using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace LinqExtend.Test
 {

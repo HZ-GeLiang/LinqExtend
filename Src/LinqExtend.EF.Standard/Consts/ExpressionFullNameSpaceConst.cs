@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LinqExtend.EF.Consts
+﻿namespace LinqExtend.EF.Consts
 {
     /// <summary>
     /// 常量
