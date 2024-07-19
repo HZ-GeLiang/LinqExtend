@@ -93,14 +93,17 @@ namespace LinqExtend
         {
             return source.Where(a => string.IsNullOrEmpty(a) == false).AggregateToString(a => a, separator);
         }
+
         public static string AggregateToString(this IOrderedEnumerable<string> source, string separator)
         {
             return source.Where(a => string.IsNullOrEmpty(a) == false).AggregateToString(a => a, separator);
         }
+
         public static string AggregateToString(this List<int> source, string separator)
         {
             return source.AggregateToString(a => a, separator);
         }
+
         public static string AggregateToString(this List<int?> source, string separator)
         {
             return source.Where(a => a.HasValue).AggregateToString(a => a, separator);
@@ -207,6 +210,5 @@ namespace LinqExtend
             var txt = sb.ToString();
             return txt;
         }
-
     }
 }

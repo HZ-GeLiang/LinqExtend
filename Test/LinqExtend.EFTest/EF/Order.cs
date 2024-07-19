@@ -10,8 +10,5 @@ public class Order
     [Required]
     public long ShopId { get; set; }
 
-
     public DateTime PaymentTime { get; set; }
-
-
 }

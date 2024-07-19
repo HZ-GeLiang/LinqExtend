@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+
 #if IQuerableSource
 using LinqExtend.EF.ExtendMethods;
 #endif
@@ -14,8 +15,6 @@ namespace LinqExtend.Handle
         where TSource : class
         where TResult : class, new()
     {
-
-
 #if IEnumerableSource
 
         /// <summary>
@@ -65,10 +64,12 @@ namespace LinqExtend.Handle
         public Action<string> OnSelectMapLogTo { get; set; }
 
 #if IEnumerableSource
+
         /// <summary>
         /// 自动填充
         /// </summary>
         public bool IsAutoFill { get; }
+
 #endif
     }
 
@@ -137,10 +138,8 @@ namespace LinqExtend.Handle
                 bindings.AddRange(autoMap_bindings);
             }
 
-
 #if IEnumerableSource
             {
-
                 //todo:SelectMap_Enumerable_支持值对象
                 //1等公民的处理(自定义类型)
                 //var unmappedCustomProperty = process.GetUnmappedPropertyWithCustom();
@@ -156,7 +155,6 @@ namespace LinqExtend.Handle
 
                 //    //bindings.Add(memberAssignment);
                 //}
-
             }
 
 #endif
@@ -416,7 +414,6 @@ namespace LinqExtend.Handle
                                 //    }
                                 //}
 
-
                                 for (int i = 0; i < parameters.Length; i++)
                                 {
                                     ParameterInfo parameter = parameters[i];
@@ -452,7 +449,6 @@ namespace LinqExtend.Handle
                                 }
 
                                 MemberInit_new_left = customPropertyType.GetConstructor(_ConstructorTypes.ToArray());
-
                             }
                         }
 
@@ -468,7 +464,6 @@ namespace LinqExtend.Handle
 
                         var list = process.Result.CustomPropertyProcessList[propertyName]
                                                 .PropertyGroup.BuildInPropertyProcessList;
-
 
                         var exp_customProperty_props = exp_customPropertyType.GetProperties();
 
@@ -501,7 +496,6 @@ namespace LinqExtend.Handle
 
                             MemberInit_Right.Add(propInit);
                             process.Result.DealPropertyWithCustom(propertyName, itemProperty.Value.Name);
-
                         }
                         //添加 binding
                         var bind_right =
@@ -516,7 +510,6 @@ namespace LinqExtend.Handle
                         );
 
                         bindings.Add(memberAssignment);
-
                     }
                     break;
                 }
@@ -565,6 +558,5 @@ namespace LinqExtend.Handle
             var log = sb.ToString();
             return log;
         }
-
     }
 }

@@ -22,7 +22,6 @@
                     return string.Compare(a, b);
                 }).AggregateToString(",");
                 Assert.AreEqual(str, "2,3,4");
-
             }
 
             {
@@ -53,7 +52,6 @@
         [TestMethod]
         public void Test_OrderByFunc_ListIsNull()
         {
-
             {
                 List<string> list = null;
                 //单个字段
@@ -63,7 +61,6 @@
                 }).AggregateToString(",");
                 Assert.AreEqual(str, "");
             }
-
 
             {
                 List<pepple2> pepples = null;
@@ -186,7 +183,6 @@
             Assert.AreEqual(orderResult3, "5,1,6,2,3,4");
         }
 
-
         [TestMethod]
         public void Test_OrderByExpression_ListTIsDynamic()
         {
@@ -287,9 +283,7 @@
                     })
                     .AggregateToString(a => a.Id, ","); // 准确结果应该是   1 5 6 2 3 4
             });
-
         }
-
 
         [TestMethod]
         public void Test_OrderByExpression_Desc()
@@ -313,7 +307,6 @@
                   .OrderByExpression(a => new { a.Name }, a => new { }) // 没有倒序排序字段
                   .AggregateToString(a => a.Id, ","); //1,5,2,4,3,6
             Assert.AreEqual(orderResult4, "1,5,2,4,3,6");
-
 
             var orderResult1 = tests
                    .OrderByExpression(a => new { a.Name }, a => a.Name) // 在排序字段中

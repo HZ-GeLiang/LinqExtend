@@ -5,5 +5,4 @@
     public double Price { get; set; }
     public string? Publisher { get; set; }
     public string? Key { get; set; }
-
 }

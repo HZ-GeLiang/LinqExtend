@@ -5,7 +5,6 @@
     /// </summary>
     public static class IEnumerableExtensions
     {
-
 #if !NET6_0_OR_GREATER && !NETSTANDARD1_0_OR_GREATER
         // 注: net 6.0 自带了 DistinctBy,
 
@@ -37,6 +36,5 @@
         }
 
 #endif
-
     }
 }

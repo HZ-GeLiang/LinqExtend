@@ -197,7 +197,6 @@ FROM [T_Books] AS [t]");
             }
 
             {
-
                 //使用 SelectMap 创建表达式
                 //1:分开写
                 var exp = ExpressionHelper.SelectMap<Book, BookDto>();
@@ -212,7 +211,6 @@ FROM [T_Books] AS [t]");
                 var selectMapList = selectMapQuery.ToList();
 
                 CollectionAssert.AreEqual(queryList, selectMapList);
-
             }
 
             {
@@ -244,7 +242,6 @@ FROM [T_Books] AS [t]");
                 var expStr = exp.ToString();
                 Assert.AreEqual(expStr, $@"Param_0 => new [] {{}}");
             }
-
         }
 
         [TestMethod]
@@ -275,7 +272,6 @@ FROM [T_Books] AS [t]");
             {
                 //规则
                 Key = a.key
-
             });
 
             /* 详细的 SelectMap 如下
@@ -293,10 +289,7 @@ FROM [T_Books] AS [t]");
 
             var selectMapList = selectMapQuery.ToList();
             CollectionAssert.AreEqual(queryList, selectMapList);
-
         }
-
-
 
         [TestMethod]
         public void SelectMap_值类型_Test_Case1()
@@ -339,18 +332,14 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
 ");
         }
 
-
-
         [TestMethod]
         public void Main()
         {
-
             /*
 
              SELECT [t].[Id], [t].[IsDel], [t].[IsDel2], [t].[Price], [t].[PubTime], [t].[Publisher], [t].[Publisher2], [t].[BookInfo_AuthorName], [t].[BookInfo_Title]
             FROM [T_Books] AS [t]
             WHERE ([t].[IsDel] IS NOT NULL) AND ([t].[IsDel] = CAST(1 AS bit))*/
-
 
             using TestDbContext ctx = new TestDbContext();
 
@@ -369,7 +358,6 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
             var sql2 = ctx.Books
                 .Where(b => b.IsDel != true)
                 .Count();
-
 
             Console.WriteLine(sql1);
         }

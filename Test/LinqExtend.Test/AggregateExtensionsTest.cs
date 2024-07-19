@@ -1,6 +1,5 @@
 ﻿namespace LinqExtend.Test
 {
-
     [TestClass]
     public class AggregateExtensionsTest
     {
@@ -32,7 +31,6 @@
                 var list = new List<int> { 4 };
                 var str2 = list.AggregateToString(",");
                 Assert.AreEqual(str2, "4");
-
             }
 
             {
@@ -51,9 +49,7 @@
 
                 str2 = list.AggregateToString(a => $@"'{a}'", ",");
                 Assert.AreEqual(str1, "'1','2','3'");
-
             }
-
 
             {
                 var peopleList = new List<People>()
@@ -65,7 +61,6 @@
 
                 var str1 = peopleList.AggregateToString(a => $@"{a.Id}", "\r\n");
                 Assert.AreEqual(str1, "1\r\n2\r\n3");
-
             }
         }
     }

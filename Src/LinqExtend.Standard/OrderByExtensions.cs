@@ -10,7 +10,6 @@ namespace LinqExtend
 {
     public static class OrderByExtensions
     {
-
         #region OrderByFunc
 
         /// <summary>
@@ -49,7 +48,6 @@ namespace LinqExtend
             var result = source.OrderBy(a => a, sortComparer); //需要 using System.Linq;
             return result;
         }
-
 
         #endregion
 
@@ -123,7 +121,6 @@ namespace LinqExtend
             }
             return ht_desc;
         }
-
 
         /// <summary>
         /// 自定义Expression来实现OrderBy
@@ -293,7 +290,6 @@ namespace LinqExtend
                                 //注: 如果 在执行 methodCallExpression.Method 时发生错误, 这里不会体现
                                 orderedResult = GetIOrderedEnumerable<TSource>(source, orderedResult, lambda, genericType_arg2, isDescending);
                                 continue;
-
                             }
                         }
                     }
@@ -318,7 +314,6 @@ namespace LinqExtend
                                 }
                             }
                         }
-
 
                         //if (argument.Type == typeof(int))
                         //{
@@ -393,7 +388,6 @@ namespace LinqExtend
                     ? Enumerable.OrderBy(source, lambda.Compile())
                     : Enumerable.ThenBy(orderedResult, lambda.Compile());
             }
-
         }
 
         private static IOrderedEnumerable<TSource> GetIOrderedEnumerable<TSource>(

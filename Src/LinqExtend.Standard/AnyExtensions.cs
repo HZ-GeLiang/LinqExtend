@@ -13,8 +13,11 @@ namespace LinqExtend
         //public static bool AnyEnhance(this ICollection source) => source != null && source.Count > 0;
 
         public static bool AnyEnhance(this StringBuilder source) => source != null && source.Length > 0;
+
         public static bool AnyEnhance(this string source) => source != null && source.Length > 0;
+
         public static bool AnyEnhance(this DataRowCollection source) => source != null && source.Count > 0;
+
         public static bool AnyEnhance(this ArrayList source) => source != null && source.Count > 0;
 
         /// <summary>

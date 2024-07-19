@@ -1,12 +1,15 @@
 ﻿#if IEnumerableSource
+
 using LinqExtend;
 using LinqExtend.Config;
 using LinqExtend.ExtensionMethod;
+
 #elif IQuerableSource
 using LinqExtend.EF.Config;
 using LinqExtend.EF.ExtendMethods;
 #else
 #endif
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +69,6 @@ namespace LinqExtend.Handle
     internal class PropertyGroup
     {
         private static HashSet<Type> _buildInType = new HashSet<Type>()  {
-
             typeof(bool),
             typeof(bool?),
             typeof(char),
@@ -123,6 +125,7 @@ namespace LinqExtend.Handle
         }
 
         public Type Type { get; private set; }
+
         public PropertyGroup(Type type)
         {
             Type = type;
@@ -168,7 +171,6 @@ namespace LinqExtend.Handle
             return propertyProcessInfo;
         }
 
-
         /// <summary>
         /// 获得类名
         /// </summary>
@@ -208,7 +210,6 @@ namespace LinqExtend.Handle
         /// 所有类型
         /// </summary>
         public PropertyInfo[] All { get; }
-
 
         /// <summary>
         /// is内置属性
@@ -253,7 +254,6 @@ namespace LinqExtend.Handle
                 DealPropertyWithCustom(propertyName);
             }
         }
-
 
         /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
         public void DealPropertyWithBuildIn(string propertyName)
@@ -313,7 +313,6 @@ namespace LinqExtend.Handle
             }
         }
 
-
         /// <summary>
         /// 从自定义类中获得属性信息
         /// </summary>
@@ -333,7 +332,6 @@ namespace LinqExtend.Handle
             return null;
         }
 
-
         /// <summary>
         /// 添加处理过的自定义类型的属性
         /// </summary>
@@ -341,7 +339,6 @@ namespace LinqExtend.Handle
         /// <param name="check"></param>
         public void DealPropertyWithCustom(string propertyName, bool check)
         {
-
 #if IEnumerableSource
             var checkSensitiveField = check && LinqExtendConfig.EnabledSensitiveField;
 #elif IQuerableSource

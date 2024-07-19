@@ -2,7 +2,6 @@
 
 namespace LinqExtend.EF.Handle
 {
-
     /// <summary>
     /// 敏感的
     /// </summary>
@@ -18,5 +17,4 @@ namespace LinqExtend.EF.Handle
             "salt",
         };//集合中区分大小写
     }
-
 }

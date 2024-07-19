@@ -41,7 +41,6 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2); //([t].[Publisher] IS NULL) OR([t].[Publisher] LIKE N'')
         }
 
-
         [TestMethod]
         public void IsEmpty_Test2()
         {
@@ -117,7 +116,6 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2);
         }
 
-
         [TestMethod]
         public void IsDeleted_Test4()
         {
@@ -129,7 +127,6 @@ namespace LinqExtend.EF.Test
                 .ToQueryString();
             Assert.AreEqual(sql1, sql2);
         }
-
 
         [TestMethod]
         public void IsNotDeleted_Test1()
@@ -179,7 +176,6 @@ namespace LinqExtend.EF.Test
             Assert.AreEqual(sql1, sql2);
         }
 
-
         [TestMethod]
         public void SelectMap_DbSet_Test()
         {
@@ -202,6 +198,5 @@ namespace LinqExtend.EF.Test
 
             CollectionAssert.AreEqual(queryList, selectMapList);
         }
-
     }
 }

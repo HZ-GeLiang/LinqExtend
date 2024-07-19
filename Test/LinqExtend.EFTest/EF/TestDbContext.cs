@@ -18,7 +18,6 @@ namespace LinqExtend.EF.Test.EF
         public DbSet<Shop> Shops { get; set; }
         public DbSet<Student> Students { get; set; }
 
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -31,9 +30,7 @@ namespace LinqExtend.EF.Test.EF
         //各种配置信息
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
             modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);//加载当前程序集中所有实现了IEntityTypeConfiguration接口的类
         }
-
     }
 }

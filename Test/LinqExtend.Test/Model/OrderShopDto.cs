@@ -7,5 +7,4 @@
     public int UserId { get; set; }
 
     public DateTime PubTime { get; set; }//发布日期
-
 }

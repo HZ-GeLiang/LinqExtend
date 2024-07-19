@@ -5,8 +5,6 @@ namespace LinqExtend.ExtensionMethod
 {
     internal static class TypeExtensions
     {
-
-
         /// <summary>
         /// 获得泛型类型的第一个T的 Type
         /// </summary>
@@ -20,7 +18,6 @@ namespace LinqExtend.ExtensionMethod
             }
             return type.GenericTypeArguments[0];
         }
-
 
         public static bool IsGenericType(this Type type)
         {
@@ -46,15 +43,14 @@ namespace LinqExtend.ExtensionMethod
             return value;
         }
 
-
         internal class TypeHelper<T>
         {
             private static readonly T value;
+
             public static T GetValueOrDefault()
             {
                 return value;
             }
         }
     }
-
 }

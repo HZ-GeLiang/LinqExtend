@@ -16,7 +16,6 @@ namespace LinqExtend.EF.Handle
         public PropertyGroup<TSource> Source { get; set; }
         public PropertyGroup<TResult> Result { get; set; }
 
-
         /// <summary>
         /// 处理属性
         /// </summary>
@@ -34,7 +33,6 @@ namespace LinqExtend.EF.Handle
 
             Result.DealPropertyWithAuto(propertyName);
         }
-
 
         /// <inheritdoc cref="DealPropertyWithBuildIn(string, bool)"/>
         public void DealPropertyWithBuildIn(string propertyName)
@@ -125,7 +123,6 @@ namespace LinqExtend.EF.Handle
             }
             return result;
         }
-
 
         /// <summary>
         /// 相同的内置属性名

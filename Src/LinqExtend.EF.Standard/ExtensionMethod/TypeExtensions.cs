@@ -3,11 +3,8 @@ using System.Reflection;
 
 namespace LinqExtend.EF.ExtensionMethod
 {
-
     internal static class TypeExtensions
     {
-
-
         /// <summary>
         /// 获得泛型类型的第一个T的 Type
         /// </summary>
@@ -21,7 +18,6 @@ namespace LinqExtend.EF.ExtensionMethod
             }
             return type.GenericTypeArguments[0];
         }
-
 
         public static bool IsGenericType(this Type type)
         {
@@ -47,15 +43,14 @@ namespace LinqExtend.EF.ExtensionMethod
             return value;
         }
 
-
         internal class TypeHelper<T>
         {
             private static readonly T value;
+
             public static T GetValueOrDefault()
             {
                 return value;
             }
         }
     }
-
 }

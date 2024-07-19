@@ -26,8 +26,6 @@ namespace LinqExtend.EF.Test.EF
         //public string? English2 { get; init; }
     }
 
-
-
     public record Student
     {
         public int Id { get; set; }
@@ -68,14 +66,12 @@ namespace LinqExtend.EF.Test.EF
         //    this.Chinese = chinese;
         //}
 
-
         //case5, 暂不支持
         //private MultilingualString() { }
 
         public string Chinese { get; init; }
         public string? English { get; init; }
     }
-
 
     public enum GenderEnum
     {
@@ -98,10 +94,9 @@ namespace LinqExtend.EF.Test.EF
         /// 保密
         /// </summary>
         BaoMi = 3,
-
     }
 
-    class StudentConfig : IEntityTypeConfiguration<Student>
+    internal class StudentConfig : IEntityTypeConfiguration<Student>
     {
         public void Configure(EntityTypeBuilder<Student> builder)
         {
@@ -113,5 +108,4 @@ namespace LinqExtend.EF.Test.EF
             });
         }
     }
-
 }

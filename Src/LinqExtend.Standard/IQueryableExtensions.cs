@@ -22,7 +22,6 @@ namespace LinqExtend
             return false;
         }
 
-
         public static bool IsOrdered<T, TKey>(this IQueryable<T> queryable, Expression<Func<T, TKey>> keySelector)
         {
             // 获取查询表达式树

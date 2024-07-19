@@ -4,7 +4,6 @@ using System.Data;
 
 namespace LinqExtend.Test
 {
-
     [TestClass]
     public class SelectExtensionsTest
     {
@@ -61,7 +60,6 @@ namespace LinqExtend.Test
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
                     Age = 18,
-
                 }).ToList();
 
                 CollectionAssert.AreEqual(list, new List<PeopleDto>()
@@ -69,7 +67,6 @@ namespace LinqExtend.Test
                     new PeopleDto(){ Id =1 , Age=18},
                     new PeopleDto(){ Id =2 , Age=18},
                 });
-
             }
 
             {
@@ -78,7 +75,6 @@ namespace LinqExtend.Test
                 {
                     //有规则的写规则, 不在规则里面的按属性名一一对象来处理
                     Age = a.Age * 2,
-
                 }).ToList();
 
                 CollectionAssert.AreEqual(list, new List<PeopleDto>()
@@ -89,11 +85,9 @@ namespace LinqExtend.Test
             }
         }
 
-
         [TestMethod]
         public void SelectMap_Enumerable_2等公民对象的处理()
         {
-
             {
                 var shop = new Shop()
                 {
@@ -224,9 +218,6 @@ Gender = a.Gender
             //    Chinese = "c",
             //    English = "e"
             //};
-
         }
-
     }
-
 }

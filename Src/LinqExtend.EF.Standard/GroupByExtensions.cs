@@ -16,7 +16,6 @@ namespace LinqExtend
             return source.GroupBy(keySelector);
         }
 
-
         public static IQueryable<IGrouping<TKey, TSource>> GroupByMap<TSource, TKey>(this IQueryable<TSource> source, TKey _)
            where TSource : class
            where TKey : class, new()

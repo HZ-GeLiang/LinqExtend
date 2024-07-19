@@ -2,7 +2,6 @@
 {
     public record StudentCreate : Student
     {
-
     }
 
     public record Student
@@ -18,7 +17,6 @@
     }
 
     public record MultilingualString(string Chinese, string? English);
-
 
     public enum GenderEnum
     {
@@ -41,6 +39,5 @@
         /// 保密
         /// </summary>
         BaoMi = 3,
-
     }
 }

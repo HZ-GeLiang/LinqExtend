@@ -62,6 +62,5 @@ namespace LinqExtend.ExtensionMethod
 
             return txt;
         }
-
     }
 }

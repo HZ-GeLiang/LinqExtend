@@ -18,6 +18,5 @@ namespace LinqExtend.Test
             Assert.AreEqual("".AnyEnhance(), false);
             Assert.AreEqual("1".AnyEnhance(), true);
         }
-
     }
 }

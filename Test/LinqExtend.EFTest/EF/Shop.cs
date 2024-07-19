@@ -7,9 +7,12 @@ public class Shop
     [Key]
     public long Id { get; set; }//主键
 
+    /// <summary>
+    /// 发布日期
+    /// </summary>
     [Required]
-    public DateTime PubTime { get; set; }//发布日期
-    public string Name { get; set; }//单价
-    public double Price { get; set; }//单价
+    public DateTime PubTime { get; set; }
 
+    public string Name { get; set; }
+    public double Price { get; set; }
 }

@@ -21,7 +21,6 @@
 
         public record class MultilingualStringDto
         {
-
             public MultilingualStringDto(string chinese, string eng)
             {
                 this.Chinese = chinese;
@@ -40,7 +39,6 @@
             //public string? English2 => this.English ?? "" + "_" + this.English ?? "";
             // 6.2自己手动的初始化这个属性,完成数据绑定
             //todo: 手动初始化 custom 类的, 内部的任何属性将不处理.
-
         }
 
         public record class MultilingualString
@@ -48,7 +46,5 @@
             public string Chinese { get; init; }
             public string? English { get; init; }
         }
-
-
     }
 }

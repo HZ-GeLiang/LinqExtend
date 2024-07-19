@@ -55,5 +55,4 @@ namespace LinqExtend.EF
             return ExpressionHelper.SelectMap<TEntity, TResult>();
         }
     }
-
 }

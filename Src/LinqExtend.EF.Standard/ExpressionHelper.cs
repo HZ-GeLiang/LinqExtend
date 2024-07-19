@@ -411,9 +411,7 @@ namespace LinqExtend.EF
                 selectExpression = Expression.Lambda<Func<TSource, object[]>>(newArrayExp, exParameter);
             }
 
-
             return selectExpression;
         }
-
     }
 }
