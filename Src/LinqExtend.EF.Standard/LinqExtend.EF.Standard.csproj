@@ -25,8 +25,7 @@
 		<RepositoryType>github</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Version>0.0.6</Version>
-		<LangVersion>10</LangVersion>
-
+		<LangVersion>10</LangVersion> 
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 

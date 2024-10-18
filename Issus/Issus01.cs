@@ -17,7 +17,9 @@
         public class A : B
         {
             public new int Id => 1;
+#pragma warning disable CS0108 // 成员隐藏继承的成员；缺少关键字 new
             public int ParentId { get; set; }
+#pragma warning restore CS0108 // 成员隐藏继承的成员；缺少关键字 new
         }
 
         public class A2 : B2<int>

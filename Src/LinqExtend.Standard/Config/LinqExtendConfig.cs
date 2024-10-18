@@ -1,10 +1,9 @@
-﻿namespace LinqExtend.Config
+﻿namespace LinqExtend.Config;
+
+public class LinqExtendConfig
 {
-    public class LinqExtendConfig
-    {
-        /// <summary>
-        /// 敏感字段的输出检查
-        /// </summary>
-        public static bool EnabledSensitiveField = false;
-    }
+    /// <summary>
+    /// 敏感字段的输出检查
+    /// </summary>
+    public static bool EnabledSensitiveField = false;
 }
