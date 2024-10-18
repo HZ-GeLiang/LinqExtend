@@ -9,6 +9,14 @@ namespace LinqExtend;
 /// </summary>
 public static class AggregateExtensions
 {
+    /// <summary>
+    /// 聚合为一个字符串
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="columnName"></param>
+    /// <param name="separator"></param>
+    /// <returns>没有值时返回""</returns>
+    /// <exception cref="ArgumentNullException"></exception>
     public static string AggregateToString(this DataRowCollection source, string columnName, string separator)
     {
         if (source is null)
@@ -192,12 +200,15 @@ public static class AggregateExtensions
     }
 
     /// <summary>
-    ///
+    /// 聚合为一个字符串
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <param name="source"></param>
-    /// <param name="content">dynamic的目的: 调用端不用刻意的使用 ToString() </param>
+    /// <param name="content">dynamic的目的: 调用端不用刻意的使用 ToString()</param>
     /// <param name="separator"></param>
+    /// <returns>没有值时返回""</returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="Exception"></exception>
     public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> content, string separator)
     {
         if (source is null)

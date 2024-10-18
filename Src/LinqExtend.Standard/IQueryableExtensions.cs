@@ -4,9 +4,19 @@ namespace LinqExtend;
 
 public static class IQueryableExtensions
 {
-    public static bool IsOrdered<T>(this IQueryable<T> source)
+    #region 是否已应用OrderBy/OrderByDescending
+
+    // 场景:在尝试Skip()和Take()之前检查IQueryable<T> 是否已应用OrderBy
+
+    /// <summary>
+    /// query是否包含了OrderBy/OrderByDescending
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="queryable"></param>
+    /// <returns></returns>
+    public static bool IsOrdered<T>(this IQueryable<T> queryable)
     {
-        var expression = source.Expression;
+        var expression = queryable.Expression;
 
         while (expression is MethodCallExpression)
         {
@@ -22,6 +32,14 @@ public static class IQueryableExtensions
         return false;
     }
 
+    /// <summary>
+    /// query是否包含了OrderBy/OrderByDescending
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="TKey"></typeparam>
+    /// <param name="queryable"></param>
+    /// <param name="keySelector"></param>
+    /// <returns></returns>
     public static bool IsOrdered<T, TKey>(this IQueryable<T> queryable, Expression<Func<T, TKey>> keySelector)
     {
         // 获取查询表达式树
@@ -29,10 +47,13 @@ public static class IQueryableExtensions
 
         // 查找 OrderBy 或 OrderByDescending 方法的调用
         var methodCallExpression = expression as MethodCallExpression;
-        while (methodCallExpression != null && (methodCallExpression.Method.Name == "OrderBy" || methodCallExpression.Method.Name == "OrderByDescending"))
+        while (methodCallExpression != null &&
+                (methodCallExpression.Method.Name == "OrderBy" || methodCallExpression.Method.Name == "OrderByDescending"))
         {
             // 检查调用的参数是否与提供的键选择器匹配
-            if (methodCallExpression.Arguments[1] is UnaryExpression unaryExpression && unaryExpression.Operand is LambdaExpression lambdaExpression && lambdaExpression.Body.ToString() == keySelector.Body.ToString())
+            if (methodCallExpression.Arguments[1] is UnaryExpression unaryExpression &&
+                unaryExpression.Operand is LambdaExpression lambdaExpression &&
+                lambdaExpression.Body.ToString() == keySelector.Body.ToString())
             {
                 return true;
             }
@@ -44,4 +65,6 @@ public static class IQueryableExtensions
         // 如果没有找到 OrderBy 或 OrderByDescending 方法的调用，则查询没有进行排序
         return false;
     }
+
+    #endregion
 }

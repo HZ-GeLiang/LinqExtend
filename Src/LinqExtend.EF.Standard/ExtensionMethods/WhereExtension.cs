@@ -239,7 +239,5 @@ public static class WhereExtension
         throw new NotImplementedException();
     }
 
-    //IsNotDeleted
-
     #endregion
 }

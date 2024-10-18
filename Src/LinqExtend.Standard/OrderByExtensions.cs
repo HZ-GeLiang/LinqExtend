@@ -76,7 +76,7 @@ public static class OrderByExtensions
         HashSet<string> ht_desc = null;
         if (descending != null)
         {
-            ht_desc = new HashSet<string>();
+            ht_desc = new HashSet<string>(StringComparer.Ordinal);
 
             if (descending.Body is System.Linq.Expressions.UnaryExpression bodyUnaryExpression)
             {
