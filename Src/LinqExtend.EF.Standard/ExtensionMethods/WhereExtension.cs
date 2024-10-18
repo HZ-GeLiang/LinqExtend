@@ -157,7 +157,7 @@ public static class WhereExtension
     /// <param name="propertySelector"></param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
-    public static IQueryable<TSource> WhereIsNotDeleted<TSource, TProperty>(this IQueryable<TSource> query,
+    public static IQueryable<TSource> WhereNotDeleted<TSource, TProperty>(this IQueryable<TSource> query,
         Expression<Func<TSource, TProperty>> propertySelector)
     {
         // 获取属性名

@@ -36,6 +36,10 @@ namespace LinqExtend.EF.Test.EF
 
         public GenderEnum Gender { get; set; }
         public MultilingualString NickName { get; set; }
+
+        public bool? IsDel2 { get; set; }
+        public int IsDel3 { get; set; }
+        public int? IsDel4 { get; set; }
     }
 
     //public record MultilingualString(string Chinese, string? English);
