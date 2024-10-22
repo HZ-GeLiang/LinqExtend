@@ -121,6 +121,7 @@ public static class OrderByExtensions
 
     /// <summary>
     /// 自定义Expression来实现OrderBy
+    /// 只能实现 xx.属性, 不能实现 xx.属性.属性的写法
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <param name="source">数据源</param>
