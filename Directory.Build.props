@@ -15,10 +15,10 @@
 		<DefineConstants Condition="Exists('../_cancel_sql_log')==true">cancel_sql_log</DefineConstants>
 		<DefineConstants Condition="Exists('../_timer')==true">timer</DefineConstants>
 	</PropertyGroup>
-	
+
 	<!--必备Nuget包 start-->
 	<ItemGroup>
-		<PackageReference Include="AutoPrimitive" Version="0.0.6" />
+		<PackageReference Include="AutoPrimitive" Version="0.0.9" />
 		<Using Include="AutoPrimitive" />
 	</ItemGroup>
 	<!--必备Nuget包 start-->
@@ -46,7 +46,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<PackageReference Include="NonIQuerableAnalyzer" Version="1.1.0">
+		<PackageReference Include="NonIQuerableAnalyzer" Version="1.1.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
