@@ -26,7 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Src\LinqExtend.EF.Standard\LinqExtend.EF.Standard.csproj" />
+		<ProjectReference Include="..\..\Src\LinqExtend.EF.Standard\LinqExtend.EF.Standard.csproj" />
 	</ItemGroup>
- 
+
 </Project>
