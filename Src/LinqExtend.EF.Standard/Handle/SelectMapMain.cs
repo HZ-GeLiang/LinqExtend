@@ -227,6 +227,8 @@ internal class SelectMapMain
         where TSource : class
         where TResult : class
     {
+        Dictionary<string, ArgumentException> dict = new Dictionary<string, ArgumentException>();
+
         var bindings = new List<MemberBinding>();
         //1等公民的处理(内置类型)
         var unmappedBuildInProperty = process.GetUnmappedPropertyWithBuildIn(rank: 1);
@@ -245,13 +247,32 @@ internal class SelectMapMain
             }
             catch (System.ArgumentException argumentException)
             {
-                throw new ArgumentException($"{argumentException.Message}:{propertyName}", argumentException);
+                dict.Add(propertyName, argumentException);
+                //throw new ArgumentException($"{argumentException.Message}:{propertyName}", argumentException);
             }
             catch (System.Exception ex)
             {
-                throw new Exception($"{argumentException.Message}:{propertyName}", ex);
+                throw new Exception($"{ex.Message}:{propertyName}", ex);
             }
+        }
 
+        if (dict.Any())
+        {
+            var errors = dict.Values.Select(a => a.Message).Distinct();
+            if (errors.Count() == 1)
+            {
+                throw new ArgumentException($@"{errors.First()}:{string.Join(",", dict.Keys)}");
+            }
+            else
+            {
+                List<string> list = new List<string>();
+                foreach (var item in dict)
+                {
+                    list.Add($@"{item.Value.Message}:{item.Key}");
+                }
+
+                throw new ArgumentException(string.Join(",", list));
+            }
         }
         return bindings;
     }
