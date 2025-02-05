@@ -366,6 +366,7 @@ public sealed class ExpressionHelper
      where TSource : class
      where TResult : class
     {
+        //Mapster 中有一个 .ProjectToType<xxx>()方法
         var selectorLast = SelectMapMain.GetSelectorLast<TSource, TResult>();
         var lambda = SelectMapMain.SelectMap_GetExpression<TSource, TResult>(
             new GetExpressionArgs<TSource, TResult>(

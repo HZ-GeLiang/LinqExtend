@@ -270,7 +270,7 @@ FROM [T_Books] AS [t]");
 
             var selectMapQuery = query_tmp.SelectMap(a => new BookDto
             {
-                //规则
+                //具体的规则
                 Key = a.key
             });
 
@@ -312,6 +312,7 @@ FROM [T_Books] AS [t]");
                 _mapperLog = mapperLog;
             };
 
+            //m,IQuerable/自动Select,示例
             var selectMapQuery = query_tmp.SelectMap(a => new StudentDto
             {
                 //NickName = new MultilingualString(a.b.NickName.Chinese, a.b.NickName.English)
