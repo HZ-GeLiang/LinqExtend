@@ -10,8 +10,21 @@ namespace LinqExtend.EF.Test.EF
         public string UserName { get; set; }
         public GenderEnum Gender { get; set; }
         public MultilingualStringDto NickName { get; set; }
+
     }
 
+
+
+    public class StudentDto_多一个参数
+    {
+        public int Id { get; set; }
+
+        public string UserName { get; set; }
+        public GenderEnum Gender { get; set; }
+        public MultilingualStringDto NickName { get; set; }
+
+        public string AAAA { get; set; } //不匹配的参数
+    }
     public record class MultilingualStringDto
     {
         //case1 构造器的第二个参数名找不到属性

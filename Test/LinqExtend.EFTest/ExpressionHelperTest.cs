@@ -333,6 +333,43 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
 ");
         }
 
+
+        [TestMethod]
+        public void SelectMap_值类型_Test_Case1_多一个参数()
+        {
+            //return;//因为  LinqExtend.Standard 中的 还未完成.
+            using TestDbContext ctx = new TestDbContext();
+
+            var query_tmp = from b in ctx.Students
+                            select new { b };
+
+            query_tmp.Select(a => new
+            {
+                a.b.NickName.Chinese
+            });
+
+            string _mapperLog = "";
+
+            SelectExtensions.OnSelectMapLogTo = mapperLog =>
+            {
+                _mapperLog = mapperLog;
+            };
+
+            var selectMapQuery = query_tmp.SelectMap(a => new StudentDto_多一个参数
+            {
+
+            })
+            ;
+
+            var sql_selectMap = selectMapQuery.ToQueryString();
+
+            Assert.AreEqual(_mapperLog, $@"Id = a.b.Id
+UserName = a.b.UserName
+Gender = a.b.Gender
+NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b.NickName.English}}
+");
+        }
+
         [TestMethod]
         public void Main()
         {

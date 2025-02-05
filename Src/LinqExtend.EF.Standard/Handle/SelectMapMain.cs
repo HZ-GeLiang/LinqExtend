@@ -1,4 +1,5 @@
 ﻿using LinqExtend.EF.ExtensionMethods;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -36,7 +37,8 @@ internal class GetExpressionArgs<TSource, TResult>
     }
 
 #else
-    private GetExpressionArgs(){
+    private GetExpressionArgs()
+    {
         throw new Exception("未知的DefineConstants");
     }
 
@@ -231,14 +233,25 @@ internal class SelectMapMain
 
         foreach (var propertyName in unmappedBuildInProperty)
         {
-            process.DealPropertyWithBuildIn(propertyName);
+            try
+            {
+                process.DealPropertyWithBuildIn(propertyName);
+                var memberAssignment = Expression.Bind(
+                    typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
+                    Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
+                );
 
-            var memberAssignment = Expression.Bind(
-                typeof(TResult).GetProperty(propertyName),   //  TResult 的 set_UserNickName()
-                Expression.Property(parameterExp, propertyName)// TSource 的 a.UserNickName
-            );
+                bindings.Add(memberAssignment);
+            }
+            catch (System.ArgumentException argumentException)
+            {
+                throw new ArgumentException($"{argumentException.Message}:{propertyName}", argumentException);
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"{argumentException.Message}:{propertyName}", ex);
+            }
 
-            bindings.Add(memberAssignment);
         }
         return bindings;
     }
