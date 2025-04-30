@@ -14,7 +14,7 @@ namespace LinqExtend.EF.Test.EF
     }
 
 
-
+    //对比 StudentDto  , 多一个参数
     public class StudentDto_多一个参数
     {
         public int Id { get; set; }

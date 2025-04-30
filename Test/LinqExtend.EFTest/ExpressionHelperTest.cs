@@ -1,6 +1,7 @@
 ﻿using LinqExtend.EF.Test.EF;
 using LinqExtend.Test;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace LinqExtend.EF.Test
 {
@@ -178,43 +179,61 @@ namespace LinqExtend.EF.Test
         {
             using TestDbContext ctx = new TestDbContext();
 
-            List<BookDto>? queryList;
 
             {
-                // 手动编写映射
-                var query = ctx.Books.Select(a => new BookDto()
+                IQueryable<BookDto>? query;
                 {
-                    Id = a.Id,
-                    PubTime = a.PubTime,
-                    Price = a.Price,
-                    Publisher = a.Publisher
-                });
+                    // 手动编写映射(利用语法糖来创建一个 Expression<Func<Book, BookDto>> 对象)
+                    query = ctx.Books.Select(a => new BookDto()
+                    {
+                        Id = a.Id,
+                        PubTime = a.PubTime,
+                        Price = a.Price,
+                        Publisher = a.Publisher
+                    });
 
-                var sql = query.ToQueryString();
-                Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
-FROM [T_Books] AS [t]");
-                queryList = query.ToList();
-            }
-
-            {
-                //使用 SelectMap 创建表达式
-                //1:分开写
-                var exp = ExpressionHelper.SelectMap<Book, BookDto>();
-                var selectMapQuery = ctx.Books.Select(exp);
-
-                //1:直接写里面
-                //var selectMapQuery = ctx.Books.Select(ExpressionHelper.SelectMap<Book, BookDto>());
-                var sql_selectMap = selectMapQuery.ToQueryString();
-                Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+                    var sql = query.ToQueryString();
+                    Assert.AreEqual(sql, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
 
-                var selectMapList = selectMapQuery.ToList();
+                }
 
-                CollectionAssert.AreEqual(queryList, selectMapList);
+
+                IQueryable<BookDto> selectMapQuery;
+                {
+                    //使用 SelectMap 创建表达式
+                    {
+
+                        //1.分开写
+                        Expression<Func<Book, BookDto>>? exp = ExpressionHelper.SelectMap<Book, BookDto>();
+                        selectMapQuery = ctx.Books.Select(exp);
+                        var sql_selectMap = selectMapQuery.ToQueryString();
+                        Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
+                    }
+                    {
+                        //2.直接写里面
+                        selectMapQuery = ctx.Books.Select(ExpressionHelper.SelectMap<Book, BookDto>());
+                        var sql_selectMap = selectMapQuery.ToQueryString();
+                        Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
+FROM [T_Books] AS [t]");
+                    }
+
+                }
+
+
+                {
+                    List<BookDto>? queryList = query.ToList();
+
+                    List<BookDto>? selectMapList = selectMapQuery.ToList();
+
+                    CollectionAssert.AreEqual(queryList, selectMapList);
+                }
             }
 
+
             {
-                //通过泛型封装, 动态的查询出想要的dto
+                //通过泛型封装, 获得想要查询的属性名称
                 var props = typeof(BookDto).GetProperties().Select(p => p.Name).ToArray();
 
                 //selectMapQuery是 BookDto 和 Book 共同的属性
@@ -250,8 +269,7 @@ FROM [T_Books] AS [t]");
             //return;//因为  LinqExtend.Standard 中的 还未完成.
             using TestDbContext ctx = new TestDbContext();
 
-            var query_tmp = from b in ctx.Books
-                            select new { b, key = "_key" };
+            var query_tmp = from b in ctx.Books select new { b, key = "_key" };
 
             var query = query_tmp.Select(a => new BookDto()
             {
@@ -297,8 +315,7 @@ FROM [T_Books] AS [t]");
             //return;//因为  LinqExtend.Standard 中的 还未完成.
             using TestDbContext ctx = new TestDbContext();
 
-            var query_tmp = from b in ctx.Students
-                            select new { b };
+            var query_tmp = from b in ctx.Students select new { b };
 
             query_tmp.Select(a => new
             {
@@ -321,8 +338,7 @@ FROM [T_Books] AS [t]");
                 //    Chinese = a.b.NickName.Chinese,
                 //    English = a.b.NickName.English
                 //}
-            })
-            ;
+            });
 
             var sql_selectMap = selectMapQuery.ToQueryString();
 
@@ -340,8 +356,7 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
             //return;//因为  LinqExtend.Standard 中的 还未完成.
             using TestDbContext ctx = new TestDbContext();
 
-            var query_tmp = from b in ctx.Students
-                            select new { b };
+            var query_tmp = from b in ctx.Students select new { b };
 
             query_tmp.Select(a => new
             {
@@ -358,8 +373,7 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
             var selectMapQuery = query_tmp.SelectMap(a => new StudentDto_多一个参数
             {
 
-            })
-            ;
+            });
 
             var sql_selectMap = selectMapQuery.ToQueryString();
 

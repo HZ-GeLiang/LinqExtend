@@ -206,7 +206,7 @@ internal class SelectMapMain
         }
         else
         {
-            throw new NotSupportedException("当前selector的写法暂不支持,请修改程序或提issue");
+            throw new NotSupportedException("LinqExtend.EF:当前selector的写法暂不支持,请修改程序或提issue");
         }
 
         return bindings;
