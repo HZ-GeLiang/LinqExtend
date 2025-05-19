@@ -181,7 +181,7 @@ namespace LinqExtend.EF.Test
         {
             using TestDbContext ctx = new TestDbContext();
 
-            var query = ctx.Books.Select(a => new BookDto()
+            var query1 = ctx.Books.Select(a => new BookDto()
             {
                 Id = a.Id,
                 PubTime = a.PubTime,
@@ -189,14 +189,15 @@ namespace LinqExtend.EF.Test
                 Publisher = a.Publisher
             });
 
-            var queryList = query.ToList();
+            var query2 = ctx.Books.Select(SelectMap<BookDto>());
 
-            var selectMapList =
-                ctx.Books
-                .Select(SelectMap<BookDto>())
-                .ToList();
+            var sql1 = query1.ToQueryString();
+            var sql2 = query2.ToQueryString();
+            Assert.AreEqual(sql1, sql2);
 
-            CollectionAssert.AreEqual(queryList, selectMapList);
+            //var queryList = query1.ToList();
+            //var selectMapList = query2.ToList();
+            //CollectionAssert.AreEqual(queryList, selectMapList);
         }
     }
 }

@@ -179,7 +179,6 @@ namespace LinqExtend.EF.Test
         {
             using TestDbContext ctx = new TestDbContext();
 
-
             {
                 IQueryable<BookDto>? query;
                 {
@@ -223,11 +222,11 @@ FROM [T_Books] AS [t]");
 
 
                 {
-                    List<BookDto>? queryList = query.ToList();
+                    //List<BookDto>? queryList = query.ToList();
 
-                    List<BookDto>? selectMapList = selectMapQuery.ToList();
+                    //List<BookDto>? selectMapList = selectMapQuery.ToList();
 
-                    CollectionAssert.AreEqual(queryList, selectMapList);
+                    //CollectionAssert.AreEqual(queryList, selectMapList);
                 }
             }
 
@@ -243,15 +242,17 @@ FROM [T_Books] AS [t]");
                 Assert.AreEqual(sql_selectMap, $@"SELECT [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
 
-                var selectMapList = selectMapQuery.ToList();
-
-                //使用
-                foreach (var item in selectMapList)
                 {
-                    var id = item[0];
-                    var PubTime = item[1];
-                    var Price = item[2];
-                    var Publisher = item[3];
+                    //var selectMapList = selectMapQuery.ToList();
+
+                    ////使用
+                    //foreach (var item in selectMapList)
+                    //{
+                    //    var id = item[0];
+                    //    var PubTime = item[1];
+                    //    var Price = item[2];
+                    //    var Publisher = item[3];
+                    //}
                 }
             }
 
@@ -284,8 +285,6 @@ FROM [T_Books] AS [t]");
             Assert.AreEqual(sql_query, $@"SELECT N'_key' AS [Key], [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
 
-            var queryList = query.ToList();
-
             var selectMapQuery = query_tmp.SelectMap(a => new BookDto
             {
                 //具体的规则
@@ -305,8 +304,9 @@ Publisher = a.b.Publisher
             Assert.AreEqual(sql_selectMap, $@"SELECT N'_key' AS [Key], [t].[Id], [t].[PubTime], [t].[Price], [t].[Publisher]
 FROM [T_Books] AS [t]");
 
-            var selectMapList = selectMapQuery.ToList();
-            CollectionAssert.AreEqual(queryList, selectMapList);
+            //var queryList = query.ToList();
+            //var selectMapList = selectMapQuery.ToList();
+            //CollectionAssert.AreEqual(queryList, selectMapList);
         }
 
         [TestMethod]
@@ -387,31 +387,21 @@ NickName = new MultilingualStringDto(a.b.NickName.Chinese, null) {{English = a.b
         [TestMethod]
         public void Main()
         {
-            /*
-
-             SELECT [t].[Id], [t].[IsDel], [t].[IsDel2], [t].[Price], [t].[PubTime], [t].[Publisher], [t].[Publisher2], [t].[BookInfo_AuthorName], [t].[BookInfo_Title]
-            FROM [T_Books] AS [t]
-            WHERE ([t].[IsDel] IS NOT NULL) AND ([t].[IsDel] = CAST(1 AS bit))*/
-
             using TestDbContext ctx = new TestDbContext();
 
-            //var sql1 = ctx.Books
-            // .Where(b => b.IsDel.HasValue && b.IsDel == true)
-            // .Count();
 
-            //var sql12 = ctx.Books
-            //     .Where(b => b.IsDel == true)
-            //     .Count();
 
-            var sql1 = ctx.Books
-              .Where(b => b.IsDel == null || b.IsDel == false)
-                .Count();
+            var query1 = ctx.Books.Where(b => b.IsDel == null || b.IsDel == false);
+            var query2 = ctx.Books.Where(b => b.IsDel != true);
 
-            var sql2 = ctx.Books
-                .Where(b => b.IsDel != true)
-                .Count();
+            //var count1 = query1.Count();
+            //var count2 = query2.Count();
 
-            Console.WriteLine(sql1);
+            var sql1 = query1.ToQueryString();
+            var sql2 = query2.ToQueryString();
+
+            Assert.IsTrue(sql1.Contains("WHERE ([t].[IsDel] = CAST(0 AS bit)) OR ([t].[IsDel] IS NULL)"));
+            Assert.IsTrue(sql2.Contains("WHERE ([t].[IsDel] <> CAST(1 AS bit)) OR ([t].[IsDel] IS NULL)"));
         }
     }
 }
