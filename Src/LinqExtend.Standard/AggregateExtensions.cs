@@ -31,7 +31,6 @@ public static class AggregateExtensions
         throw new Exception($"不支持的TKey类型:{keyType}");
     }
 
-
     public static string AggregateToString(this List<string> source, string separator)
     {
         return source.Where(a => string.IsNullOrEmpty(a) == false).AggregateToString(a => a, separator);
@@ -85,16 +84,17 @@ public static class AggregateExtensions
     /// 聚合为一个字符串
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="predicate"></param>
+    /// <param name="func_predicate"></param>
     /// <param name="columnName"></param>
     /// <param name="separator"></param>
     /// <returns>没有值时返回""</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static string AggregateToString(this DataRowCollection source, Func<DataRow, bool> predicate, string columnName, string separator)
+    public static string AggregateToString(this DataRowCollection source, Func<DataRow, bool> func_predicate, string columnName, string separator)
     {
         if (source is null)
         {
-            throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
+            return string.Empty;
+            //throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
         }
         if (columnName.HasValue() == false)
         {
@@ -102,7 +102,8 @@ public static class AggregateExtensions
         }
         if (separator is null)
         {
-            throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+            separator = "";
+            //throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
         }
         if (source.Count <= 0)
         {
@@ -111,10 +112,9 @@ public static class AggregateExtensions
 
         var sb = new StringBuilder();
 
-
         if (separator.HasValue())
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (DataRow item in source)
                 {
@@ -125,17 +125,16 @@ public static class AggregateExtensions
             {
                 foreach (DataRow item in source)
                 {
-                    if (predicate.Invoke(item))
+                    if (func_predicate.Invoke(item))
                     {
                         sb.Append(item[columnName]).Append(separator);
                     }
                 }
             }
-
         }
         else
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (DataRow item in source)
                 {
@@ -146,7 +145,7 @@ public static class AggregateExtensions
             {
                 foreach (DataRow item in source)
                 {
-                    if (predicate.Invoke(item))
+                    if (func_predicate.Invoke(item))
                     {
                         sb.Append(item[columnName]);
                     }
@@ -162,25 +161,28 @@ public static class AggregateExtensions
         return txt;
     }
 
-    public static string AggregateToString(this DataRowCollection source, Func<DataRow, dynamic> content, string separator)
+    public static string AggregateToString(this DataRowCollection source, Func<DataRow, dynamic> func_predicate, string separator)
     {
-        return AggregateToString(source, null, content, separator);
+        return AggregateToString(source, null, func_predicate, separator);
     }
 
-    public static string AggregateToString(this DataRowCollection source, Func<DataRow, bool> predicate, Func<DataRow, dynamic> content, string separator)
+    public static string AggregateToString(this DataRowCollection source, Func<DataRow, bool> func_predicate, Func<DataRow, dynamic> func_content, string separator)
     {
         if (source is null)
         {
-            throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
+            return string.Empty;
+            //throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
         }
-        if (content is null)
+        if (func_content is null)
         {
-            throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
+            throw new ArgumentNullException($"{nameof(func_content)}参数不能为空", nameof(func_content));
         }
         if (separator is null)
         {
-            throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+            separator = "";
+            //throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
         }
+
         if (source.Count <= 0)
         {
             return string.Empty;
@@ -188,43 +190,42 @@ public static class AggregateExtensions
 
         var sb = new StringBuilder();
 
-
         if (separator.HasValue())
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (DataRow row in source)
                 {
-                    sb.Append(content.Invoke(row)).Append(separator);
+                    sb.Append(func_content.Invoke(row)).Append(separator);
                 }
             }
             else
             {
                 foreach (DataRow row in source)
                 {
-                    if (predicate.Invoke(row) == true)
+                    if (func_predicate.Invoke(row) == true)
                     {
-                        sb.Append(content.Invoke(row)).Append(separator);
+                        sb.Append(func_content.Invoke(row)).Append(separator);
                     }
                 }
             }
         }
         else
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (DataRow row in source)
                 {
-                    sb.Append(content.Invoke(row));
+                    sb.Append(func_content.Invoke(row));
                 }
             }
             else
             {
                 foreach (DataRow row in source)
                 {
-                    if (predicate.Invoke(row) == true)
+                    if (func_predicate.Invoke(row) == true)
                     {
-                        sb.Append(content.Invoke(row));
+                        sb.Append(func_content.Invoke(row));
                     }
                 }
             }
@@ -238,17 +239,22 @@ public static class AggregateExtensions
         return txt;
     }
 
-
-    /// <inheritdoc cref="AggregateToString{TSource}(IEnumerable{TSource}, Func{TSource, bool}, Func{TSource, TSource}, string, int, string)"/>
-    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> content, string separator)
+    /// <inheritdoc cref="AggregateToString{TSource}(IEnumerable{TSource}, Func{TSource, bool}, Func{TSource, TSource}, string, int, string, bool)"/>
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> func_content, string separator)
     {
-        return AggregateToString(source, null, content, separator, 0, string.Empty);
+        return AggregateToString(source, null, func_content, separator, 0, string.Empty, false);
     }
 
-    /// <inheritdoc cref="AggregateToString{TSource}(IEnumerable{TSource}, Func{TSource, bool}, Func{TSource, TSource}, string, int, string)"/>
-    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> content, string separator, int groupCount, string groupSeparator)
+    /// <inheritdoc cref="AggregateToString{TSource}(IEnumerable{TSource}, Func{TSource, bool}, Func{TSource, TSource}, string, int, string, bool)"/>
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> func_content, string separator, bool skipEmptyItem)
     {
-        return AggregateToString(source, null, content, separator, groupCount, groupSeparator);
+        return AggregateToString(source, null, func_content, separator, 0, string.Empty, skipEmptyItem);
+    }
+
+    /// <inheritdoc cref="AggregateToString{TSource}(IEnumerable{TSource}, Func{TSource, bool}, Func{TSource, TSource}, string, int, string, bool)"/>
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, TSource> func_content, string separator, int groupCount, string groupSeparator)
+    {
+        return AggregateToString(source, null, func_content, separator, groupCount, groupSeparator, false);
     }
 
     /// <summary>
@@ -256,32 +262,41 @@ public static class AggregateExtensions
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <param name="source"></param>
-    /// <param name="predicate"></param>
-    /// <param name="content"></param>
+    /// <param name="func_predicate"></param>
+    /// <param name="func_content"></param>
     /// <param name="separator"></param>
     /// <param name="groupCount">每个分组的数量</param>
     /// <param name="groupSeparator">分组的结尾符号</param>
+    /// <param name="skipEmptyItem">跳过空值的项,空值: null, 空字符串</param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="Exception"></exception>
-    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate, Func<TSource, TSource> content, string separator, int groupCount, string groupSeparator)
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source,
+        Func<TSource, bool> func_predicate, Func<TSource, TSource> func_content, string separator,
+        int groupCount, string groupSeparator,
+        bool skipEmptyItem)
     {
         if (source is null)
         {
-            throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
+            return string.Empty;
+            //throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
         }
-        if (content is null)
+        if (func_content is null)
         {
-            throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
+            throw new ArgumentNullException($"{nameof(func_content)}参数不能为空", nameof(func_content));
         }
         if (separator is null)
         {
-            throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+            separator = "";
+            //throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
         }
+
         if (source.Any() == false)
         {
             return string.Empty;
         }
+
+        var isStringCollection = typeof(TSource) == typeof(string);
 
 #if DEBUG
         if (source.GetType() == typeof(string)) // string is IEnumerable<TSource> == true
@@ -301,18 +316,26 @@ public static class AggregateExtensions
 
             if (separatorhasValue)
             {
-                if (predicate == null)
+                if (func_predicate == null)
                 {
                     foreach (var item in source)
                     {
+                        var content = func_content.Invoke(item);
+                        if (skipEmptyItem)
+                        {
+                            if (content == null || (isStringCollection && object.Equals("", content)))
+                            {
+                                continue;
+                            }
+                        }
+
                         if (appendGroupSeparator)
                         {
                             sb.Append(groupSeparator);
                             appendGroupSeparator = false;
                         }
                         count++;
-
-                        sb.Append(content.Invoke(item)).Append(separator);
+                        sb.Append(content).Append(separator);
                         if (count > 0 && count % groupCount == 0)
                         {
                             appendGroupSeparator = true;
@@ -323,16 +346,24 @@ public static class AggregateExtensions
                 {
                     foreach (var item in source)
                     {
-                        if (predicate.Invoke(item))
+                        if (func_predicate.Invoke(item))
                         {
+                            var content = func_content.Invoke(item);
+                            if (skipEmptyItem)
+                            {
+                                if (content == null || (isStringCollection && object.Equals("", content)))
+                                {
+                                    continue;
+                                }
+                            }
+
                             if (appendGroupSeparator)
                             {
                                 sb.Append(groupSeparator);
                                 appendGroupSeparator = false;
                             }
                             count++;
-
-                            sb.Append(content.Invoke(item)).Append(separator);
+                            sb.Append(content).Append(separator);
                             if (count > 0 && count % groupCount == 0)
                             {
                                 appendGroupSeparator = true;
@@ -340,21 +371,28 @@ public static class AggregateExtensions
                         }
                     }
                 }
-
             }
             else
             {
-                if (predicate == null)
+                if (func_predicate == null)
                 {
                     foreach (var item in source)
                     {
+                        var content = func_content.Invoke(item);
+                        if (skipEmptyItem)
+                        {
+                            if (content == null || (isStringCollection && object.Equals("", content)))
+                            {
+                                continue;
+                            }
+                        }
                         if (appendGroupSeparator)
                         {
                             sb.Append(groupSeparator);
                             appendGroupSeparator = false;
                         }
                         count++;
-                        sb.Append(content.Invoke(item));
+                        sb.Append(content);
                         if (count > 0 && count % groupCount == 0)
                         {
                             appendGroupSeparator = true;
@@ -365,15 +403,25 @@ public static class AggregateExtensions
                 {
                     foreach (var item in source)
                     {
-                        if (predicate.Invoke(item))
+                        if (func_predicate.Invoke(item))
                         {
+                            var content = func_content.Invoke(item);
+                            if (skipEmptyItem)
+                            {
+                                if (content == null || (isStringCollection && object.Equals("", content)))
+                                {
+                                    continue;
+                                }
+                            }
+
                             if (appendGroupSeparator)
                             {
                                 sb.Append(groupSeparator);
                                 appendGroupSeparator = false;
                             }
                             count++;
-                            sb.Append(content.Invoke(item));
+
+                            sb.Append(content);
                             if (count > 0 && count % groupCount == 0)
                             {
                                 appendGroupSeparator = true;
@@ -387,40 +435,72 @@ public static class AggregateExtensions
         {
             if (separatorhasValue)
             {
-                if (predicate == null)
+                if (func_predicate == null)
                 {
                     foreach (var item in source)
                     {
-                        sb.Append(content.Invoke(item)).Append(separator);
+                        var content = func_content.Invoke(item);
+                        if (skipEmptyItem)
+                        {
+                            if (content == null || (isStringCollection && object.Equals("", content)))
+                            {
+                                continue;
+                            }
+                        }
+                        sb.Append(content).Append(separator);
                     }
                 }
                 else
                 {
                     foreach (var item in source)
                     {
-                        if (predicate.Invoke(item))
+                        if (func_predicate.Invoke(item))
                         {
-                            sb.Append(content.Invoke(item)).Append(separator);
+                            var content = func_content.Invoke(item);
+                            if (skipEmptyItem)
+                            {
+                                if (content == null || (isStringCollection && object.Equals("", content)))
+                                {
+                                    continue;
+                                }
+                            }
+                            sb.Append(content).Append(separator);
                         }
                     }
                 }
             }
             else
             {
-                if (predicate == null)
+                if (func_predicate == null)
                 {
                     foreach (var item in source)
                     {
-                        sb.Append(content.Invoke(item));
+                        var content = func_content.Invoke(item);
+                        if (skipEmptyItem)
+                        {
+                            if (content == null || (isStringCollection && object.Equals("", content)))
+                            {
+                                continue;
+                            }
+                        }
+                        sb.Append(content);
                     }
                 }
                 else
                 {
                     foreach (var item in source)
                     {
-                        if (predicate.Invoke(item))
+                        if (func_predicate.Invoke(item))
                         {
-                            sb.Append(content.Invoke(item));
+                            var content = func_content.Invoke(item);
+                            if (skipEmptyItem)
+                            {
+                                if (content == null || (isStringCollection && object.Equals("", content)))
+                                {
+                                    continue;
+                                }
+                            }
+                            sb.Append(content);
                         }
                     }
                 }
@@ -441,10 +521,9 @@ public static class AggregateExtensions
         return txt;
     }
 
-
-    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> content, string separator)
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, dynamic> func_content, string separator)
     {
-        return AggregateToString(source, null, content, separator);
+        return AggregateToString(source, null, func_content, separator);
     }
 
     /// <summary>
@@ -452,25 +531,27 @@ public static class AggregateExtensions
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <param name="source"></param>
-    /// <param name="predicate"></param>
-    /// <param name="content">dynamic的目的: 调用端不用刻意的使用 ToString()</param>
+    /// <param name="func_predicate"></param>
+    /// <param name="func_content">dynamic的目的: 调用端不用刻意的使用 ToString()</param>
     /// <param name="separator"></param>
     /// <returns>没有值时返回""</returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="Exception"></exception>
-    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> predicate, Func<TSource, dynamic> content, string separator)
+    public static string AggregateToString<TSource>(this IEnumerable<TSource> source, Func<TSource, bool> func_predicate, Func<TSource, dynamic> func_content, string separator)
     {
         if (source is null)
         {
-            throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
+            return string.Empty;
+            //throw new ArgumentNullException($"{nameof(source)}参数不能为空", nameof(source));
         }
-        if (content is null)
+        if (func_content is null)
         {
-            throw new ArgumentNullException($"{nameof(content)}参数不能为空", nameof(content));
+            throw new ArgumentNullException($"{nameof(func_content)}参数不能为空", nameof(func_content));
         }
         if (separator is null)
         {
-            throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
+            separator = "";
+            //throw new ArgumentNullException($"{nameof(separator)}参数不能为空", nameof(separator));
         }
 
         if (source.Any() == false)
@@ -491,41 +572,40 @@ public static class AggregateExtensions
 
         if (separatorhasValue)
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (var item in source)
                 {
-                    sb.Append(content.Invoke(item)).Append(separator);
+                    sb.Append(func_content.Invoke(item)).Append(separator);
                 }
             }
             else
             {
                 foreach (var item in source)
                 {
-                    if (predicate.Invoke(item))
+                    if (func_predicate.Invoke(item))
                     {
-                        sb.Append(content.Invoke(item)).Append(separator);
+                        sb.Append(func_content.Invoke(item)).Append(separator);
                     }
                 }
             }
-
         }
         else
         {
-            if (predicate == null)
+            if (func_predicate == null)
             {
                 foreach (var item in source)
                 {
-                    sb.Append(content.Invoke(item));
+                    sb.Append(func_content.Invoke(item));
                 }
             }
             else
             {
                 foreach (var item in source)
                 {
-                    if (predicate.Invoke(item))
+                    if (func_predicate.Invoke(item))
                     {
-                        sb.Append(content.Invoke(item));
+                        sb.Append(func_content.Invoke(item));
                     }
                 }
             }
