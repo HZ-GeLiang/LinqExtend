@@ -3,7 +3,7 @@
 //对外的, 命名空间简单点
 namespace LinqExtend.EF;
 
-public static class IQueryableExtension
+public static class IQueryableExtensions
 {
     #region 是否有值
 
