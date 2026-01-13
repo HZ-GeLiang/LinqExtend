@@ -9,6 +9,25 @@ namespace LinqExtend;
 /// </summary>
 public static class AggregateExtensions
 {
+
+    public static string AggregateToString<TKey, TValue>(this Dictionary<TKey, TValue> source,
+        Func<KeyValuePair<TKey, TValue>, string> func_content, string separator)
+    {
+        if (source == null)
+        {
+            return string.Empty;
+        }
+
+        List<string> list = new List<string>(source.Count);
+        foreach (var item in source)
+        {
+            list.Add(func_content.Invoke(item));
+        }
+
+        return list.AggregateToString(a => a, separator);
+    }
+
+
     #region 常见的列表对象调用 AggregateToString, 表现形式一般为 list.AggregateToString(a => a,",")
 
     public static string AggregateToString<TKey, TValue>(this Dictionary<TKey, TValue>.KeyCollection keys, string separator)
