@@ -9,7 +9,6 @@ namespace LinqExtend;
 /// </summary>
 public static class AggregateExtensions
 {
-
     public static string AggregateToString<TKey, TValue>(this Dictionary<TKey, TValue> source,
         Func<KeyValuePair<TKey, TValue>, string> func_content, string separator)
     {
@@ -26,7 +25,6 @@ public static class AggregateExtensions
 
         return list.AggregateToString(a => a, separator);
     }
-
 
     #region 常见的列表对象调用 AggregateToString, 表现形式一般为 list.AggregateToString(a => a,",")
 

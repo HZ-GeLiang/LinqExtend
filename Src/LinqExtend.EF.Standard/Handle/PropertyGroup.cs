@@ -285,8 +285,6 @@ internal class PropertyGroup
 #endif
                 //Debug.WriteLine(msg);
                 Console.ResetColor();
-
-
             }
         }
 
